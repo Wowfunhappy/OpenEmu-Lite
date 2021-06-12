@@ -111,13 +111,13 @@ static const CGFloat _OEHUDWindowTopBorder             = 22.0;
 //    [self OE_commonHUDWindowInit];
 //}
 
-//- (void)dealloc 
-//{
-//    _isDeallocating = YES;
-//    _borderWindow = nil;
-//    [super setDelegate:nil];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self];
-//}
+- (void)dealloc 
+{
+    _isDeallocating = YES;
+    _borderWindow = nil;
+    [super setDelegate:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)anItem
 {
@@ -183,10 +183,10 @@ static const CGFloat _OEHUDWindowTopBorder             = 22.0;
 // 2. [self setHasShadow:NO]; [self setHasShadow:YES] in -OE_layout makes the shadow appear only when the user resizes the window.
 //    This same -setHasShadow: dance does *not* make the shadow appear upon the window being ordered front;
 // 3. -display may prevent the shadow from appearing.
-//- (BOOL)hasShadow
-//{
-//    return YES;
-//}
+- (BOOL)hasShadow
+{
+    return YES;
+}
 
 // If we don’t override -orderWindow:relativeTo:, the border window may be ordered below the HUD window even
 // if it was added as a child window ordered above its parent window, thus preventing OEHUDWindowThemeView
@@ -233,21 +233,21 @@ static const CGFloat _OEHUDWindowTopBorder             = 22.0;
     [self addChildWindow:_borderWindow ordered:NSWindowAbove];*/
 }
 
-//- (void)OE_setupBackgroundView
-//{
-//    NSRect contentRect = [self frame];
-//    contentRect.origin = NSZeroPoint;
-//
-//    contentRect.origin.x    += _OEHUDWindowLeftBorder;
-//    contentRect.origin.y    += _OEHUDWindowBottomBorder;
-//    contentRect.size.width  -= (_OEHUDWindowLeftBorder + _OEHUDWindowRightBorder);
-//    contentRect.size.height -= (_OEHUDWindowTopBorder  + _OEHUDWindowBottomBorder);
-//    _backgroundView = [[NSBox alloc] initWithFrame:contentRect];
-//    [_backgroundView setBoxType:NSBoxCustom];
-//    [_backgroundView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-//
-//    [[super contentView] addSubview:_backgroundView positioned:NSWindowBelow relativeTo:nil];
-//}
+- (void)OE_setupBackgroundView
+{
+    NSRect contentRect = [self frame];
+    contentRect.origin = NSZeroPoint;
+
+    contentRect.origin.x    += _OEHUDWindowLeftBorder;
+    contentRect.origin.y    += _OEHUDWindowBottomBorder;
+    contentRect.size.width  -= (_OEHUDWindowLeftBorder + _OEHUDWindowRightBorder);
+    contentRect.size.height -= (_OEHUDWindowTopBorder  + _OEHUDWindowBottomBorder);
+    _backgroundView = [[NSBox alloc] initWithFrame:contentRect];
+    [_backgroundView setBoxType:NSBoxCustom];
+    [_backgroundView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+
+    [[super contentView] addSubview:_backgroundView positioned:NSWindowBelow relativeTo:nil];
+}
 
 //- (void)OE_layout
 //{

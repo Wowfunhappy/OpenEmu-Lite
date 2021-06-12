@@ -511,145 +511,36 @@ typedef enum
 //    }];
 //}
 //
-//- (void)windowDidEnterFullScreen:(NSNotification *)notification
-//{
-//    _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusFullScreen;
-//
-//    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-//    if(_resumePlayingAfterFullScreenTransition)
-//        [[self document] setEmulationPaused:NO];
-//
-//    [[gameViewController controlsWindow] hide];
-//    [[gameViewController controlsWindow] setCanShow:YES];
-//    [NSCursor unhide];
-//}
-//
-//- (void)windowWillExitFullScreen:(NSNotification *)notification
-//{
-//    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-//
-//    _fullScreenStatus                        = _OEPopoutGameWindowFullScreenStatusExiting;
-//    _resumePlayingAfterFullScreenTransition  = ![[self document] isEmulationPaused];
-//    
-//    [[self document] setEmulationPaused:YES];
-//    
-//    [NSCursor hide];
-//    [[gameViewController controlsWindow] setCanShow:NO];
-//    [[gameViewController controlsWindow] hide];
-//}
-//
-//- (NSArray *)customWindowsToExitFullScreenForWindow:(NSWindow *)window
-//{
-//    return @[[self window], _screenshotWindow];
-//}
 
-//- (void)window:(NSWindow *)window startCustomAnimationToExitFullScreenWithDuration:(NSTimeInterval)duration
-//{
-//    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-//    OEGameView *gameView                     = [gameViewController gameView];
-//    CALayer *layer                           = [[_screenshotWindow screenshotView] layer];
-//    NSView *contentView                      = [(OEHUDWindow *)window mainContentView];
-//    NSScreen *mainScreen                     = [[NSScreen screens] objectAtIndex:0];
-//    const NSRect screenFrame                 = [mainScreen frame];
-//    const NSRect fullScreenGameArea          = [self OE_screenshotWindowFrameForOriginalFrame:screenFrame];
-//    const NSTimeInterval showBorderDuration  = duration / 4;
-//    const NSTimeInterval resizeDuration      = duration - showBorderDuration;
-//
-//    [_screenshotWindow setScreenshot:[gameView screenshot]];
-//    [self OE_forceLayerReposition:layer toFrame:fullScreenGameArea];
-//    [_screenshotWindow orderFront:self];
-//
-//    const NSRect contentFrame          = [OEHUDWindow mainContentRectForFrameRect:_frameForNonFullScreenMode];
-//    const NSRect screenshotWindowFrame = [self OE_screenshotWindowFrameForOriginalFrame:contentFrame];
-//
-//    // Restore the window to its original frame
-//    {
-//        [window setAlphaValue:0.0];
-//        [window setFrame:_frameForNonFullScreenMode display:YES];
-//
-//        // Resize the content view so that it takes window decoration into account
-//        NSRect contentRect = [window convertRectFromScreen:[OEHUDWindow mainContentRectForFrameRect:_frameForNonFullScreenMode]];
-//        [contentView setFrame:contentRect];
-//    }
-//
-//    CABasicAnimation *moveToPosition = [CABasicAnimation animationWithKeyPath:@"position"];
-//    moveToPosition.fromValue = [NSValue valueWithPoint:fullScreenGameArea.origin];
-//    moveToPosition.toValue = [NSValue valueWithPoint:screenshotWindowFrame.origin];
-//    moveToPosition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-//    moveToPosition.duration = resizeDuration;
-//    moveToPosition.fillMode = kCAFillModeForwards;
-//    moveToPosition.removedOnCompletion = NO;
-//
-//    CABasicAnimation *scaleToSize = [CABasicAnimation animationWithKeyPath:@"bounds.size"];
-//    scaleToSize.fromValue = [NSValue valueWithSize:fullScreenGameArea.size];
-//    scaleToSize.toValue = [NSValue valueWithSize:screenshotWindowFrame.size];
-//    scaleToSize.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-//    scaleToSize.duration = resizeDuration;
-//    scaleToSize.fillMode = kCAFillModeForwards;
-//    scaleToSize.removedOnCompletion = NO;
-//
-//    // Scale the screenshot window down
-//    [CATransaction begin];
-//    [CATransaction setCompletionBlock:^{
-//        // Fade the real window back in after the scaling is done
-//        [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-//            [context setDuration:showBorderDuration];
-//
-//            [[window animator] setAlphaValue:1.0];
-//            //[[[(OEHUDWindow *)[self window] borderWindow] animator] setAlphaValue:1.0];
-//        } completionHandler:^{
-//            [self OE_hideScreenshotWindow];
-//        }];
-//    }];
-//
-//    [_screenshotWindow.screenshotView.layer addAnimation:moveToPosition forKey:@"moveToPosition"];
-//    [_screenshotWindow.screenshotView.layer addAnimation:scaleToSize forKey:@"scaleToSize"];
-//
-//    [CATransaction commit];
-//}
-//
-//- (void)windowDidExitFullScreen:(NSNotification *)notification
-//{
-//    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-//
-//    _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusNonFullScreen;
-//
-//    [[self window] setAnimationBehavior:NSWindowAnimationBehaviorDocumentWindow];
-//    [[self window] makeKeyAndOrderFront:self];
-//
-//    if(_resumePlayingAfterFullScreenTransition)
-//        [[self document] setEmulationPaused:NO];
-//
-//    [[gameViewController controlsWindow] hide];
-//    [[gameViewController controlsWindow] setCanShow:YES];
-//    [NSCursor unhide];
-//}
-//
-//- (void)windowDidFailToEnterFullScreen:(NSWindow *)window
-//{
-//    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-//
-//    _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusNonFullScreen;
-//
-//    if(_resumePlayingAfterFullScreenTransition)
-//        [[self document] setEmulationPaused:NO];
-//
-//    [[gameViewController controlsWindow] setCanShow:YES];
-//    [NSCursor unhide];
-//}
-//
-//- (void)windowDidFailToExitFullScreen:(NSWindow *)window
-//{
-//    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-//
-//    _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusFullScreen;
-//
-//    if(_resumePlayingAfterFullScreenTransition)
-//        [[self document] setEmulationPaused:NO];
-//
-//    [[gameViewController controlsWindow] setCanShow:YES];
-//    [NSCursor unhide];
-//}
+
+
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
+    [[gameViewController controlsWindow] hide];
+    [[gameViewController controlsWindow] setCanShow:NO];
+}
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
+    [[gameViewController controlsWindow] show];
+    [[gameViewController controlsWindow] setCanShow:YES];
+    _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusFullScreen;
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
+    [[gameViewController controlsWindow] setCanShow:NO];
+    [[gameViewController controlsWindow] hide];
+}
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
+    [[gameViewController controlsWindow] setCanShow:YES];
+    [[gameViewController controlsWindow] show];
+    _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusNonFullScreen;
+}
 
 @end
 
