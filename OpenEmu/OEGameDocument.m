@@ -506,10 +506,15 @@ typedef enum : NSUInteger
 
 - (void)showInSeparateWindowInFullScreen:(BOOL)fullScreen;
 {
-    OEHUDWindow *window = [[OEHUDWindow alloc] initWithContentRect:NSZeroRect];
+    //OEHUDWindow *window = [[OEHUDWindow alloc] initWithContentRect:NSZeroRect];
+    //OEPopoutGameWindowController *windowController = [[OEPopoutGameWindowController alloc] initWithWindow:window];
+    
+    NSWindow *window = [[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:
+                        NSTitledWindowMask | NSResizableWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask
+                                                     backing:NSBackingStoreBuffered defer:NO];
     OEPopoutGameWindowController *windowController = [[OEPopoutGameWindowController alloc] initWithWindow:window];
 
-    [windowController setWindowFullScreen:fullScreen];
+    //[windowController setWindowFullScreen:fullScreen];
     [self setGameWindowController:windowController];
     [self showWindows];
 
