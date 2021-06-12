@@ -165,7 +165,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(libraryDatabaseDidLoad:) name:OELibraryDidLoadNotificationName object:nil];
 
-    [[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
+    //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self loadDatabase];
@@ -179,19 +179,19 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [self OE_loadPlugins];
 
     DLog();
-    mainWindowController  = [[OEMainWindowController alloc]  initWithWindowNibName:@"MainWindow"];
-    [mainWindowController loadWindow];
+    //mainWindowController  = [[OEMainWindowController alloc]  initWithWindowNibName:@"MainWindow"];
+    //[mainWindowController loadWindow];
     preferencesController = [[OEPreferencesController alloc] initWithWindowNibName:@"Preferences"];
     [preferencesController loadWindow];
 
     _gameDocuments = [NSMutableArray array];
 
     // Remove the Open Recent menu item
-    NSMenu *fileMenu = [self fileMenu];
+    /*NSMenu *fileMenu = [self fileMenu];
     NSInteger openDocumentMenuItemIndex = [fileMenu indexOfItemWithTarget:nil andAction:@selector(openDocument:)];
 
     if(openDocumentMenuItemIndex >= 0 && [[fileMenu itemAtIndex:openDocumentMenuItemIndex + 1] hasSubmenu])
-        [fileMenu removeItemAtIndex:openDocumentMenuItemIndex + 1];
+        [fileMenu removeItemAtIndex:openDocumentMenuItemIndex + 1];*/
 
     // Run Migration Manager
     [[OEVersionMigrationController defaultMigrationController] runMigrationIfNeeded];
@@ -391,7 +391,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
          if(completionHandler != nil)
              completionHandler(document, documentWasAlreadyOpen, error);
          
-         [[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
+         //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
      }];
 }
 

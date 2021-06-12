@@ -630,14 +630,14 @@ typedef enum : NSUInteger
 
                 // Ugly hack to start imported games in main window
                 OEMainWindowController *mainWindowController = [(OEApplicationDelegate*)[NSApp delegate] mainWindowController];
-                if([mainWindowController mainWindowRunsGame] == NO)
+                /*if([mainWindowController mainWindowRunsGame] == NO)
                 {
                     [mainWindowController startGame:[rom game]];
                 }
                 else
-                {
+                {*/
                     [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[rom URL] display:NO completionHandler:nil];
-                }
+                //}
             }
         };
 
