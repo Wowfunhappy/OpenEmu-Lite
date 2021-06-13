@@ -203,7 +203,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [self OE_setupHIDSupport];
 
     // Replace quick save / quick load items with menus if required
-    [self OE_updateControlsMenu];
+    //[self OE_updateControlsMenu];
 
     // Preload Composition plugins so HUDControls Bar and Gameplay Preferneces load faster
     [OECompositionPlugin allPluginNames];
@@ -796,7 +796,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     return YES;
 }
 
-- (void)OE_updateControlsMenu
+/*- (void)OE_updateControlsMenu
 {
     const NSUInteger SaveStateSlotCount = 10;
 
@@ -873,7 +873,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [controlsMenu setAutoenablesItems:YES];
     [controlsMenu update];
 
-}
+}*/
 #pragma mark - KVO
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
