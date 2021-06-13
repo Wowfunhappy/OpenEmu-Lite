@@ -375,7 +375,6 @@
 		83200BF9162F5C1C00BCFA9D /* OESidebarBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 83200BF8162F5C1C00BCFA9D /* OESidebarBackgroundView.m */; };
 		8328D9E513C75CAE0026D2A7 /* OEDBImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8328D9E413C75CAE0026D2A7 /* OEDBImage.m */; };
 		832AB28C18649B550022DFB0 /* 1.0 Beta 4 to 1.0.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 832AB28B18649B550022DFB0 /* 1.0 Beta 4 to 1.0.xcmappingmodel */; };
-		832D29401451A68700BDF950 /* OEMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 832D293F1451A68700BDF950 /* OEMainWindowController.m */; };
 		832D29431451ACF200BDF950 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 832D29421451ACF200BDF950 /* MainWindow.xib */; };
 		832F7F94196EAE4D004F10D4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 832F7F93196EAE4D004F10D4 /* WebKit.framework */; };
 		832FA8801455526E00BBBD94 /* NSControl+OEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 832FA87F1455526E00BBBD94 /* NSControl+OEAdditions.m */; };
@@ -1993,8 +1992,6 @@
 		8328D9E413C75CAE0026D2A7 /* OEDBImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = OEDBImage.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		832AB285186496990022DFB0 /* OEDatabase 1.0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "OEDatabase 1.0.xcdatamodel"; sourceTree = "<group>"; };
 		832AB28B18649B550022DFB0 /* 1.0 Beta 4 to 1.0.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = "1.0 Beta 4 to 1.0.xcmappingmodel"; sourceTree = "<group>"; };
-		832D293E1451A68700BDF950 /* OEMainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEMainWindowController.h; sourceTree = "<group>"; };
-		832D293F1451A68700BDF950 /* OEMainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEMainWindowController.m; sourceTree = "<group>"; };
 		832D29421451ACF200BDF950 /* MainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		832F7F93196EAE4D004F10D4 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		832FA87E1455526E00BBBD94 /* NSControl+OEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSControl+OEAdditions.h"; sourceTree = "<group>"; };
@@ -4018,8 +4015,6 @@
 			isa = PBXGroup;
 			children = (
 				83FC3CC4156D155B00F0CDB6 /* OEMainWindowContentController.h */,
-				832D293E1451A68700BDF950 /* OEMainWindowController.h */,
-				832D293F1451A68700BDF950 /* OEMainWindowController.m */,
 				832D29441451B0CA00BDF950 /* MainWindow: Library */,
 				53439AE813B92E72005C0CC8 /* Controls */,
 			);
@@ -8044,7 +8039,6 @@
 				3DFAB00D144644D4005EF0C3 /* OEGameShader.m in Sources */,
 				83C68ED114483579000F720A /* OEHUDAlert.m in Sources */,
 				831C2AE4144F41E4009533C0 /* OEApplicationDelegate.m in Sources */,
-				832D29401451A68700BDF950 /* OEMainWindowController.m in Sources */,
 				832FA8801455526E00BBBD94 /* NSControl+OEAdditions.m in Sources */,
 				8301557B1456BF7A0093D681 /* OEGameViewController.m in Sources */,
 				A6F3061218AF3BB7007CF986 /* INWindowButton.m in Sources */,

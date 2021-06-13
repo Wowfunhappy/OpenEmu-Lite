@@ -50,9 +50,6 @@
 #import "NSView+FadeImage.h"
 #import "NSViewController+OEAdditions.h"
 
-// using the main window controller here is not very nice, but meh
-#import "OEMainWindowController.h"
-
 #import <objc/message.h>
 
 NSString *const OEGameCoreManagerModePreferenceKey = @"OEGameCoreManagerModePreference";

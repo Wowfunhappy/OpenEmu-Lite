@@ -26,7 +26,6 @@
 
 #import "OECollectionViewController.h"
 #import "NSImage+OEDrawingAdditions.h"
-#import "OEMainWindowController.h"
 #import "OEGameViewController.h"
 #import "OEGameDocument.h"
 

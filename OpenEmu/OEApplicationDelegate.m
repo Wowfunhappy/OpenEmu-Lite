@@ -39,7 +39,6 @@
 #import "NSImage+OEDrawingAdditions.h"
 #import "NSWindow+OEFullScreenAdditions.h"
 
-#import "OEMainWindowController.h"
 #import "OELibraryController.h"
 
 #import "OEHUDAlert+DefaultAlertsAdditions.h"
@@ -194,15 +193,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     // Replace quick save / quick load items with menus if required
     //[self OE_updateControlsMenu];
 
-    // Preload Composition plugins so HUDControls Bar and Gameplay Preferneces load faster
-    [OECompositionPlugin allPluginNames];
-
-    [mainWindowController showWindow:self];
-
-    BOOL startInFullscreen = [[NSUserDefaults standardUserDefaults] boolForKey:OEMainWindowFullscreenKey];
-    if(startInFullscreen != [[mainWindowController window] isFullScreen])
-        [[mainWindowController window] toggleFullScreen:self];
-
     NSUserDefaultsController *sudc = [NSUserDefaultsController sharedUserDefaultsController];
     [self bind:@"logHIDEvents" toObject:sudc withKeyPath:@"values.logsHIDEvents" options:nil];
     [self bind:@"logKeyboardEvents" toObject:sudc withKeyPath:@"values.logsHIDEventsNoKeyboard" options:nil];
@@ -236,10 +226,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-    if(_libraryLoaded)
-        [mainWindowController showWindow:self];
-    else
-        [[self startupQueue] addObject:^{[mainWindowController showWindow:self];}];
 
     return NO;
 }
@@ -362,10 +348,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
      {
          if([document isKindOfClass:[OEGameDocument class]])
          {
-             NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-             BOOL fullScreen = [standardDefaults boolForKey:OEFullScreenGameWindowKey];
-
-             [self OE_setupGameDocument:(OEGameDocument*)document display:YES fullScreen:fullScreen completionHandler:nil];
+             [self OE_setupGameDocument:(OEGameDocument*)document display:YES fullScreen:NO completionHandler:nil];
          }
          
          if([[error domain] isEqualToString:OEGameDocumentErrorDomain] && [error code] == OEImportRequiredError)
@@ -617,11 +600,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 - (NSString *)aboutCreditsPath
 {
     return [[NSBundle mainBundle] pathForResource:@"Credits" ofType:@"rtf"];
-}
-
-- (IBAction)showOpenEmuWindow:(id)sender;
-{
-    [[self mainWindowController] showWindow:sender];
 }
 
 - (IBAction)openWeblink:(id)sender

@@ -492,10 +492,10 @@ extern NSString * const OEGameControlsBarCanDeleteSaveStatesKey;
     }
     else
     {
-        if([[NSUserDefaults standardUserDefaults] boolForKey:OEForcePopoutGameWindowKey])
-        {
-            [menu addItemWithTitle:OELocalizedString(@"Play Games (Caution)", @"") action:@selector(startGame:) keyEquivalent:@""];
-        }
+//        if([[NSUserDefaults standardUserDefaults] boolForKey:OEForcePopoutGameWindowKey])
+//        {
+//            [menu addItemWithTitle:OELocalizedString(@"Play Games (Caution)", @"") action:@selector(startGame:) keyEquivalent:@""];
+//        }
 
         // Create Rating Item
         menuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Rating", @"") action:NULL keyEquivalent:@""];
