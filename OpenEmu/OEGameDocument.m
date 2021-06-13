@@ -511,6 +511,7 @@ typedef enum : NSUInteger
     
     NSWindow *window = [[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:
                         NSTitledWindowMask | NSResizableWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask
+
                                                      backing:NSBackingStoreBuffered defer:NO];
     OEPopoutGameWindowController *windowController = [[OEPopoutGameWindowController alloc] initWithWindow:window];
 

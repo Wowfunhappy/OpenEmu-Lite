@@ -148,7 +148,7 @@ typedef enum
         [window center];
         [window setContentAspectRatio:[gameViewController defaultScreenSize]];
         [[window contentView] addSubview:[gameViewController view]];
-        const NSRect contentRect = [window convertRectFromScreen:[window frame]];
+        const NSRect contentRect = [[window contentView]frame];
         [[gameViewController view] setFrame:contentRect];
         [[gameViewController view] setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 
@@ -159,26 +159,16 @@ typedef enum
 - (void)showWindow:(id)sender
 {
     NSWindow *window = [self window];
-    const BOOL needsToggleFullScreen = (!![self isWindowFullScreen] != !![window isFullScreen]);
 
     if(![window isVisible])
     {
         OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-
-        // We disable window animation if we need to toggle full screen because two parallel animations
-        // (window being ordered front and toggling full-screen) looks painfully ugly. The animation
-        // behaviour is restored in -windowDidExitFullScreen:.
-        if(needsToggleFullScreen)
-            [window setAnimationBehavior:NSWindowAnimationBehaviorNone];
         
         [window makeKeyAndOrderFront:sender];
 
         [gameViewController viewWillAppear];
         [gameViewController viewDidAppear];
     }
-
-    if(needsToggleFullScreen)
-        [window toggleFullScreen:self];
 }
 
 #pragma mark - Actions
@@ -234,7 +224,9 @@ typedef enum
     const NSSize contentSize = [self OE_windowContentSizeForGameViewIntegralScale:gameViewIntegralScale];
     const NSSize windowSize  = [OEHUDWindow frameRectForMainContentRect:(NSRect){.size = contentSize}].size;
 
-    return windowSize;
+    //Wowfunhappy: For some reason, windowSize is one pixel too high by default, screwing up integer scaling.
+    //Meticulously confirmed by looking at striped patterns NESTopia and SNES 9X cores.
+    return NSMakeSize(windowSize.width, windowSize.height - 1);
 }
 
 - (void)OE_changeGameViewIntegralScale:(unsigned int)newScale
@@ -406,13 +398,13 @@ typedef enum
     [gameViewController viewDidDisappear];
 }
 
-- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
-{
-    _integralScale = _OEFitToWindowScale;
-    const NSSize windowSize  = [OEHUDWindow frameRectForMainContentRect:(NSRect){.size = frameSize}].size;
-
-    return windowSize;
-}
+//- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
+//{
+//    _integralScale = _OEFitToWindowScale;
+//    const NSSize windowSize  = [OEHUDWindow frameRectForMainContentRect:(NSRect){.size = frameSize}].size;
+//
+//    return windowSize;
+//}
 
 - (void)cancelOperation:(id)sender
 {
@@ -426,29 +418,21 @@ typedef enum
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-    [[gameViewController controlsWindow] hide];
-    [[gameViewController controlsWindow] setCanShow:NO];
+    NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
+    [[self window] setContentAspectRatio:NSMakeSize(mainDisplayRect.size.width, mainDisplayRect.size.height)];
 }
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
-    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-    [[gameViewController controlsWindow] show];
-    [[gameViewController controlsWindow] setCanShow:YES];
     _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusFullScreen;
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
     OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-    [[gameViewController controlsWindow] setCanShow:NO];
-    [[gameViewController controlsWindow] hide];
+    [[self window] setContentAspectRatio:[gameViewController defaultScreenSize]];
 }
 - (void)windowDidExitFullScreen:(NSNotification *)notification
 {
-    OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-    [[gameViewController controlsWindow] setCanShow:YES];
-    [[gameViewController controlsWindow] show];
     _fullScreenStatus = _OEPopoutGameWindowFullScreenStatusNonFullScreen;
 }
 
