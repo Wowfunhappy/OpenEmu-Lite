@@ -758,7 +758,6 @@ typedef enum : NSUInteger
          _emulationStatus = OEEmulationStatusPlaying;
      }];
     
-    [[self gameViewController] reflectEmulationPaused:NO];
 }
 
 - (BOOL)isEmulationPaused
@@ -790,7 +789,6 @@ typedef enum : NSUInteger
     }
 
     [_gameCoreManager setPauseEmulation:pauseEmulation];
-    [[self gameViewController] reflectEmulationPaused:pauseEmulation];
 }
 
 // switchCore:: expects sender or [sender representedObject] to be an OECorePlugin object and prompts the user for confirmation
@@ -880,7 +878,6 @@ typedef enum : NSUInteger
 - (void)setVolume:(float)volume asDefault:(BOOL)defaultFlag
 {
     [_gameCoreManager setVolume:volume];
-    [[self gameViewController] reflectVolume:volume];
 
     if(defaultFlag)
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithFloat:volume] forKey:OEGameVolumeKey];

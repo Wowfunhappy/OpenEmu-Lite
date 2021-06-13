@@ -49,7 +49,6 @@ static NSArray *OE_defaultSortDescriptors;
 extern NSString * const OEGameControlsBarCanDeleteSaveStatesKey;
 
 @interface OEGameCollectionViewController ()
-- (NSMenu *)OE_saveStateMenuForGame:(OEDBGame *)game;
 - (NSMenu *)OE_ratingMenuForGames:(NSArray *)games;
 - (NSMenu *)OE_collectionsMenuForGames:(NSArray *)games;
 
@@ -456,7 +455,6 @@ extern NSString * const OEGameControlsBarCanDeleteSaveStatesKey;
 
         // Create Save Game Menu
         menuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Play Save Games", @"") action:NULL keyEquivalent:@""];
-        [menuItem setSubmenu:[self OE_saveStateMenuForGame:game]];
         [menu addItem:menuItem];
 
         [menu addItem:[NSMenuItem separatorItem]];
@@ -529,46 +527,6 @@ extern NSString * const OEGameControlsBarCanDeleteSaveStatesKey;
     
     [menu setAutoenablesItems:YES];
     return menu;
-}
-
-- (NSMenu *)OE_saveStateMenuForGame:(OEDBGame *)game
-{
-    NSMenu    *saveGamesMenu = [[NSMenu alloc] init];
-    NSSet     *roms = [game roms];
-
-    [roms enumerateObjectsUsingBlock:^(id obj, BOOL *stop) {
-        [obj removeMissingStates];
-
-        NSMenuItem  *item;
-        NSArray     *saveStates = [obj normalSaveStatesByTimestampAscending:NO];
-        for(OEDBSaveState *saveState in saveStates)
-        {
-            NSString *itemTitle = [saveState name];
-            if(!itemTitle || [itemTitle isEqualToString:@""])
-                itemTitle = [NSString stringWithFormat:@"%@", [saveState timestamp]];
-
-            item = [[NSMenuItem alloc] initWithTitle:itemTitle action:@selector(startSelectedGameWithSaveState:) keyEquivalent:@""];
-            [item setRepresentedObject:saveState];
-            [saveGamesMenu addItem:item];
-
-            if([[NSUserDefaults standardUserDefaults] boolForKey:OEGameControlsBarCanDeleteSaveStatesKey])
-            {
-                NSMenuItem *alternateItem = [[NSMenuItem alloc] initWithTitle:itemTitle action:@selector(deleteSaveState:) keyEquivalent:@""];
-                [alternateItem setAlternate:YES];
-                [alternateItem setKeyEquivalentModifierMask:NSAlternateKeyMask];
-                [alternateItem setRepresentedObject:saveState];
-                [saveGamesMenu addItem:alternateItem];
-            }
-        }
-    }];
-
-    if([[saveGamesMenu itemArray] count] == 0)
-    {
-        [saveGamesMenu addItemWithTitle:OELocalizedString(@"No Save States available", @"") action:NULL keyEquivalent:@""];
-        [(NSMenuItem*)[[saveGamesMenu itemArray] lastObject] setEnabled:NO];
-    }
-
-    return saveGamesMenu;
 }
 
 - (NSMenu *)OE_ratingMenuForGames:(NSArray*)games

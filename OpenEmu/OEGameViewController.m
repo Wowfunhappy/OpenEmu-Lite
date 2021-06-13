@@ -220,22 +220,6 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     return [_gameView nativeScreenshot];
 }
 
-- (void)reflectVolume:(float)volume;
-{
-    [[self controlsWindow] reflectVolume:volume];
-}
-
-- (void)reflectEmulationPaused:(BOOL)paused;
-{
-    [[self controlsWindow] reflectEmulationRunning:!paused];
-}
-
-- (void)toggleControlsVisibility:(NSMenuItem*)sender
-{
-    [sender setState:![sender state]];
-    [[self controlsWindow] setCanShow:[sender state]==NSOffState];
-}
-
 #pragma mark - HUD Bar Actions
 - (void)selectFilter:(id)sender
 {

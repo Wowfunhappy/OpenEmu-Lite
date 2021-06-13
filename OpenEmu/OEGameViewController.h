@@ -28,7 +28,6 @@
 
 #import <OpenEmuBase/OpenEmuBase.h>
 #import "OEGameCoreHelper.h"
-#import "OEGameControlsBar.h"
 
 extern NSString *const OEGameVolumeKey;
 extern NSString *const OEGameDefaultVideoFilterKey;
@@ -80,8 +79,6 @@ extern NSString *const OEScreenshotPropertiesKey;
 
 - (NSImage *)takeNativeScreenshot;
 
-- (void)reflectVolume:(float)volume;
-- (void)reflectEmulationPaused:(BOOL)paused;
 #pragma mark - HUD Bar Actions
 // switchCore:: expects sender or [sender representedObject] to be an OECorePlugin object and prompts the user for confirmation
 - (void)selectFilter:(id)sender;

@@ -55,7 +55,6 @@
 
 #import "OEPreferencesController.h"
 #import "OEGameViewController.h"
-#import "OEGameControlsBar.h"
 
 #import "OEFiniteStateMachine.h"
 
@@ -127,7 +126,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
                                      OEAutomaticallyGetInfoKey : @YES,
                                    OEGameDefaultVideoFilterKey : @"Pixellate",
                                                OEGameVolumeKey : @0.5f,
-                       OEGameControlsBarCanDeleteSaveStatesKey : @YES,
                               @"defaultCore.openemu.system.gb" : @"org.openemu.Gambatte",
                              @"defaultCore.openemu.system.gba" : @"org.openemu.VisualBoyAdvance",
                              @"defaultCore.openemu.system.nes" : @"org.openemu.Nestopia",

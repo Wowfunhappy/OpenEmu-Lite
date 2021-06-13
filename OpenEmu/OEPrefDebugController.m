@@ -149,7 +149,6 @@ NSString * const OptionsKey = @"options";
                                       ),
 
                               Group(@"Library Window"),
-                              NCheckbox(OEMenuOptionsStyleKey, @"Dark GridView context menu"),
                               Checkbox(OERetrodeSupportEnabledKey, @"Enable Retrode support"),
                               Checkbox(OECoverGridViewGlossDisabledKey, @"Disable grid view gloss overlay"),
                               Checkbox(OECoverGridViewAutoDownloadEnabledKey, @"Download missing artwork on the fly"),
@@ -158,13 +157,8 @@ NSString * const OptionsKey = @"options";
 
                               Group(@"HUD Bar / Gameplay"),
                               NCheckbox(OEDontShowGameTitleInWindowKey, @"Use game name as window title"),
-                              Checkbox(OEGameControlsBarCanDeleteSaveStatesKey, @"Can delete save states"),
-                              NCheckbox(OEGameControlsBarHidesOptionButtonKey, @"Show options button"),
                               Checkbox(OEForceCorePicker, @"Use gamecore picker"),
                               Checkbox(OESaveStateUseQuickSaveSlotsKey, @"Use quicksave slots"),
-                              Checkbox(OEGameControlsBarShowsQuickSaveStateKey, @"Show quicksave in menu"),
-                              Checkbox(OEGameControlsBarShowsAutoSaveStateKey, @"Show autosave in menu"),
-                              Checkbox(OEGameControlsBarShowsAudioOutput, @"Show audio output device in menu"),
                               Checkbox(OETakeNativeScreenshots, @"Take screenshots in native size"),
                               Checkbox(OEScreenshotAspectRationCorrectionDisabled, @"Disable aspect ratio correction"),
                               ColorWell(OEGameViewBackgroundColorKey, @"Game View Background color"),
