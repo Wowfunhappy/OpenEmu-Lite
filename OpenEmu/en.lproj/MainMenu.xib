@@ -9850,7 +9850,7 @@ IEdpdEh1Yi4gA</bytes>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="216930690">
 									<reference key="NSMenu" ref="637300847"/>
-									<string key="NSTitle">Launch Game…</string>
+									<string key="NSTitle">Open Game…</string>
 									<string key="NSKeyEquiv">o</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>

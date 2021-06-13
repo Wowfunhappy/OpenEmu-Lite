@@ -78,6 +78,7 @@ NSString *const OEGameControlsBarShowsAudioOutput       = @"HUDBarShowAudioOutpu
     NSUInteger      _openMenus;
     NSMutableArray *_cheats;
     BOOL            _cheatsLoaded;
+    BOOL            _wowfunhappyMenuSetupComplete;
 }
 
 @property(unsafe_unretained) OEGameViewController *gameViewController;
@@ -258,170 +259,190 @@ NSString *const OEGameControlsBarShowsAudioOutput       = @"HUDBarShowAudioOutpu
 
 #pragma mark - Menus
 
-- (void)showOptionsMenu:(id)sender
-{
-    NSMenu *menu = [[NSMenu alloc] init];
-
-    NSMenuItem *item;
-    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Edit Game Controls", @"") action:@selector(editControls:) keyEquivalent:@""];
-    [menu addItem:item];
-
-    // Setup Cheats Menu
-    if([[self gameViewController] supportsCheats])
-    {
-        NSMenu *cheatsMenu = [[NSMenu alloc] init];
-        [cheatsMenu setTitle:OELocalizedString(@"Select Cheat", @"")];
-        item = [[NSMenuItem alloc] init];
-        [item setTitle:OELocalizedString(@"Select Cheat", @"")];
-        [menu addItem:item];
-        [item setSubmenu:cheatsMenu];
-
-        NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
-                                                                  action:@selector(addCheat:)
-                                                           keyEquivalent:@""];
-        [addCheatMenuItem setRepresentedObject:_cheats];
-        [cheatsMenu addItem:addCheatMenuItem];
-
-        if([_cheats count] != 0)
-            [cheatsMenu addItem:[NSMenuItem separatorItem]];
-
-        for(NSDictionary *cheatObject in _cheats)
-        {
-            NSString *description = [cheatObject objectForKey:@"description"];
-            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
-
-            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
-            [cheatsMenuItem setRepresentedObject:cheatObject];
-            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
-
-            [cheatsMenu addItem:cheatsMenuItem];
-        }
-    }
-
-    // Setup Core selection menu
-    NSMenu *coresMenu = [[NSMenu alloc] init];
-    [coresMenu setTitle:OELocalizedString(@"Select Core", @"")];
-
-    NSString *systemIdentifier = [[self gameViewController] systemIdentifier];
-    NSArray *corePlugins = [OECorePlugin corePluginsForSystemIdentifier:systemIdentifier];
-    if([corePlugins count] > 1)
-    {
-        corePlugins = [corePlugins sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            return [[obj1 displayName] compare:[obj2 displayName]];
-        }];
-
-        for(OECorePlugin *aPlugin in corePlugins)
-        {
-            NSMenuItem *coreItem = [[NSMenuItem alloc] initWithTitle:[aPlugin displayName] action:@selector(switchCore:) keyEquivalent:@""];
-            [coreItem setRepresentedObject:aPlugin];
-
-            if([[aPlugin bundleIdentifier] isEqual:[[self gameViewController] coreIdentifier]]) [coreItem setState:NSOnState];
-
-            [coresMenu addItem:coreItem];
-        }
-
-        item = [[NSMenuItem alloc] init];
-        item.title = OELocalizedString(@"Select Core", @"");
-        [item setSubmenu:coresMenu];
-        if([[coresMenu itemArray] count] > 1)
-            [menu addItem:item];
-    }
-
-    // Setup Video Filter Menu
-    NSMenu *filterMenu = [[NSMenu alloc] init];
-    [filterMenu setTitle:OELocalizedString(@"Select Filter", @"")];
-
-    NSString *selectedFilter = ([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, systemIdentifier]]
-                                ? : [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey]);
-
-    // Select the Default Filter if the current is not available (ie. deleted)
-    if(![_filterPlugins containsObject:selectedFilter])
-        selectedFilter = [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey];
-
-    for(NSString *aName in _filterPlugins)
-    {
-        NSMenuItem *filterItem = [[NSMenuItem alloc] initWithTitle:aName action:@selector(selectFilter:) keyEquivalent:@""];
-
-        if([aName isEqualToString:selectedFilter]) [filterItem setState:NSOnState];
-
-        [filterMenu addItem:filterItem];
-    }
-
-    item = [[NSMenuItem alloc] init];
-    item.title = OELocalizedString(@"Select Filter", @"");
-    [menu addItem:item];
-    [item setSubmenu:filterMenu];
-
-    // Setup integral scaling
-    id<OEGameIntegralScalingDelegate> integralScalingDelegate = [[self gameViewController] integralScalingDelegate];
-    const BOOL hasSubmenu = [integralScalingDelegate shouldAllowIntegralScaling] && [integralScalingDelegate respondsToSelector:@selector(maximumIntegralScale)];
-
-    NSMenu *scaleMenu = [NSMenu new];
-    [scaleMenu setTitle:OELocalizedString(@"Select Scale", @"")];
-    item = [NSMenuItem new];
-    [item setTitle:[scaleMenu title]];
-    [menu addItem:item];
-    [item setSubmenu:scaleMenu];
-
-    if(hasSubmenu)
-    {
-        unsigned int maxScale = [integralScalingDelegate maximumIntegralScale];
-        unsigned int currentScale = [integralScalingDelegate currentIntegralScale];
-
-        for(unsigned int scale = 1; scale <= maxScale; scale++)
-        {
-            NSString *scaleTitle  = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
-            NSMenuItem *scaleItem = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
-            [scaleItem setRepresentedObject:@(scale)];
-            [scaleItem setState:(scale == currentScale ? NSOnState : NSOffState)];
-            [scaleMenu addItem:scaleItem];
-        }
-    }
-    else
-        [item setEnabled:NO];
-
-    if([[NSUserDefaults standardUserDefaults] boolForKey:OEGameControlsBarShowsAudioOutput])
-    {
-        // Setup audio output
-        NSMenu *audioOutputMenu = [NSMenu new];
-        [audioOutputMenu setTitle:OELocalizedString(@"Select Audio Output Device", @"")];
-        item = [NSMenuItem new];
-        [item setTitle:[audioOutputMenu title]];
-        [menu addItem:item];
-        [item setSubmenu:audioOutputMenu];
-
-        NSPredicate *outputPredicate = [NSPredicate predicateWithBlock:^BOOL(OEAudioDevice *device, NSDictionary *bindings) {
-            return [device numberOfOutputChannels] > 0;
-        }];
-        NSArray *audioOutputDevices = [[[OEAudioDeviceManager sharedAudioDeviceManager] audioDevices] filteredArrayUsingPredicate:outputPredicate];
-        if([audioOutputDevices count] == 0)
-            [item setEnabled:NO];
-        else
-            for(OEAudioDevice *device in audioOutputDevices)
-            {
-                NSMenuItem *deviceItem = [[NSMenuItem alloc] initWithTitle:[device deviceName] action:@selector(changeAudioOutputDevice:) keyEquivalent:@""];
-                [deviceItem setRepresentedObject:device];
-                [audioOutputMenu addItem:deviceItem];
-            }
-    }
-
-    // Create OEMenu and display it
-    [menu setDelegate:self];
-
-    NSRect targetRect = [sender bounds];
-    targetRect.size.width -= 7.0;
-    targetRect = NSInsetRect(targetRect, -2.0, 1.0);
-    targetRect = [self convertRectToScreen:[sender convertRect:targetRect toView:nil]];
-
-    NSDictionary *options = @{
-        OEMenuOptionsStyleKey : @(OEMenuStyleLight),
-        OEMenuOptionsArrowEdgeKey : @(OEMinYEdge),
-        OEMenuOptionsMaximumSizeKey : [NSValue valueWithSize:NSMakeSize(500, 256)],
-        OEMenuOptionsScreenRectKey : [NSValue valueWithRect:targetRect]
-    };
-
-    [OEMenu openMenu:menu withEvent:nil forView:sender options:options];
-}
+//- (void)showOptionsMenu:(id)sender
+//{
+//    
+//    NSMenu *mainMenu = [NSApp mainMenu];
+//    
+//    NSMenuItem *editMenuItem = [mainMenu itemAtIndex:2];
+//    NSMenu *editMenu = [editMenuItem submenu];
+//    
+//    NSMenuItem *viewMenuItem = [mainMenu itemAtIndex:3];
+//    NSMenu *viewMenu = [viewMenuItem submenu];
+//
+//    NSMenuItem *item;
+//    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Edit Game Controls", @"") action:@selector(editControls:) keyEquivalent:@""];
+//    [editMenu addItem:item];
+//
+//    // Setup Cheats Menu
+//    if([[self gameViewController] supportsCheats])
+//    {
+//        NSMenu *cheatsMenu = [[NSMenu alloc] init];
+//        [cheatsMenu setTitle:OELocalizedString(@"Select Cheat", @"")];
+//        item = [[NSMenuItem alloc] init];
+//        [item setTitle:OELocalizedString(@"Select Cheat", @"")];
+//        [editMenu addItem:item];
+//        [item setSubmenu:cheatsMenu];
+//
+//        NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
+//                                                                  action:@selector(addCheat:)
+//                                                           keyEquivalent:@""];
+//        [addCheatMenuItem setRepresentedObject:_cheats];
+//        [cheatsMenu addItem:addCheatMenuItem];
+//
+//        if([_cheats count] != 0)
+//            [cheatsMenu addItem:[NSMenuItem separatorItem]];
+//
+//        for(NSDictionary *cheatObject in _cheats)
+//        {
+//            NSString *description = [cheatObject objectForKey:@"description"];
+//            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
+//
+//            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
+//            [cheatsMenuItem setRepresentedObject:cheatObject];
+//            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
+//
+//            [cheatsMenu addItem:cheatsMenuItem];
+//        }
+//    }
+//
+//    // Setup Core selection menu
+//    NSMenu *coresMenu = [[NSMenu alloc] init];
+//    [coresMenu setTitle:OELocalizedString(@"Select Core", @"")];
+//
+//    NSString *systemIdentifier = [[self gameViewController] systemIdentifier];
+//    NSArray *corePlugins = [OECorePlugin corePluginsForSystemIdentifier:systemIdentifier];
+//    if([corePlugins count] > 1)
+//    {
+//        corePlugins = [corePlugins sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+//            return [[obj1 displayName] compare:[obj2 displayName]];
+//        }];
+//
+//        for(OECorePlugin *aPlugin in corePlugins)
+//        {
+//            NSMenuItem *coreItem = [[NSMenuItem alloc] initWithTitle:[aPlugin displayName] action:@selector(switchCore:) keyEquivalent:@""];
+//            [coreItem setRepresentedObject:aPlugin];
+//
+//            if([[aPlugin bundleIdentifier] isEqual:[[self gameViewController] coreIdentifier]]) [coreItem setState:NSOnState];
+//
+//            [coresMenu addItem:coreItem];
+//        }
+//
+//        item = [[NSMenuItem alloc] init];
+//        item.title = OELocalizedString(@"Select Core", @"");
+//        [item setSubmenu:coresMenu];
+//        if([[coresMenu itemArray] count] > 1)
+//            [editMenu addItem:item];
+//    }
+//
+//    // Setup Video Filter Menu
+//    NSMenu *filterMenu = [[NSMenu alloc] init];
+//    [filterMenu setTitle:OELocalizedString(@"Select Filter", @"")];
+//
+//    NSString *selectedFilter = ([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, systemIdentifier]]
+//                                ? : [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey]);
+//
+//    // Select the Default Filter if the current is not available (ie. deleted)
+//    if(![_filterPlugins containsObject:selectedFilter])
+//        selectedFilter = [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey];
+//
+//    for(NSString *aName in _filterPlugins)
+//    {
+//        NSMenuItem *filterItem = [[NSMenuItem alloc] initWithTitle:aName action:@selector(selectFilter:) keyEquivalent:@""];
+//
+//        if([aName isEqualToString:selectedFilter]) [filterItem setState:NSOnState];
+//
+//        [filterMenu addItem:filterItem];
+//    }
+//
+//    item = [[NSMenuItem alloc] init];
+//    item.title = OELocalizedString(@"Select Filter", @"");
+//    [viewMenu addItem:item];
+//    [item setSubmenu:filterMenu];
+//
+//    // Setup integral scaling
+//    id<OEGameIntegralScalingDelegate> integralScalingDelegate = [[self gameViewController] integralScalingDelegate];
+//    const BOOL hasSubmenu = [integralScalingDelegate shouldAllowIntegralScaling] && [integralScalingDelegate respondsToSelector:@selector(maximumIntegralScale)];
+//
+//    NSMenu *scaleMenu = [NSMenu new];
+//    [scaleMenu setTitle:OELocalizedString(@"Select Scale", @"")];
+//    item = [NSMenuItem new];
+//    [item setTitle:[scaleMenu title]];
+//    [viewMenu addItem:item];
+//    [item setSubmenu:scaleMenu];
+//
+//    if(hasSubmenu)
+//    {
+//        unsigned int maxScale = [integralScalingDelegate maximumIntegralScale];
+//        unsigned int currentScale = [integralScalingDelegate currentIntegralScale];
+//
+//        for(unsigned int scale = 1; scale <= maxScale; scale++)
+//        {
+//            NSString *scaleTitle  = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
+//            NSMenuItem *scaleItem = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
+//            [scaleItem setRepresentedObject:@(scale)];
+//            [scaleItem setState:(scale == currentScale ? NSOnState : NSOffState)];
+//            [scaleMenu addItem:scaleItem];
+//        }
+//    }
+//    else
+//        [item setEnabled:NO];
+//
+//    /*if([[NSUserDefaults standardUserDefaults] boolForKey:OEGameControlsBarShowsAudioOutput])
+//    {
+//        // Setup audio output
+//        NSMenu *audioOutputMenu = [NSMenu new];
+//        [audioOutputMenu setTitle:OELocalizedString(@"Select Audio Output Device", @"")];
+//        item = [NSMenuItem new];
+//        [item setTitle:[audioOutputMenu title]];
+//        [menu addItem:item];
+//        [item setSubmenu:audioOutputMenu];
+//
+//        NSPredicate *outputPredicate = [NSPredicate predicateWithBlock:^BOOL(OEAudioDevice *device, NSDictionary *bindings) {
+//            return [device numberOfOutputChannels] > 0;
+//        }];
+//        NSArray *audioOutputDevices = [[[OEAudioDeviceManager sharedAudioDeviceManager] audioDevices] filteredArrayUsingPredicate:outputPredicate];
+//        if([audioOutputDevices count] == 0)
+//            [item setEnabled:NO];
+//        else
+//            for(OEAudioDevice *device in audioOutputDevices)
+//            {
+//                NSMenuItem *deviceItem = [[NSMenuItem alloc] initWithTitle:[device deviceName] action:@selector(changeAudioOutputDevice:) keyEquivalent:@""];
+//                [deviceItem setRepresentedObject:device];
+//                [audioOutputMenu addItem:deviceItem];
+//            }
+//    }*/
+//
+//    // Create OEMenu and display it
+//    //[menu setDelegate:self];
+//    
+//    
+//    //Wowfunhappy futzery
+//    /*NSMenu *mainMenu = [NSApp mainMenu];
+//    NSMenuItem *viewMenuItem = [mainMenu itemAtIndex:3];
+//    NSMenu *viewMenu = [viewMenuItem submenu];
+//    NSMenuItem *scaleMenuItem = [viewMenu addItemWithTitle:@"Scale" action:nil keyEquivalent:@""];
+//    [viewMenu setSubmenu:scaleMenu forItem:scaleMenuItem];
+//    
+//    [viewMenu update];*/
+//    
+//    [mainMenu update];
+//
+//
+//    /*NSRect targetRect = [sender bounds];
+//    targetRect.size.width -= 7.0;
+//    targetRect = NSInsetRect(targetRect, -2.0, 1.0);
+//    targetRect = [self convertRectToScreen:[sender convertRect:targetRect toView:nil]];
+//
+//    NSDictionary *options = @{
+//        OEMenuOptionsStyleKey : @(OEMenuStyleLight),
+//        OEMenuOptionsArrowEdgeKey : @(OEMinYEdge),
+//        OEMenuOptionsMaximumSizeKey : [NSValue valueWithSize:NSMakeSize(500, 256)],
+//        OEMenuOptionsScreenRectKey : [NSValue valueWithRect:targetRect]
+//    };
+//
+//    [OEMenu openMenu:menu withEvent:nil forView:sender options:options];*/
+//}
 
 - (void)showSaveMenu:(id)sender
 {
@@ -571,7 +592,167 @@ NSString *const OEGameControlsBarShowsAudioOutput       = @"HUDBarShowAudioOutpu
 
     if(isEmulationRunning && !_cheatsLoaded)
         [self OE_loadCheats];
+    
+    if (!_wowfunhappyMenuSetupComplete) {
+        _wowfunhappyMenuSetupComplete = [self wowfunhappyMenuSetup];
+    }
 }
+
+
+
+
+
+- (BOOL)wowfunhappyMenuSetup {
+    NSMenu *mainMenu = [NSApp mainMenu];
+    
+    
+    
+    //Edit Menu
+    NSMenuItem *editMenuItem = [mainMenu itemAtIndex:2];
+    NSMenu *editMenu = [editMenuItem submenu];
+    [editMenu addItem:[NSMenuItem separatorItem]];
+    
+    NSMenuItem *item;
+    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Edit Game Controls", @"") action:@selector(editControls:) keyEquivalent:@""];
+    [editMenu addItem:item];
+    
+    // Setup Cheats Menu
+    if([[self gameViewController] supportsCheats])
+    {
+        NSMenu *cheatsMenu = [[NSMenu alloc] init];
+        [cheatsMenu setTitle:OELocalizedString(@"Select Cheat", @"")];
+        item = [[NSMenuItem alloc] init];
+        [item setTitle:OELocalizedString(@"Select Cheat", @"")];
+        [editMenu addItem:item];
+        [item setSubmenu:cheatsMenu];
+        
+        NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
+                                                                  action:@selector(addCheat:)
+                                                           keyEquivalent:@""];
+        [addCheatMenuItem setRepresentedObject:_cheats];
+        [cheatsMenu addItem:addCheatMenuItem];
+        
+        if([_cheats count] != 0)
+            [cheatsMenu addItem:[NSMenuItem separatorItem]];
+        
+        for(NSDictionary *cheatObject in _cheats)
+        {
+            NSString *description = [cheatObject objectForKey:@"description"];
+            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
+            
+            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
+            [cheatsMenuItem setRepresentedObject:cheatObject];
+            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
+            
+            [cheatsMenu addItem:cheatsMenuItem];
+        }
+    }
+    
+    // Setup Core selection menu
+    NSMenu *coresMenu = [[NSMenu alloc] init];
+    [coresMenu setTitle:OELocalizedString(@"Select Core", @"")];
+    
+    NSString *systemIdentifier = [[self gameViewController] systemIdentifier];
+    NSArray *corePlugins = [OECorePlugin corePluginsForSystemIdentifier:systemIdentifier];
+    if([corePlugins count] > 1)
+    {
+        corePlugins = [corePlugins sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            return [[obj1 displayName] compare:[obj2 displayName]];
+        }];
+        
+        for(OECorePlugin *aPlugin in corePlugins)
+        {
+            NSMenuItem *coreItem = [[NSMenuItem alloc] initWithTitle:[aPlugin displayName] action:@selector(switchCore:) keyEquivalent:@""];
+            [coreItem setRepresentedObject:aPlugin];
+            
+            if([[aPlugin bundleIdentifier] isEqual:[[self gameViewController] coreIdentifier]]) [coreItem setState:NSOnState];
+            
+            [coresMenu addItem:coreItem];
+        }
+        
+        item = [[NSMenuItem alloc] init];
+        item.title = OELocalizedString(@"Select Core", @"");
+        [item setSubmenu:coresMenu];
+        if([[coresMenu itemArray] count] > 1)
+            [editMenu addItem:item];
+    }
+    
+    
+    
+    //View Menu
+    
+    NSMenuItem *viewMenuItem = [mainMenu itemAtIndex:3];
+    NSMenu *viewMenu = [viewMenuItem submenu];
+    [viewMenu addItem:[NSMenuItem separatorItem]];
+    
+    //Setup Video Filter Menu
+    NSMenu *filterMenu = [[NSMenu alloc] init];
+    [filterMenu setTitle:OELocalizedString(@"Select Filter", @"")];
+
+    NSString *selectedFilter = ([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, systemIdentifier]]
+                                ? : [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey]);
+
+    // Select the Default Filter if the current is not available (ie. deleted)
+    if(![_filterPlugins containsObject:selectedFilter])
+        selectedFilter = [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey];
+
+    for(NSString *aName in _filterPlugins)
+    {
+        NSMenuItem *filterItem = [[NSMenuItem alloc] initWithTitle:aName action:@selector(selectFilter:) keyEquivalent:@""];
+
+        if([aName isEqualToString:selectedFilter]) [filterItem setState:NSOnState];
+
+        [filterMenu addItem:filterItem];
+    }
+
+    item = [[NSMenuItem alloc] init];
+    item.title = OELocalizedString(@"Select Filter", @"");
+    [viewMenu addItem:item];
+    [item setSubmenu:filterMenu];
+
+    // Setup integral scaling
+    id<OEGameIntegralScalingDelegate> integralScalingDelegate = [[self gameViewController] integralScalingDelegate];
+    const BOOL hasSubmenu = [integralScalingDelegate shouldAllowIntegralScaling] && [integralScalingDelegate respondsToSelector:@selector(maximumIntegralScale)];
+
+    NSMenu *scaleMenu = [NSMenu new];
+    [scaleMenu setTitle:OELocalizedString(@"Select Scale", @"")];
+    item = [NSMenuItem new];
+    [item setTitle:[scaleMenu title]];
+    [viewMenu addItem:item];
+    [item setSubmenu:scaleMenu];
+
+    if(hasSubmenu)
+    {
+        unsigned int maxScale = [integralScalingDelegate maximumIntegralScale];
+        //unsigned int currentScale = [integralScalingDelegate currentIntegralScale];
+
+        for(unsigned int scale = 1; scale <= maxScale; scale++)
+        {
+            NSString *scaleTitle  = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
+            NSMenuItem *scaleItem = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
+            [scaleItem setRepresentedObject:@(scale)];
+            //[scaleItem setState:(scale == currentScale ? NSOnState : NSOffState)];
+            [scaleMenu addItem:scaleItem];
+        }
+    }
+    else
+        [item setEnabled:NO];
+
+    
+    
+    
+    
+    return true;
+}
+
+
+
+
+
+
+
+
+
 
 - (void)parentWindowDidEnterFullScreen:(NSNotification *)notification;
 {
