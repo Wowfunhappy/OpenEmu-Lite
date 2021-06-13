@@ -51,7 +51,7 @@
 #import "NSFileManager+OEHashingAdditions.h"
 #pragma mark Key sources
 #import "OEPreferencesController.h"
-#import "OESetupAssistant.h"
+//#import "OESetupAssistant.h"
 #import "OECollectionViewController.h"
 #import "OEGameViewController.h"
 #import "OERetrodeDeviceManager.h"
@@ -134,7 +134,7 @@ NSString * const OptionsKey = @"options";
     self.keyDescriptions =  @[
                               FirstGroup(@"General"),
                               Checkbox(OEDebugModeKey, @"Debug Mode"),
-                              Checkbox(OESetupAssistantHasFinishedKey, @"Setup Assistant has finished"),
+                              //Checkbox(OESetupAssistantHasFinishedKey, @"Setup Assistant has finished"),
                               Popover(@"Region", @selector(changeRegion:),
                                       Option(@"Auto", @(-1)),
                                       Option(@"North America", @0),

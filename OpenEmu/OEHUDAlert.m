@@ -41,7 +41,6 @@
 #import "OEBackgroundImageView.h"
 
 #import "OETheme.h"
-#import "OEDownload.h"
 
 static const CGFloat _OEHUDAlertBoxSideMargin           =  18.0;
 static const CGFloat _OEHUDAlertBoxTopMargin            =  51.0;

@@ -33,7 +33,6 @@
 #import "OEDBImage.h"
 
 #import "OEGameInfoHelper.h"
-#import "OEDownload.h"
 
 #import "NSFileManager+OEHashingAdditions.h"
 #import "NSArray+OEAdditions.h"
@@ -43,12 +42,8 @@ NSString *const OEDisplayGameTitle = @"displayGameTitle";
 
 NSString *const OEGameArtworkFormatKey = @"artworkFormat";
 NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
-@interface OEDBGame ()
-@property OEDownload *romDownload;
-@end
 
 @implementation OEDBGame
-@synthesize romDownload=_romDownload;
 @dynamic name, gameTitle, rating, gameDescription, importDate, lastInfoSync, status, displayName;
 @dynamic boxImage, system, roms, genres, collections, credits;
 
@@ -159,63 +154,6 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
         [self save];
         [[self libraryDatabase] startOpenVGDBSync];
     }
-}
-
-#pragma mark - ROM Downloading
-- (void)requestROMDownload
-{
-    if(_romDownload != nil) return;
-    [self setStatus:@(OEDBGameStatusDownloading)];
-
-    OEDBRom *rom = [self defaultROM];
-    NSString *source = [rom source];
-    if(source == nil || [source length] == 0)
-    {
-        DLog(@"Invalid URL to download!");
-        return;
-    }
-
-    NSURL *url = [NSURL URLWithString:source];
-    if(url == nil)
-    {
-        DLog(@"Invalid URL to download!");
-        return;
-    }
-
-    __block __strong OEDBGame *blockSelf = self; // We don't want to be deallocated while the download is still running
-    _romDownload = [[OEDownload alloc] initWithURL:url];
-    [_romDownload setCompletionHandler:^(NSURL *url, NSError *error) {
-        if(!url || error)
-        {
-            DLog(@"ROM download Failed!");
-            DLog(@"%@", error);
-        }
-        else
-        {
-            DLog(@"Downloaded to %@", url);
-            [rom setURL:url];
-            NSError *err = nil;
-            if(![rom consolidateFilesWithError:&err])
-            {
-                DLog(@"%@", err);
-                [rom setURL:nil];
-            }
-            [rom save];
-        }
-
-        [blockSelf setStatus:@(OEDBGameStatusOK)];
-        [blockSelf setRomDownload:nil];
-        [blockSelf save];
-    }];
-    [_romDownload startDownload];
-}
-
-- (void)cancelROMDownload
-{
-    [_romDownload cancelDownload];
-    _romDownload = nil;
-    [self setStatus:@(OEDBGameStatusOK)];
-    [self save];
 }
 
 #pragma mark - Accessors
@@ -360,14 +298,6 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
 + (NSEntityDescription *)entityDescriptionInContext:(NSManagedObjectContext *)context
 {
     return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:context];
-}
-
-- (void)prepareForDeletion
-{
-    [[self boxImage] delete];
-
-    [_romDownload cancelDownload];
-    _romDownload = nil;
 }
 
 #pragma mark - NSPasteboardWriting

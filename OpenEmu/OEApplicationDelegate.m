@@ -30,7 +30,6 @@
 
 #import "OEPlugin.h"
 #import "OECorePlugin.h"
-#import "OECoreUpdater.h"
 
 #import "OESystemPlugin.h"
 #import "OECompositionPlugin.h"
@@ -41,7 +40,6 @@
 #import "NSWindow+OEFullScreenAdditions.h"
 
 #import "OEMainWindowController.h"
-#import "OESetupAssistant.h"
 #import "OELibraryController.h"
 
 #import "OEHUDAlert+DefaultAlertsAdditions.h"
@@ -55,7 +53,7 @@
 #import "OEPreferencesController.h"
 #import "OEGameViewController.h"
 
-#import "OEFiniteStateMachine.h"
+//#import "OEFiniteStateMachine.h"
 
 #import <OpenEmuSystem/OpenEmuSystem.h>
 #import "OEToolTipManager.h"
@@ -200,8 +198,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [OECompositionPlugin allPluginNames];
 
     [mainWindowController showWindow:self];
-
-    [[OECoreUpdater sharedUpdater] checkForNewCores:@NO];
 
     BOOL startInFullscreen = [[NSUserDefaults standardUserDefaults] boolForKey:OEMainWindowFullscreenKey];
     if(startInFullscreen != [[mainWindowController window] isFullScreen])

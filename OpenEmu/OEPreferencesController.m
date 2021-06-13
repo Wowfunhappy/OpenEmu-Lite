@@ -40,7 +40,6 @@
 #import "OEPrefLibraryController.h"
 #import "OEPrefGameplayController.h"
 #import "OEPrefControlsController.h"
-#import "OEPrefCoresController.h"
 #import "OEPrefDebugController.h"
 #import "OEPrefBiosController.h"
 
@@ -226,9 +225,6 @@ static const unsigned short konamiCodeSize = 10;
     [array addObject:controller];
     
     controller = [[OEPrefControlsController alloc] init];
-    [array addObject:controller];
-    
-    controller = [[OEPrefCoresController alloc] init];
     [array addObject:controller];
 
     TODO(@"Re-enable after 1.0.4");

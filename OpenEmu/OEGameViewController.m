@@ -43,9 +43,6 @@
 #import "OECorePlugin.h"
 
 #import "OEDBSaveState.h"
-//#import "OEGameControlsBar.h"
-
-#import "OECoreUpdater.h"
 
 #import "OEGameDocument.h"
 #import "OEAudioDeviceManager.h"

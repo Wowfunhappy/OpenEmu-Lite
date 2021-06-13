@@ -30,8 +30,6 @@
 #import "NSImage+OEDrawingAdditions.h"
 #import "OEMainWindow.h"
 #import "NSWindow+OEFullScreenAdditions.h"
-#import "OESetupAssistant.h"
-#import "OECoreUpdater.h"
 #import "OELibraryController.h"
 
 #import "NSDocumentController+OEAdditions.h"

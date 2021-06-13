@@ -31,7 +31,6 @@
 #import "OEBackgroundColorView.h"
 #import "OECorePickerController.h"
 #import "OECorePlugin.h"
-#import "OECoreUpdater.h"
 #import "OEDBRom.h"
 #import "OEDBGame.h"
 #import "OEDBSaveState.h"
@@ -50,7 +49,6 @@
 #import "NSURL+OELibraryAdditions.h"
 #import "NSView+FadeImage.h"
 #import "NSViewController+OEAdditions.h"
-#import "OEDownload.h"
 
 // using the main window controller here is not very nice, but meh
 #import "OEMainWindowController.h"
@@ -166,102 +164,6 @@ typedef enum : NSUInteger
 {
     NSURL *fileURL = [rom URL];
 
-    // Check if local file is available
-    if(![fileURL checkResourceIsReachableAndReturnError:nil])
-    {
-        fileURL = nil;
-        NSURL *sourceURL = [rom sourceURL];
-
-        // try to fallback on external source
-        if(sourceURL)
-        {
-            NSString *name   = [rom fileName] ?: [[sourceURL lastPathComponent] stringByDeletingPathExtension];
-            NSString *server = [sourceURL host];
-
-            if([[OEHUDAlert romDownloadRequiredAlert:name server:server] runModal] == NSAlertDefaultReturn)
-            {
-                __block NSURL   *destination;
-                __block NSError *error;
-
-                NSString *message = [NSString stringWithFormat:OELocalizedString(@"Downloading %@…", @"Downloading rom message text"), name];
-                OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:message defaultButton:OELocalizedString(@"Cancel",@"") alternateButton:@""];
-                [alert setShowsProgressbar:YES];
-                [alert setProgress:-1];
-
-                [alert performBlockInModalSession:^{
-                    OEDownload *download = [[OEDownload alloc] initWithURL:sourceURL];
-                    [download setProgressHandler:^BOOL(CGFloat progress) {
-                        [alert setProgress:progress];
-                        return YES;
-                    }];
-
-                    [download setCompletionHandler:^(NSURL *dst, NSError *err) {
-                        destination = dst,
-                        error = err;
-                        [alert closeWithResult:NSAlertAlternateReturn];
-                    }];
-
-                    [download startDownload];
-                }];
-
-
-                if([alert runModal] == NSAlertDefaultReturn || [error code] == NSUserCancelledError)
-                {
-                    // User canceld
-                    if(outError != NULL)
-                        *outError = [NSError errorWithDomain:NSCocoaErrorDomain
-                                                        code:NSUserCancelledError
-                                                    userInfo:nil];
-                    return NO;
-                }
-                else
-                {
-                    if(error || destination == nil)
-                    {
-                        if(outError != NULL)
-                            *outError = [error copy];
-                        return NO;
-                    }
-
-                    fileURL = [destination copy];
-                    // make sure that rom's fileName is set
-                    if([rom fileName] == nil) {
-                        [rom setFileName:[destination lastPathComponent]];
-                        [rom save];
-                    }
-                }
-            }
-            else
-            {
-                // User canceld
-                if(outError != NULL)
-                    *outError = [NSError errorWithDomain:NSCocoaErrorDomain
-                                                    code:NSUserCancelledError
-                                                userInfo:nil];
-                return NO;
-            }
-        }
-
-        // check if we have recovered
-        if(fileURL == nil || [fileURL checkResourceIsReachableAndReturnError:nil] == NO)
-        {
-            if(outError != NULL)
-            {
-                *outError = [NSError errorWithDomain:OEGameDocumentErrorDomain
-                                                code:OEFileDoesNotExistError
-                                            userInfo:
-                             [NSDictionary dictionaryWithObjectsAndKeys:
-                              OELocalizedString(@"The file you selected doesn't exist", @"Inexistent file error reason."),
-                              NSLocalizedFailureReasonErrorKey,
-                              OELocalizedString(@"Choose a valid file.", @"Inexistent file error recovery suggestion."),
-                              NSLocalizedRecoverySuggestionErrorKey,
-                              nil]];
-            }
-            DLog(@"File does not exist");
-            return NO;
-        }
-    }
-
     _rom = rom;
     _romFileURL = fileURL;
     _corePlugin = core;
@@ -274,18 +176,6 @@ typedef enum : NSUInteger
     if(_corePlugin == nil)
     {
         __block NSError *blockError = *outError;
-        [[OECoreUpdater sharedUpdater] installCoreForGame:[[self rom] game] withCompletionHandler:
-        ^(OECorePlugin *plugin, NSError *error)
-        {
-            if(error == nil && plugin != nil)
-            {
-                _corePlugin = plugin;
-            }
-            else if(error == nil)
-            {
-                blockError = nil;
-            }
-        }];
         *outError = blockError;
     }
 
@@ -1388,37 +1278,7 @@ typedef enum : NSUInteger
         return;
     }
 
-    void (^runWithCore)(OECorePlugin *, NSError *) =
-    ^(OECorePlugin *plugin, NSError *error)
-    {
-        if(plugin == nil)
-        {
-            if(error != nil)
-                [self presentError:error];
-            return;
-        }
-
-        [self OE_setupGameCoreManagerUsingCorePlugin:plugin completionHandler:
-         ^{
-             loadState();
-         }];
-    };
-
-    OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:OELocalizedString(@"This save state was created with a different core. Do you want to switch to that core now?", @"")
-                                           defaultButton:OELocalizedString(@"OK", @"")
-                                         alternateButton:OELocalizedString(@"Cancel", @"")];
-    [alert showSuppressionButtonForUDKey:OEAutoSwitchCoreAlertSuppressionKey];
-
-    if([alert runModal])
-    {
-        OECorePlugin *core = [OECorePlugin corePluginWithBundleIdentifier:[state coreIdentifier]];
-        if(core != nil)
-            runWithCore(core, nil);
-        else
-            [[OECoreUpdater sharedUpdater] installCoreForSaveState:state withCompletionHandler:runWithCore];
-    }
-    else
-        [self OE_startEmulation];
+    [self OE_startEmulation];
 }
 
 
