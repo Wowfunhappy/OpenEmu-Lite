@@ -64,14 +64,14 @@ NSString *const OELibraryDidLoadNotificationName = @"OELibraryDidLoadNotificatio
 NSString *const OEDatabasePathKey            = @"databasePath";
 NSString *const OEDefaultDatabasePathKey     = @"defaultDatabasePath";
 NSString *const OESaveStateLastFSEventIDKey  = @"lastSaveStateEventID";
-NSString *const OELibraryAutoImportEventKey  = @"lastAutoImportEventID";
+//NSString *const OELibraryAutoImportEventKey  = @"lastAutoImportEventID";
 
 NSString *const OELibraryDatabaseUserInfoKey = @"OELibraryDatabase";
 NSString *const OESaveStateFolderURLKey      = @"saveStateFolder";
 NSString *const OEScreenshotFolderURLKey     = @"screenshotFolder";
-NSString *const OEAutoImportFolderURLKey     = @"autoImportFolder";
+//NSString *const OEAutoImportFolderURLKey     = @"autoImportFolder";
 
-NSString *const OELibraryRomsFolderURLKey    = @"romsFolderURL";
+//NSString *const OELibraryRomsFolderURLKey    = @"romsFolderURL";
 
 NSString *const OEManagedObjectContextHasDirectChangesKey = @"hasDirectChanges";
 
@@ -98,7 +98,7 @@ const NSInteger OpenVGDBSyncBatchSize = 5;
 
 - (void)OE_setupStateWatcher;
 - (void)OE_removeStateWatcher;
-- (void)OE_setupAutoImportWatcher;
+//- (void)OE_setupAutoImportWatcher;
 - (void)OE_removeAutoImportWatcher;
 
 @property(strong) OEFSWatcher *saveStateWatcher, *autoImportWatcher;
@@ -155,7 +155,7 @@ static OELibraryDatabase *defaultDatabase = nil;
     
     [[NSUserDefaults standardUserDefaults] setObject:[[[defaultDatabase databaseURL] path] stringByAbbreviatingWithTildeInPath] forKey:OEDatabasePathKey];
     [defaultDatabase OE_setupStateWatcher];
-    [defaultDatabase OE_setupAutoImportWatcher];
+    //[defaultDatabase OE_setupAutoImportWatcher];
 
     OEROMImporter *romImporter = [[OEROMImporter alloc] initWithDatabase:defaultDatabase];
     [romImporter loadQueue];
@@ -231,7 +231,7 @@ static OELibraryDatabase *defaultDatabase = nil;
         return NO;
     }
 
-    DLog(@"ROMS folder url: %@", [self romsFolderURL]);
+    //DLog(@"ROMS folder url: %@", [self romsFolderURL]);
     return YES;
 }
 
@@ -375,32 +375,32 @@ static OELibraryDatabase *defaultDatabase = nil;
 }
 
 #pragma mark - Auto Import Handling
-- (void)OE_setupAutoImportWatcher
-{
-    NSString *autoImportFolderPath = [[self autoImportFolderURL] path];
-    OEFSBlock fsBlock = ^(NSString *path, FSEventStreamEventFlags flags) {
-        NSURL   *url   = [NSURL fileURLWithPath:path];
-        if(![url checkResourceIsReachableAndReturnError:nil])
-            return;
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[self importer] importItemAtURL:url];
-        });
-    };
-
-    OEFSWatcher *watcher = [OEFSWatcher persistentWatcherWithKey:OELibraryAutoImportEventKey forPath:autoImportFolderPath withBlock:fsBlock];
-    [watcher setDelay:1.0];
-    [watcher setStreamFlags:kFSEventStreamCreateFlagUseCFTypes|kFSEventStreamCreateFlagIgnoreSelf];
-
-    [self setAutoImportWatcher:watcher];
-    [[self autoImportWatcher] startWatching];
-}
-
-- (void)OE_removeAutoImportWatcher
-{
-    [[self autoImportWatcher] stopWatching];
-    [self setAutoImportWatcher:nil];
-}
+//- (void)OE_setupAutoImportWatcher
+//{
+//    NSString *autoImportFolderPath = [[self autoImportFolderURL] path];
+//    OEFSBlock fsBlock = ^(NSString *path, FSEventStreamEventFlags flags) {
+//        NSURL   *url   = [NSURL fileURLWithPath:path];
+//        if(![url checkResourceIsReachableAndReturnError:nil])
+//            return;
+//
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [[self importer] importItemAtURL:url];
+//        });
+//    };
+//
+//    OEFSWatcher *watcher = [OEFSWatcher persistentWatcherWithKey:OELibraryAutoImportEventKey forPath:autoImportFolderPath withBlock:fsBlock];
+//    [watcher setDelay:1.0];
+//    [watcher setStreamFlags:kFSEventStreamCreateFlagUseCFTypes|kFSEventStreamCreateFlagIgnoreSelf];
+//
+//    [self setAutoImportWatcher:watcher];
+//    [[self autoImportWatcher] startWatching];
+//}
+//
+//- (void)OE_removeAutoImportWatcher
+//{
+//    [[self autoImportWatcher] stopWatching];
+//    [self setAutoImportWatcher:nil];
+//}
 
 
 #pragma mark - Save State Handling
@@ -745,80 +745,80 @@ static OELibraryDatabase *defaultDatabase = nil;
     return [NSURL fileURLWithPath:[libraryFolderPath stringByExpandingTildeInPath] isDirectory:YES];
 }
 
-- (NSURL *)romsFolderURL
-{
-    NSURL             *result   = nil;
-    NSPersistentStore *persistentStore = [[[self persistentStoreCoordinator] persistentStores] lastObject];
-    NSDictionary      *metadata = [[self persistentStoreCoordinator] metadataForPersistentStore:persistentStore];
+//- (NSURL *)romsFolderURL
+//{
+//    NSURL             *result   = nil;
+//    NSPersistentStore *persistentStore = [[[self persistentStoreCoordinator] persistentStores] lastObject];
+//    NSDictionary      *metadata = [[self persistentStoreCoordinator] metadataForPersistentStore:persistentStore];
+//
+//    if([metadata objectForKey:OELibraryRomsFolderURLKey])
+//    {
+//        NSString *urlString = [metadata objectForKey:OELibraryRomsFolderURLKey];
+//        
+//        if([urlString rangeOfString:@"file://"].location == NSNotFound)
+//            result = [NSURL URLWithString:urlString relativeToURL:[self databaseFolderURL]];
+//        else
+//            result = [NSURL URLWithString:urlString];
+//    }
+//    else
+//    {
+//        result = [[self databaseFolderURL] URLByAppendingPathComponent:@"roms" isDirectory:YES];
+//        [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
+//        [self setRomsFolderURL:result];
+//    }
+//    
+//    return result;
+//}
 
-    if([metadata objectForKey:OELibraryRomsFolderURLKey])
-    {
-        NSString *urlString = [metadata objectForKey:OELibraryRomsFolderURLKey];
-        
-        if([urlString rangeOfString:@"file://"].location == NSNotFound)
-            result = [NSURL URLWithString:urlString relativeToURL:[self databaseFolderURL]];
-        else
-            result = [NSURL URLWithString:urlString];
-    }
-    else
-    {
-        result = [[self databaseFolderURL] URLByAppendingPathComponent:@"roms" isDirectory:YES];
-        [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
-        [self setRomsFolderURL:result];
-    }
-    
-    return result;
-}
+//- (void)setRomsFolderURL:(NSURL *)url
+//{
+//    if(url != nil)
+//    {
+//        NSError             *error             = nil;
+//        NSPersistentStore   *persistentStore   = [[[self persistentStoreCoordinator] persistentStores] lastObject];
+//        NSDictionary        *metadata          = [persistentStore metadata];
+//        NSMutableDictionary *mutableMetaData   = [metadata mutableCopy];
+//        NSURL               *databaseFolderURL = [self databaseFolderURL];
+//
+//        if([url isSubpathOfURL:databaseFolderURL])
+//        {
+//            NSString *urlString = [[url absoluteString] substringFromIndex:[[databaseFolderURL absoluteString] length]];
+//            [mutableMetaData setObject:[@"./" stringByAppendingString:urlString] forKey:OELibraryRomsFolderURLKey];
+//        }
+//        else [mutableMetaData setObject:[url absoluteString] forKey:OELibraryRomsFolderURLKey];
+//
+//        // Using the instance method sets the metadata for the current store in memory, while
+//        // using the class method writes to disk immediately. Calling both seems redundant
+//        // but is the only way i found that works.
+//        //
+//        // Also see discussion at http://www.cocoabuilder.com/archive/cocoa/295041-setting-not-saving-nspersistentdocument-metadata-changes-file-modification-date.html
+//        [[self persistentStoreCoordinator] setMetadata:mutableMetaData forPersistentStore:persistentStore];
+//        [NSPersistentStoreCoordinator setMetadata:mutableMetaData forPersistentStoreOfType:[persistentStore type] URL:[persistentStore URL] error:&error];
+//        [_writerContext performBlock:^{
+//            [_writerContext save:nil];
+//        }];
+//    }
+//}
 
-- (void)setRomsFolderURL:(NSURL *)url
-{
-    if(url != nil)
-    {
-        NSError             *error             = nil;
-        NSPersistentStore   *persistentStore   = [[[self persistentStoreCoordinator] persistentStores] lastObject];
-        NSDictionary        *metadata          = [persistentStore metadata];
-        NSMutableDictionary *mutableMetaData   = [metadata mutableCopy];
-        NSURL               *databaseFolderURL = [self databaseFolderURL];
-
-        if([url isSubpathOfURL:databaseFolderURL])
-        {
-            NSString *urlString = [[url absoluteString] substringFromIndex:[[databaseFolderURL absoluteString] length]];
-            [mutableMetaData setObject:[@"./" stringByAppendingString:urlString] forKey:OELibraryRomsFolderURLKey];
-        }
-        else [mutableMetaData setObject:[url absoluteString] forKey:OELibraryRomsFolderURLKey];
-
-        // Using the instance method sets the metadata for the current store in memory, while
-        // using the class method writes to disk immediately. Calling both seems redundant
-        // but is the only way i found that works.
-        //
-        // Also see discussion at http://www.cocoabuilder.com/archive/cocoa/295041-setting-not-saving-nspersistentdocument-metadata-changes-file-modification-date.html
-        [[self persistentStoreCoordinator] setMetadata:mutableMetaData forPersistentStore:persistentStore];
-        [NSPersistentStoreCoordinator setMetadata:mutableMetaData forPersistentStoreOfType:[persistentStore type] URL:[persistentStore URL] error:&error];
-        [_writerContext performBlock:^{
-            [_writerContext save:nil];
-        }];
-    }
-}
-
-- (NSURL *)unsortedRomsFolderURL
-{
-    NSString *unsortedFolderName = @"unsorted";
-
-    NSURL *result = [[self romsFolderURL] URLByAppendingPathComponent:unsortedFolderName isDirectory:YES];
-    [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
-
-    return result;
-}
-
-- (NSURL *)romsFolderURLForSystem:(OEDBSystem *)system
-{
-    if([system name] == nil) return [self unsortedRomsFolderURL];
-
-    NSURL *result = [[self romsFolderURL] URLByAppendingPathComponent:[system name] isDirectory:YES];
-    [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
-
-    return result;
-}
+//- (NSURL *)unsortedRomsFolderURL
+//{
+//    NSString *unsortedFolderName = @"unsorted";
+//
+//    NSURL *result = [[self romsFolderURL] URLByAppendingPathComponent:unsortedFolderName isDirectory:YES];
+//    [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
+//
+//    return result;
+//}
+//
+//- (NSURL *)romsFolderURLForSystem:(OEDBSystem *)system
+//{
+//    if([system name] == nil) return [self unsortedRomsFolderURL];
+//
+//    NSURL *result = [[self romsFolderURL] URLByAppendingPathComponent:[system name] isDirectory:YES];
+//    [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
+//
+//    return result;
+//}
 
 - (NSURL *)stateFolderURL
 {
@@ -890,23 +890,23 @@ static OELibraryDatabase *defaultDatabase = nil;
     return [baseURL URLByAppendingPathComponent:@"Import Queue.db"];
 }
 
-- (NSURL *)autoImportFolderURL
-{
-
-    NSURL *result = nil;
-    NSString *urlString = [[NSUserDefaults standardUserDefaults] objectForKey:OESaveStateFolderURLKey];
-    if(urlString)
-        result = [NSURL URLWithString:urlString];
-    else
-    {
-        NSString *autoImportFolderName = OELocalizedString(@"Automatically Import", @"Automatically Import Name");
-        result = [[self romsFolderURL] URLByAppendingPathComponent:autoImportFolderName isDirectory:YES];
-    }
-
-    [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
-
-    return result;
-}
+//- (NSURL *)autoImportFolderURL
+//{
+//
+//    NSURL *result = nil;
+//    NSString *urlString = [[NSUserDefaults standardUserDefaults] objectForKey:OESaveStateFolderURLKey];
+//    if(urlString)
+//        result = [NSURL URLWithString:urlString];
+//    else
+//    {
+//        NSString *autoImportFolderName = OELocalizedString(@"Automatically Import", @"Automatically Import Name");
+//        result = [[self romsFolderURL] URLByAppendingPathComponent:autoImportFolderName isDirectory:YES];
+//    }
+//
+//    [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
+//
+//    return result;
+//}
 
 #pragma mark - GameInfo Sync
 

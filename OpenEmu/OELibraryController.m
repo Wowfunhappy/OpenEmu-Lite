@@ -228,67 +228,67 @@ static const CGFloat _OEToolbarHeight = 44;
 
 #pragma mark - Menu Items
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-    if([menuItem action] == @selector(newCollectionFolder:)) return NO;
-    
-    if([menuItem action] == @selector(editSmartCollection:))
-        return [[[self sidebarController] selectedSidebarItem] isKindOfClass:[OEDBSmartCollection class]];
-
-    const id currentViewController = [self currentViewController];
-
-    if([menuItem action] == @selector(startGame:))
-    {
-        return [currentViewController isKindOfClass:[OEGameCollectionViewController class]] && [currentViewController respondsToSelector:@selector(selectedGames)] && [[currentViewController selectedGames] count] != 0;
-    }
-
-    if([menuItem action] == @selector(startSaveState:))
-    {
-        return [currentViewController isKindOfClass:[OEGameCollectionViewController class]] && [currentViewController respondsToSelector:@selector(selectedSaveStates)] && [[currentViewController selectedSaveStates] count] != 0;
-    }
-
-    if([menuItem action] == @selector(find:))
-    {
-        return [[self toolbarSearchField] isEnabled];
-    }
-    
-    NSButton *button = nil;
-    if([menuItem action] == @selector(switchToGridView:))
-        button = [self toolbarGridViewButton];
-    else if([menuItem action] == @selector(switchToFlowView:))
-        button = [self toolbarFlowViewButton];
-    else if([menuItem action] == @selector(switchToListView:))
-        button = [self toolbarListViewButton];
-    else return YES;
-    
-    [menuItem setState:[button state]];
-    return [button isEnabled];
-}
+//- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+//{
+//    if([menuItem action] == @selector(newCollectionFolder:)) return NO;
+//    
+//    if([menuItem action] == @selector(editSmartCollection:))
+//        return [[[self sidebarController] selectedSidebarItem] isKindOfClass:[OEDBSmartCollection class]];
+//
+//    const id currentViewController = [self currentViewController];
+//
+//    if([menuItem action] == @selector(startGame:))
+//    {
+//        return [currentViewController isKindOfClass:[OEGameCollectionViewController class]] && [currentViewController respondsToSelector:@selector(selectedGames)] && [[currentViewController selectedGames] count] != 0;
+//    }
+//
+//    if([menuItem action] == @selector(startSaveState:))
+//    {
+//        return [currentViewController isKindOfClass:[OEGameCollectionViewController class]] && [currentViewController respondsToSelector:@selector(selectedSaveStates)] && [[currentViewController selectedSaveStates] count] != 0;
+//    }
+//
+//    if([menuItem action] == @selector(find:))
+//    {
+//        return [[self toolbarSearchField] isEnabled];
+//    }
+//    
+//    NSButton *button = nil;
+//    if([menuItem action] == @selector(switchToGridView:))
+//        button = [self toolbarGridViewButton];
+//    else if([menuItem action] == @selector(switchToFlowView:))
+//        button = [self toolbarFlowViewButton];
+//    else if([menuItem action] == @selector(switchToListView:))
+//        button = [self toolbarListViewButton];
+//    else return YES;
+//    
+//    [menuItem setState:[button state]];
+//    return [button isEnabled];
+//}
 
 #pragma mark - Import
 
-- (IBAction)addToLibrary:(id)sender
-{
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setAllowsMultipleSelection:YES];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setCanCreateDirectories:NO];
-    [openPanel setCanChooseDirectories:YES];
-    
-    NSWindow *win = [[self view] window];
-    
-    [openPanel beginSheetModalForWindow:win completionHandler:
-     ^(NSInteger result)
-     {
-         if(result == NSFileHandlingPanelOKButton)
-         {
-             // exit our initial open panels completion handler
-             //[self performSelector:@selector(startImportSheet:) withObject:[openPanel URLs] afterDelay:0.0];
-             OEROMImporter *romImporter = [[self database] importer];
-             [romImporter importItemsAtURLs:[openPanel URLs]];
-         }
-     }];
-}
+//- (IBAction)addToLibrary:(id)sender
+//{
+//    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+//    [openPanel setAllowsMultipleSelection:YES];
+//    [openPanel setCanChooseFiles:YES];
+//    [openPanel setCanCreateDirectories:NO];
+//    [openPanel setCanChooseDirectories:YES];
+//    
+//    NSWindow *win = [[self view] window];
+//    
+//    [openPanel beginSheetModalForWindow:win completionHandler:
+//     ^(NSInteger result)
+//     {
+//         if(result == NSFileHandlingPanelOKButton)
+//         {
+//             // exit our initial open panels completion handler
+//             //[self performSelector:@selector(startImportSheet:) withObject:[openPanel URLs] afterDelay:0.0];
+//             OEROMImporter *romImporter = [[self database] importer];
+//             [romImporter importItemsAtURLs:[openPanel URLs]];
+//         }
+//     }];
+//}
 
 #pragma mark -
 

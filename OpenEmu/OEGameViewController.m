@@ -266,7 +266,7 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [editMenu addItem:[NSMenuItem separatorItem]];
     
     NSMenuItem *item;
-    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Edit Game Controls", @"") action:@selector(editControls:) keyEquivalent:@""];
+    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Controls...", @"") action:@selector(editControls:) keyEquivalent:@""];
     [editMenu addItem:item];
     
     // Setup Cheats Menu

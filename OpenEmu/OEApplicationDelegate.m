@@ -27,7 +27,6 @@
 #import "OEApplicationDelegate.h"
 
 #import "OELibraryDatabase.h"
-#import "OEVersionMigrationController.h"
 
 #import "OEPlugin.h"
 #import "OECorePlugin.h"
@@ -69,7 +68,6 @@
 #import <objc/message.h>
 
 #import "OEDBSaveState.h"
-#import "OELibraryMigrator.h"
 
 NSString *const OEWebSiteURL      = @"http://openemu.org/";
 NSString *const OEUserGuideURL    = @"https://github.com/OpenEmu/OpenEmu/wiki/User-guide";
@@ -146,8 +144,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     self = [super init];
     if (self) {
-        [[OEVersionMigrationController defaultMigrationController] addMigratorTarget:self selector:@selector(migrationForceUpdateCores:) forVersion:@"1.0.4"];
-
         [self setStartupQueue:[NSMutableArray array]];
     }
     return self;
@@ -190,9 +186,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
     if(openDocumentMenuItemIndex >= 0 && [[fileMenu itemAtIndex:openDocumentMenuItemIndex + 1] hasSubmenu])
         [fileMenu removeItemAtIndex:openDocumentMenuItemIndex + 1];*/
-
-    // Run Migration Manager
-    [[OEVersionMigrationController defaultMigrationController] runMigrationIfNeeded];
 
     // update extensions
     [self updateInfoPlist];
@@ -257,10 +250,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
 {
-    if(![[NSUserDefaults standardUserDefaults] boolForKey:OESetupAssistantHasFinishedKey]){
+    /*if(![[NSUserDefaults standardUserDefaults] boolForKey:OESetupAssistantHasFinishedKey]){
         [NSApp replyToOpenOrPrint:NSApplicationDelegateReplyCancel];
         return;
-    }
+    }*/
 
     void(^block)(void) = ^{
         DLog();
@@ -472,25 +465,8 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     {
         if([error domain] == NSCocoaErrorDomain && [error code] == NSPersistentStoreIncompatibleVersionHashError)
         {
-            OELibraryMigrator *migrator = [[OELibraryMigrator alloc] initWithStoreURL:url];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                NSError *blockError = nil;
-                if(![migrator runMigration:&blockError])
-                {
-                    if([blockError domain] != OEMigrationErrorDomain || [blockError code] != OEMigrationCanceled)
-                    {
-                        DLog(@"Your Library can't be opened with this version of OpenEmu");
-                        DLog(@"%@", blockError);
-                        [[NSAlert alertWithError:blockError] runModal];
-                    }
-                    else DLog(@"Migration canceled");
-
-                    [[NSApplication sharedApplication] terminate:self];
-                }
-                else
-                {
-                    [self OE_loadDatabaseAsynchronouslyFormURL:url createIfNecessary:create];
-                }
+                [self OE_loadDatabaseAsynchronouslyFormURL:url createIfNecessary:create];
             });
         }
         else
@@ -883,11 +859,11 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 }
 
 #pragma mark - Migration
-- (BOOL)migrationForceUpdateCores:(NSError**)outError
-{
-    [[OECoreUpdater sharedUpdater] checkForUpdatesAndInstall];
-    return YES;
-}
+//- (BOOL)migrationForceUpdateCores:(NSError**)outError
+//{
+//    [[OECoreUpdater sharedUpdater] checkForUpdatesAndInstall];
+//    return YES;
+//}
 
 #pragma mark - Debug
 - (void)setLogHIDEvents:(BOOL)value

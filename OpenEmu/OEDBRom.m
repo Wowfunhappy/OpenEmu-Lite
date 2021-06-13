@@ -51,10 +51,10 @@
 {
     if(url == nil) return nil;
 
-    OELibraryDatabase *library = [[context userInfo] valueForKey:OELibraryDatabaseUserInfoKey];
-    NSURL *romFolderURL = [library romsFolderURL];
+    //OELibraryDatabase *library = [[context userInfo] valueForKey:OELibraryDatabaseUserInfoKey];
+    //NSURL *romFolderURL = [library romsFolderURL];
 
-    url = [url urlRelativeToURL:romFolderURL];
+    //url = [url urlRelativeToURL:romFolderURL];
 
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"location == %@", [url relativeString]];
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:[self entityName]];
@@ -97,14 +97,14 @@
 #pragma mark - Accessors
 - (NSURL *)URL
 {
-    NSURL *romFolderURL = [[self libraryDatabase] romsFolderURL];
-    return [NSURL URLWithString:[self location] relativeToURL:romFolderURL];
+    //NSURL *romFolderURL = [[self libraryDatabase] romsFolderURL];
+    return [NSURL URLWithString:[self location]];
 }
 
 - (void)setURL:(NSURL *)url
 {
-    NSURL *romFolderURL = [[self libraryDatabase] romsFolderURL];
-    [self setLocation:[[url urlRelativeToURL:romFolderURL] relativeString]];
+    //NSURL *romFolderURL = [[self libraryDatabase] romsFolderURL];
+    [self setLocation:[url relativeString]];
 }
 
 - (NSURL *)sourceURL
@@ -275,46 +275,46 @@
 }
 
 #pragma mark - File Handling
-- (BOOL)consolidateFilesWithError:(NSError**)error
-{
-    NSURL *url = [self URL];
-    OELibraryDatabase *library = [self libraryDatabase];
-    NSURL *romsFolderURL = [library romsFolderURL];
-
-    if([url checkResourceIsReachableAndReturnError:nil] && ![url isSubpathOfURL:romsFolderURL])
-    {
-        BOOL romFileLocked = NO;
-        if([[[[NSFileManager defaultManager] attributesOfItemAtPath:[url path] error:nil] objectForKey:NSFileImmutable] boolValue])
-        {
-            romFileLocked = YES;
-            [[NSFileManager defaultManager] setAttributes:@{ NSFileImmutable: @(FALSE) } ofItemAtPath:[url path] error:nil];
-        }
-
-        NSString *fullName  = [url lastPathComponent];
-        NSString *extension = [fullName pathExtension];
-        NSString *baseName  = [fullName stringByDeletingPathExtension];
-
-        OEDBSystem  *system = [[self game] system];
-
-        NSURL *unsortedFolder = [library romsFolderURLForSystem:system];
-        NSURL *romURL         = [unsortedFolder URLByAppendingPathComponent:fullName];
-        romURL = [romURL uniqueURLUsingBlock:^NSURL *(NSInteger triesCount) {
-            NSString *newName = [NSString stringWithFormat:@"%@ %ld.%@", baseName, triesCount, extension];
-            return [unsortedFolder URLByAppendingPathComponent:newName];
-        }];
-
-        if([[NSFileManager defaultManager] copyItemAtURL:url toURL:romURL error:error])
-        {
-            [self setURL:romURL];
-            NSLog(@"New URL: %@", romURL);
-        }
-        else if(error != nil) return NO;
-
-        if(romFileLocked)
-            [[NSFileManager defaultManager] setAttributes:@{ NSFileImmutable: @(YES) } ofItemAtPath:[url path] error:nil];
-    }
-    return YES;
-}
+//- (BOOL)consolidateFilesWithError:(NSError**)error
+//{
+//    NSURL *url = [self URL];
+//    OELibraryDatabase *library = [self libraryDatabase];
+//    //NSURL *romsFolderURL = [library romsFolderURL];
+//
+//    if([url checkResourceIsReachableAndReturnError:nil] && ![url isSubpathOfURL:romsFolderURL])
+//    {
+//        BOOL romFileLocked = NO;
+//        if([[[[NSFileManager defaultManager] attributesOfItemAtPath:[url path] error:nil] objectForKey:NSFileImmutable] boolValue])
+//        {
+//            romFileLocked = YES;
+//            [[NSFileManager defaultManager] setAttributes:@{ NSFileImmutable: @(FALSE) } ofItemAtPath:[url path] error:nil];
+//        }
+//
+//        NSString *fullName  = [url lastPathComponent];
+//        NSString *extension = [fullName pathExtension];
+//        NSString *baseName  = [fullName stringByDeletingPathExtension];
+//
+//        OEDBSystem  *system = [[self game] system];
+//
+//        NSURL *unsortedFolder = [library romsFolderURLForSystem:system];
+//        NSURL *romURL         = [unsortedFolder URLByAppendingPathComponent:fullName];
+//        romURL = [romURL uniqueURLUsingBlock:^NSURL *(NSInteger triesCount) {
+//            NSString *newName = [NSString stringWithFormat:@"%@ %ld.%@", baseName, triesCount, extension];
+//            return [unsortedFolder URLByAppendingPathComponent:newName];
+//        }];
+//
+//        if([[NSFileManager defaultManager] copyItemAtURL:url toURL:romURL error:error])
+//        {
+//            [self setURL:romURL];
+//            NSLog(@"New URL: %@", romURL);
+//        }
+//        else if(error != nil) return NO;
+//
+//        if(romFileLocked)
+//            [[NSFileManager defaultManager] setAttributes:@{ NSFileImmutable: @(YES) } ofItemAtPath:[url path] error:nil];
+//    }
+//    return YES;
+//}
 
 - (BOOL)filesAvailable
 {
@@ -331,45 +331,45 @@
 
 #pragma mark - Core Data utilities
 
-- (void)deleteByMovingFile:(BOOL)moveToTrash keepSaveStates:(BOOL)statesFlag
-{
-    NSURL *url = [self URL];
-
-    if(moveToTrash && [url isSubpathOfURL:[[self libraryDatabase] romsFolderURL]])
-    {
-        NSInteger count = 1;
-        if([self archiveFileIndex])
-        {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"location == %@", [self location]];
-            NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:[[self class] entityName]];
-            [fetchRequest setPredicate:predicate];
-            count = [[self managedObjectContext] countForFetchRequest:fetchRequest error:nil];
-        }
-
-        if(count == 1)
-        {
-            NSString *path = [url path];
-            NSString *source = [path stringByDeletingLastPathComponent];
-            NSArray *files = @[[path lastPathComponent]];
-
-            if([[[path pathExtension] lowercaseString] isEqualToString:@"cue"])
-            {
-                OECUESheet *sheet = [[OECUESheet alloc] initWithPath:path];
-                NSArray *additionalFileNames = [sheet referencedFileNames];
-                files = [files arrayByAddingObjectsFromArray:additionalFileNames];
-            }
-
-            [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:source destination:@"" files:files tag:NULL];
-        } else DLog(@"Keeping file, other roms depent on it!");
-    }
-
-    if(!statesFlag)
-    {
-        // TODO: remove states
-    }
-
-    [[self managedObjectContext] deleteObject:self];
-}
+//- (void)deleteByMovingFile:(BOOL)moveToTrash keepSaveStates:(BOOL)statesFlag
+//{
+//    NSURL *url = [self URL];
+//
+//    if(moveToTrash && [url isSubpathOfURL:[[self libraryDatabase] romsFolderURL]])
+//    {
+//        NSInteger count = 1;
+//        if([self archiveFileIndex])
+//        {
+//            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"location == %@", [self location]];
+//            NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:[[self class] entityName]];
+//            [fetchRequest setPredicate:predicate];
+//            count = [[self managedObjectContext] countForFetchRequest:fetchRequest error:nil];
+//        }
+//
+//        if(count == 1)
+//        {
+//            NSString *path = [url path];
+//            NSString *source = [path stringByDeletingLastPathComponent];
+//            NSArray *files = @[[path lastPathComponent]];
+//
+//            if([[[path pathExtension] lowercaseString] isEqualToString:@"cue"])
+//            {
+//                OECUESheet *sheet = [[OECUESheet alloc] initWithPath:path];
+//                NSArray *additionalFileNames = [sheet referencedFileNames];
+//                files = [files arrayByAddingObjectsFromArray:additionalFileNames];
+//            }
+//
+//            [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:source destination:@"" files:files tag:NULL];
+//        } else DLog(@"Keeping file, other roms depent on it!");
+//    }
+//
+//    if(!statesFlag)
+//    {
+//        // TODO: remove states
+//    }
+//
+//    [[self managedObjectContext] deleteObject:self];
+//}
 
 + (NSString *)entityName
 {

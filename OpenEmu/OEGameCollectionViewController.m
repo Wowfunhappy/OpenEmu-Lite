@@ -209,69 +209,69 @@ extern NSString * const OEGameControlsBarCanDeleteSaveStatesKey;
         [state deleteAndRemoveFiles];
 }
 
-- (void)deleteSelectedItems:(id)sender
-{
-    OECoreDataMainThreadAssertion();
-
-    NSArray *selectedGames = [self selectedGames];
-    BOOL multipleGames = ([selectedGames count]>1);
-
-    // deleting from 'All Games', Smart Collections and consoles removes games from the library
-    if([[self representedObject] isKindOfClass:[OEDBSmartCollection class]]
-       || [self representedObject]==(id<OEGameCollectionViewItemProtocol>)[OEDBAllGamesCollection sharedDBAllGamesCollection]
-       || [[self representedObject] isKindOfClass:[OEDBSystem class]])
-    {
-        // delete games from library if user allows it
-        if([[OEHUDAlert removeGamesFromLibraryAlert:multipleGames] runModal])
-        {
-            NSURL* romsFolderURL             = [[[self libraryController] database] romsFolderURL];
-            __block BOOL romsAreInRomsFolder = NO;
-            [selectedGames enumerateObjectsUsingBlock:^(OEDBGame *game, NSUInteger idx, BOOL *stopGames) {
-                [[game roms] enumerateObjectsUsingBlock:^(OEDBRom *rom, BOOL *stopRoms) {
-                    NSURL *romURL = [rom URL];
-                    if(romURL != nil && [romURL isSubpathOfURL:romsFolderURL])
-                    {
-                        romsAreInRomsFolder = YES;
-
-                        *stopGames = YES;
-                        *stopRoms = YES;
-                    }
-                }];
-            }];
-
-            BOOL deleteFiles = NO;
-            if(romsAreInRomsFolder)
-            {
-                NSUInteger alertReturn = [[OEHUDAlert removeGameFilesFromLibraryAlert:multipleGames] runModal];
-                deleteFiles = (alertReturn == NSAlertDefaultReturn);
-            }
-
-            DLog(@"deleteFiles: %d", deleteFiles);
-            [selectedGames enumerateObjectsUsingBlock:^(OEDBGame *game, NSUInteger idx, BOOL *stopGames) {
-                [game deleteByMovingFile:deleteFiles keepSaveStates:YES];
-            }];
-
-            NSManagedObjectContext *context = [[selectedGames lastObject] managedObjectContext];
-            [context save:nil];
-
-            NSRect visibleRect = [[self gridView] visibleRect];
-            [self reloadData];
-            [[self gridView] scrollRectToVisible:visibleRect];
-        }
-    }
-    // deletign from normal collections removes games from that collection
-    else if([[self representedObject] isMemberOfClass:[OEDBCollection class]])
-    {
-        // remove games from collection if user allows it
-        if([[OEHUDAlert removeGamesFromCollectionAlert] runModal])
-        {
-            OEDBCollection* collection = (OEDBCollection*)[self representedObject];
-            [[collection mutableGames] minusSet:[NSSet setWithArray:selectedGames]];
-            [collection save];
-        }
-        [self setNeedsReload];
-    }
-}
+//- (void)deleteSelectedItems:(id)sender
+//{
+//    OECoreDataMainThreadAssertion();
+//
+//    NSArray *selectedGames = [self selectedGames];
+//    BOOL multipleGames = ([selectedGames count]>1);
+//
+//    // deleting from 'All Games', Smart Collections and consoles removes games from the library
+//    if([[self representedObject] isKindOfClass:[OEDBSmartCollection class]]
+//       || [self representedObject]==(id<OEGameCollectionViewItemProtocol>)[OEDBAllGamesCollection sharedDBAllGamesCollection]
+//       || [[self representedObject] isKindOfClass:[OEDBSystem class]])
+//    {
+//        // delete games from library if user allows it
+//        if([[OEHUDAlert removeGamesFromLibraryAlert:multipleGames] runModal])
+//        {
+//            NSURL* romsFolderURL             = [[[self libraryController] database] romsFolderURL];
+//            __block BOOL romsAreInRomsFolder = NO;
+//            [selectedGames enumerateObjectsUsingBlock:^(OEDBGame *game, NSUInteger idx, BOOL *stopGames) {
+//                [[game roms] enumerateObjectsUsingBlock:^(OEDBRom *rom, BOOL *stopRoms) {
+//                    NSURL *romURL = [rom URL];
+//                    if(romURL != nil && [romURL isSubpathOfURL:romsFolderURL])
+//                    {
+//                        romsAreInRomsFolder = YES;
+//
+//                        *stopGames = YES;
+//                        *stopRoms = YES;
+//                    }
+//                }];
+//            }];
+//
+//            BOOL deleteFiles = NO;
+//            if(romsAreInRomsFolder)
+//            {
+//                NSUInteger alertReturn = [[OEHUDAlert removeGameFilesFromLibraryAlert:multipleGames] runModal];
+//                deleteFiles = (alertReturn == NSAlertDefaultReturn);
+//            }
+//
+//            DLog(@"deleteFiles: %d", deleteFiles);
+//            [selectedGames enumerateObjectsUsingBlock:^(OEDBGame *game, NSUInteger idx, BOOL *stopGames) {
+//                [game deleteByMovingFile:deleteFiles keepSaveStates:YES];
+//            }];
+//
+//            NSManagedObjectContext *context = [[selectedGames lastObject] managedObjectContext];
+//            [context save:nil];
+//
+//            NSRect visibleRect = [[self gridView] visibleRect];
+//            [self reloadData];
+//            [[self gridView] scrollRectToVisible:visibleRect];
+//        }
+//    }
+//    // deletign from normal collections removes games from that collection
+//    else if([[self representedObject] isMemberOfClass:[OEDBCollection class]])
+//    {
+//        // remove games from collection if user allows it
+//        if([[OEHUDAlert removeGamesFromCollectionAlert] runModal])
+//        {
+//            OEDBCollection* collection = (OEDBCollection*)[self representedObject];
+//            [[collection mutableGames] minusSet:[NSSet setWithArray:selectedGames]];
+//            [collection save];
+//        }
+//        [self setNeedsReload];
+//    }
+//}
 
 - (void)makeNewCollectionWithSelectedGames:(id)sender
 {

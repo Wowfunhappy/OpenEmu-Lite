@@ -79,17 +79,17 @@ extern NSString *const OEManagedObjectContextHasDirectChangesKey;
 
 #pragma mark - Database Folders
 - (NSURL *)databaseFolderURL;
-- (NSURL *)romsFolderURL;
-- (void)setRomsFolderURL:(NSURL *)url;
-- (NSURL *)unsortedRomsFolderURL;
-- (NSURL *)romsFolderURLForSystem:(OEDBSystem *)system;
+//- (NSURL *)romsFolderURL;
+//- (void)setRomsFolderURL:(NSURL *)url;
+//- (NSURL *)unsortedRomsFolderURL;
+//- (NSURL *)romsFolderURLForSystem:(OEDBSystem *)system;
 - (NSURL *)stateFolderURL;
 - (NSURL *)stateFolderURLForSystem:(OEDBSystem *)system;
 - (NSURL *)stateFolderURLForROM:(OEDBRom *)rom;
 - (NSURL *)screenshotFolderURL;
 - (NSURL *)coverFolderURL;
 - (NSURL *)importQueueURL;
-- (NSURL *)autoImportFolderURL;
+//- (NSURL *)autoImportFolderURL;
 
 #pragma mark - OpenVGDB Sync
 - (void)startOpenVGDBSync;

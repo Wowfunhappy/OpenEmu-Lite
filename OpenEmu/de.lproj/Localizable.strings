@@ -155,7 +155,7 @@
 
 /*s|OESidebarOutlineView.m|182|*/ "Duplicate Collection" = "Sammlung duplizieren";
 
-/*s|OEGameControlsBar.m|266|*/ "Edit Game Controls" = "Steuerung anpassen";
+/*s|OEGameControlsBar.m|266|*/ "Controls..." = "Steuerung anpassen";
 
 /*r|OEPrefDebugController.m|153|Debug Checkbox Label*/ "Enable Retrode support" = "";
 
