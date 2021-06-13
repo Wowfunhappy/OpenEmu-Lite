@@ -270,6 +270,8 @@ typedef enum
 
 
 //Wowfunhappy
+//Disabled because it doesn't work properly - Stays checked on manual window resize.
+/*
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     SEL action = [menuItem action];
@@ -287,6 +289,7 @@ typedef enum
     
     return YES;
 }
+ */
 
 
 
