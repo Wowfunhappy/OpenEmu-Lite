@@ -116,16 +116,17 @@ static const unsigned short konamiCodeSize = 10;
     [preferencesItem setEnabled:YES];
 
     OEAppStoreWindow *win = (OEAppStoreWindow *)[self window];
-    [win close]; // Make sure window doesn't show up in window menu until it's actual visible
+    //NSWindow *win = [self window];
+    //[win close]; // Make sure window doesn't show up in window menu until it's actual visible
 
     NSColor *windowBackgroundColor = [NSColor colorWithDeviceRed:0.149 green:0.149 blue:0.149 alpha:1.0];
     [win setBackgroundColor:windowBackgroundColor];
 
     [self OE_reloadPreferencePanes];
     
-    [win setTitleBarView:toolbar];
-    [win setCenterTrafficLightButtons:NO];
-    [win setTitleBarHeight:83.0];
+    //[win setTitleBarView:toolbar];
+    //[win setCenterTrafficLightButtons:NO];
+    [win setTitleBarHeight:22];
     [win setMovableByWindowBackground:NO];
    
     NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
@@ -153,13 +154,13 @@ static const unsigned short konamiCodeSize = 10;
 
 #pragma mark - NSWindowDelegate
 
-- (NSRect)window:(NSWindow *)window willPositionSheet:(NSWindow *)sheet usingRect:(NSRect)rect
-{
-    if([window isKindOfClass:[OEAppStoreWindow class]])
-        rect.origin.y -= [(OEAppStoreWindow*)window titleBarHeight]-22.0;
-    
-    return rect;
-}
+//- (NSRect)window:(NSWindow *)window willPositionSheet:(NSWindow *)sheet usingRect:(NSRect)rect
+//{
+//    if([window isKindOfClass:[OEAppStoreWindow class]])
+//        rect.origin.y -= [(OEAppStoreWindow*)window titleBarHeight]-22.0;
+//    
+//    return rect;
+//}
 
 - (void)windowWillClose:(NSNotification *)notification
 {
@@ -218,11 +219,11 @@ static const unsigned short konamiCodeSize = 10;
     
     NSViewController <OEPreferencePane>  *controller;
     
-    controller = [[OEPrefLibraryController alloc] init];
+    /*controller = [[OEPrefLibraryController alloc] init];
     [array addObject:controller];
     
     controller = [[OEPrefGameplayController alloc] init];
-    [array addObject:controller];
+    [array addObject:controller];*/
     
     controller = [[OEPrefControlsController alloc] init];
     [array addObject:controller];
@@ -247,7 +248,7 @@ static const unsigned short konamiCodeSize = 10;
 
 - (void)OE_rebuildToolbar
 {
-    if([[self preferencePanes] count] == 0)
+    /*if([[self preferencePanes] count] == 0)
         return;
 
     NSUInteger lastSelection = 0;
@@ -258,7 +259,8 @@ static const unsigned short konamiCodeSize = 10;
         toolbar = nil;
     }
     
-    OEAppStoreWindow *win = (OEAppStoreWindow*)[self window];
+    //OEAppStoreWindow *win = (OEAppStoreWindow*)[self window];
+    NSWindow *win = [self window];
     toolbar = [[OEToolbarView alloc] initWithFrame:NSMakeRect(0, 0, win.frame.size.width-10.0, 58.0)];
 
     [[self preferencePanes] enumerateObjectsUsingBlock:^(id <OEPreferencePane> aPreferencePane, NSUInteger idx, BOOL *stop) {
@@ -277,7 +279,7 @@ static const unsigned short konamiCodeSize = 10;
     [self switchView:[toolbar itemAtIndex:lastSelection] animate:YES];
     [self setVisibleItemIndex:[[[toolbar itemAtIndex:lastSelection] representedObject] integerValue]];
 
-    [win setTitleBarView:toolbar];
+    [win setTitleBarView:toolbar];*/
 }
 
 - (void)OE_openPreferencePane:(NSNotification *)notification
