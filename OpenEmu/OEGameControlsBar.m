@@ -724,14 +724,12 @@ NSString *const OEGameControlsBarShowsAudioOutput       = @"HUDBarShowAudioOutpu
     if(hasSubmenu)
     {
         unsigned int maxScale = [integralScalingDelegate maximumIntegralScale];
-        //unsigned int currentScale = [integralScalingDelegate currentIntegralScale];
 
         for(unsigned int scale = 1; scale <= maxScale; scale++)
         {
             NSString *scaleTitle  = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
             NSMenuItem *scaleItem = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
             [scaleItem setRepresentedObject:@(scale)];
-            //[scaleItem setState:(scale == currentScale ? NSOnState : NSOffState)];
             [scaleMenu addItem:scaleItem];
         }
     }
@@ -739,18 +737,8 @@ NSString *const OEGameControlsBarShowsAudioOutput       = @"HUDBarShowAudioOutpu
         [item setEnabled:NO];
 
     
-    
-    
-    
     return true;
 }
-
-
-
-
-
-
-
 
 
 

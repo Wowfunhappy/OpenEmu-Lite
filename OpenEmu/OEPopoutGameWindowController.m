@@ -269,6 +269,28 @@ typedef enum
         [self OE_changeGameViewIntegralScale:newMaxScale];
 }
 
+
+//Wowfunhappy
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    SEL action = [menuItem action];
+    
+    if(action == @selector(changeIntegralScale:))
+    {
+        NSLog(@"Wowfunhappy Testing: %d", [self currentIntegralScale]);
+        NSLog(@"Wowfunhappy Testing: %d", [[menuItem title] substringFromIndex:1].intValue);
+        if ([[menuItem representedObject] unsignedIntValue] == [self currentIntegralScale]) {
+            [menuItem setState:NSOnState];
+        } else {
+            [menuItem setState:NSOffState];
+        }
+    }
+    
+    return YES;
+}
+
+
+
 - (OEGameDocument *)OE_gameDocument
 {
     return (OEGameDocument *)[self document];
@@ -398,13 +420,18 @@ typedef enum
     [gameViewController viewDidDisappear];
 }
 
-//- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
-//{
-//    _integralScale = _OEFitToWindowScale;
-//    const NSSize windowSize  = [OEHUDWindow frameRectForMainContentRect:(NSRect){.size = frameSize}].size;
-//
-//    return windowSize;
-//}
+
+ //Wowfunhappy: We can't use this, allows windows to be sized to overlap the Dock.
+/*- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
+{
+    _integralScale = _OEFitToWindowScale;
+    const NSSize windowSize  = [OEHUDWindow frameRectForMainContentRect:(NSRect){.size = frameSize}].size;
+
+    NSLog(@"Wowfunhappy, windowWillResize: %@", windowSize);
+    return windowSize;
+}*/
+
+
 
 - (void)cancelOperation:(id)sender
 {

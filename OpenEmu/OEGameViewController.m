@@ -43,7 +43,7 @@
 #import "OECorePlugin.h"
 
 #import "OEDBSaveState.h"
-#import "OEGameControlsBar.h"
+//#import "OEGameControlsBar.h"
 
 #import "OECoreUpdater.h"
 
@@ -57,6 +57,11 @@
 
 #import "OEPreferencesController.h"
 #import "OELibraryDatabase.h"
+
+//Wowfunhappy
+#import "OECompositionPlugin.h"
+#import "OEShaderPlugin.h"
+#import "OEGameIntegralScalingDelegate.h"
 
 #import <OpenEmuSystem/OpenEmuSystem.h>
 
@@ -87,6 +92,11 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     OEIntSize   _screenSize;
     OEIntSize   _aspectSize;
     BOOL        _pausedByGoingToBackground;
+    
+    
+    NSArray        *_filterPlugins;
+    NSMutableArray *_cheats;
+    BOOL            _cheatsLoaded;
 }
 
 @end
@@ -107,8 +117,8 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
 {
     if((self = [super init]))
     {
-        _controlsWindow = [[OEGameControlsBar alloc] initWithGameViewController:self];
-        [_controlsWindow setReleasedWhenClosed:YES];
+        /*_controlsWindow = [[OEGameControlsBar alloc] initWithGameViewController:self];
+        [_controlsWindow setReleasedWhenClosed:YES];*/
 
         NSView *view = [[NSView alloc] initWithFrame:(NSRect){ .size = { 1.0, 1.0 }}];
         [self setView:view];
@@ -126,7 +136,7 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
         
         [[self view] addSubview:_gameView];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewDidChangeFrame:) name:NSViewFrameDidChangeNotification object:_gameView];
+        //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewDidChangeFrame:) name:NSViewFrameDidChangeNotification object:_gameView];
     }
     return self;
 }
@@ -138,8 +148,8 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [_gameView setDelegate:nil];
     _gameView = nil;
 
-    [_controlsWindow close];
-    _controlsWindow = nil;
+    /*[_controlsWindow close];
+    _controlsWindow = nil;*/
 }
 
 #pragma mark -
@@ -148,26 +158,40 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
 {
     [super viewDidAppear];
 
-    if([_controlsWindow parentWindow] != nil)
-        [[_controlsWindow parentWindow] removeChildWindow:_controlsWindow];
+    /*if([_controlsWindow parentWindow] != nil)
+        [[_controlsWindow parentWindow] removeChildWindow:_controlsWindow];*/
 
     NSWindow *window = [self OE_rootWindow];
     if(window == nil) return;
 
-    [window addChildWindow:_controlsWindow ordered:NSWindowAbove];
+    /*[window addChildWindow:_controlsWindow ordered:NSWindowAbove];
     [self OE_repositionControlsWindow];
-    [_controlsWindow orderFront:self];
+    [_controlsWindow orderFront:self];*/
 
     [window makeFirstResponder:_gameView];
+    
+    
+    
+    //Wowfunhappy
+    
+    NSMutableSet   *filterSet     = [NSMutableSet set];
+    [filterSet addObjectsFromArray:[OECompositionPlugin allPluginNames]];
+    [filterSet addObjectsFromArray:[OEShaderPlugin allPluginNames]];
+    [filterSet filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF beginswith '_'"]];
+    _filterPlugins = [[filterSet allObjects] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    
+    [self extraMenuItemSetup];
+    
+    
 }
 
-- (void)viewWillDisappear
-{
-    [super viewWillDisappear];
-
-    [_controlsWindow hide];
-    [[self OE_rootWindow] removeChildWindow:_controlsWindow];
-}
+//- (void)viewWillDisappear
+//{
+//    [super viewWillDisappear];
+//
+//    //[_controlsWindow hide];
+//    [[self OE_rootWindow] removeChildWindow:_controlsWindow];
+//}
 
 #pragma mark - Controlling Emulation
 
@@ -232,15 +256,167 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     SEL action = [menuItem action];
-    if(action == @selector(toggleControlsVisibility:))
+
+    if(action == @selector(selectFilter:))
     {
-        if([[self controlsWindow] canShow])
-            [menuItem setState:NSOffState];
-        else
+        if ([[_gameView filterName] isEqualToString:[menuItem title]]) {
             [menuItem setState:NSOnState];
+        } else {
+            [menuItem setState:NSOffState];
+        }
     }
+    
     return YES;
 }
+
+
+
+- (BOOL)extraMenuItemSetup {
+    //Wowfunhappy
+    
+    NSMenu *mainMenu = [NSApp mainMenu];
+    
+    //Edit Menu
+    NSMenuItem *editMenuItem = [mainMenu itemAtIndex:2];
+    NSMenu *editMenu = [editMenuItem submenu];
+    [editMenu addItem:[NSMenuItem separatorItem]];
+    
+    NSMenuItem *item;
+    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Edit Game Controls", @"") action:@selector(editControls:) keyEquivalent:@""];
+    [editMenu addItem:item];
+    
+    // Setup Cheats Menu
+    if([self supportsCheats])
+    {
+        NSMenu *cheatsMenu = [[NSMenu alloc] init];
+        [cheatsMenu setTitle:OELocalizedString(@"Select Cheat", @"")];
+        item = [[NSMenuItem alloc] init];
+        [item setTitle:OELocalizedString(@"Select Cheat", @"")];
+        [editMenu addItem:item];
+        [item setSubmenu:cheatsMenu];
+        
+        NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
+                                                                  action:@selector(addCheat:)
+                                                           keyEquivalent:@""];
+        [addCheatMenuItem setRepresentedObject:_cheats];
+        [cheatsMenu addItem:addCheatMenuItem];
+        
+        if([_cheats count] != 0)
+            [cheatsMenu addItem:[NSMenuItem separatorItem]];
+        
+        for(NSDictionary *cheatObject in _cheats)
+        {
+            NSString *description = [cheatObject objectForKey:@"description"];
+            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
+            
+            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
+            [cheatsMenuItem setRepresentedObject:cheatObject];
+            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
+            
+            [cheatsMenu addItem:cheatsMenuItem];
+        }
+    }
+    
+    // Setup Core selection menu
+    NSMenu *coresMenu = [[NSMenu alloc] init];
+    [coresMenu setTitle:OELocalizedString(@"Select Core", @"")];
+    
+    NSString *systemIdentifier = [self systemIdentifier];
+    NSArray *corePlugins = [OECorePlugin corePluginsForSystemIdentifier:systemIdentifier];
+    if([corePlugins count] > 1)
+    {
+        corePlugins = [corePlugins sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            return [[obj1 displayName] compare:[obj2 displayName]];
+        }];
+        
+        for(OECorePlugin *aPlugin in corePlugins)
+        {
+            NSMenuItem *coreItem = [[NSMenuItem alloc] initWithTitle:[aPlugin displayName] action:@selector(switchCore:) keyEquivalent:@""];
+            [coreItem setRepresentedObject:aPlugin];
+            
+            if([[aPlugin bundleIdentifier] isEqual:[self coreIdentifier]]) [coreItem setState:NSOnState];
+            
+            [coresMenu addItem:coreItem];
+        }
+        
+        item = [[NSMenuItem alloc] init];
+        item.title = OELocalizedString(@"Select Core", @"");
+        [item setSubmenu:coresMenu];
+        if([[coresMenu itemArray] count] > 1)
+            [editMenu addItem:item];
+    }
+    
+    
+    
+    //View Menu
+    
+    NSMenuItem *viewMenuItem = [mainMenu itemAtIndex:3];
+    NSMenu *viewMenu = [viewMenuItem submenu];
+    [viewMenu addItem:[NSMenuItem separatorItem]];
+    
+    //Setup Video Filter Menu
+    NSMenu *filterMenu = [[NSMenu alloc] init];
+    [filterMenu setTitle:OELocalizedString(@"Select Filter", @"")];
+    
+    NSString *selectedFilter = ([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, systemIdentifier]]
+                                ? : [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey]);
+    
+    // Select the Default Filter if the current is not available (ie. deleted)
+    if(![_filterPlugins containsObject:selectedFilter])
+        selectedFilter = [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey];
+    
+    for(NSString *aName in _filterPlugins)
+    {
+        NSMenuItem *filterItem = [[NSMenuItem alloc] initWithTitle:aName action:@selector(selectFilter:) keyEquivalent:@""];
+        if([aName isEqualToString:selectedFilter]) [filterItem setState:NSOnState];
+        [filterMenu addItem:filterItem];
+    }
+    
+    item = [[NSMenuItem alloc] init];
+    item.title = OELocalizedString(@"Select Filter", @"");
+    [viewMenu addItem:item];
+    [item setSubmenu:filterMenu];
+    
+    // Setup integral scaling
+    id<OEGameIntegralScalingDelegate> integralScalingDelegate = [self integralScalingDelegate];
+    const BOOL hasSubmenu = [integralScalingDelegate shouldAllowIntegralScaling] && [integralScalingDelegate respondsToSelector:@selector(maximumIntegralScale)];
+    
+    NSMenu *scaleMenu = [NSMenu new];
+    [scaleMenu setTitle:OELocalizedString(@"Select Scale", @"")];
+    item = [NSMenuItem new];
+    [item setTitle:[scaleMenu title]];
+    [viewMenu addItem:item];
+    [item setSubmenu:scaleMenu];
+    
+    if(hasSubmenu)
+    {
+        unsigned int maxScale = [integralScalingDelegate maximumIntegralScale];
+        unsigned int currentScale = [integralScalingDelegate currentIntegralScale];
+        
+        for(unsigned int scale = 1; scale <= maxScale; scale++)
+        {
+            NSString *scaleTitle  = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
+            NSMenuItem *scaleItem = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
+            [scaleItem setRepresentedObject:@(scale)];
+            [scaleMenu addItem:scaleItem];
+        }
+    }
+    else
+        [item setEnabled:NO];
+    
+    
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
 
 #pragma mark - Taking Screenshots
 - (void)takeScreenshot:(id)sender
@@ -321,33 +497,33 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
 
 #pragma mark - Private Methods
 
-- (void)OE_repositionControlsWindow
-{
-    NSWindow *gameWindow = [self OE_rootWindow];
-    if(gameWindow == nil) return;
-
-    static const CGFloat _OEControlsMargin = 19;
-
-    NSRect gameViewFrameInWindow = [_gameView convertRect:[_gameView frame] toView:nil];
-    NSPoint origin = [gameWindow convertRectToScreen:gameViewFrameInWindow].origin;
-
-    origin.x += ([_gameView frame].size.width - [_controlsWindow frame].size.width) / 2;
-
-    // If the controls bar fits, it sits over the window
-    if([_gameView frame].size.width >= [_controlsWindow frame].size.width)
-        origin.y += _OEControlsMargin;
-    else
-    {
-        // Otherwise, it sits below the window
-        origin.y -= ([_controlsWindow frame].size.height + _OEControlsMargin);
-
-        // Unless below the window means it being off-screen, in which case it sits above the window
-        if(origin.y < NSMinY([[gameWindow screen] visibleFrame]))
-            origin.y = NSMaxY([gameWindow frame]) + _OEControlsMargin;
-    }
-
-    [_controlsWindow setFrameOrigin:origin];
-}
+//- (void)OE_repositionControlsWindow
+//{
+//    NSWindow *gameWindow = [self OE_rootWindow];
+//    if(gameWindow == nil) return;
+//
+//    static const CGFloat _OEControlsMargin = 19;
+//
+//    NSRect gameViewFrameInWindow = [_gameView convertRect:[_gameView frame] toView:nil];
+//    NSPoint origin = [gameWindow convertRectToScreen:gameViewFrameInWindow].origin;
+//
+//    origin.x += ([_gameView frame].size.width - [_controlsWindow frame].size.width) / 2;
+//
+//    // If the controls bar fits, it sits over the window
+//    if([_gameView frame].size.width >= [_controlsWindow frame].size.width)
+//        origin.y += _OEControlsMargin;
+//    else
+//    {
+//        // Otherwise, it sits below the window
+//        origin.y -= ([_controlsWindow frame].size.height + _OEControlsMargin);
+//
+//        // Unless below the window means it being off-screen, in which case it sits above the window
+//        if(origin.y < NSMinY([[gameWindow screen] visibleFrame]))
+//            origin.y = NSMaxY([gameWindow frame]) + _OEControlsMargin;
+//    }
+//
+//    [_controlsWindow setFrameOrigin:origin];
+//}
 
 - (NSWindow *)OE_rootWindow
 {
@@ -359,10 +535,10 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
 
 #pragma mark - Notifications
 
-- (void)viewDidChangeFrame:(NSNotification*)notification
-{
-    [self OE_repositionControlsWindow];
-}
+//- (void)viewDidChangeFrame:(NSNotification*)notification
+//{
+//    [self OE_repositionControlsWindow];
+//}
 
 #pragma mark - OEGameViewDelegate Protocol
 
