@@ -424,10 +424,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     BOOL userDBSelectionRequest = ([NSEvent modifierFlags] & NSAlternateKeyMask) != 0;
     NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
     // if user holds down alt-key
-    if(userDBSelectionRequest)
+    /*if(userDBSelectionRequest)
         // we ask the user to either select/create one, or quit open emu
         [self OE_performDatabaseSelection];
-    else
+    else*/
         [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:create];
 }
 
