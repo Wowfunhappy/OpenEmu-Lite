@@ -820,21 +820,16 @@ typedef enum : NSUInteger
 
     //[[self controlsWindow] setCanShow:NO];
 
-    if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
+    /*if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
     {
         //[[self controlsWindow] setCanShow:YES];
         [self disableOSSleep];
         [self setEmulationPaused:NO];
         return NO;
-    }
+    }*/
 
     return YES;
 }
-
-//+ (BOOL)autosavesInPlace
-//{
-//    return NO;
-//}
 
 - (BOOL)isDocumentEdited
 {
@@ -874,9 +869,9 @@ typedef enum : NSUInteger
 
               [[self rom] addTimeIntervalToPlayTime:ABS([_lastPlayStartDate timeIntervalSinceNow])];
               _lastPlayStartDate = nil;
-
-              [super canCloseDocumentWithDelegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
           }];
+         
+         [super canCloseDocumentWithDelegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
      }];
 }
 
