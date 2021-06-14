@@ -419,14 +419,8 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
        [databasePath isEqual:defaultDatabasePath])
         create = YES;
 
-    BOOL userDBSelectionRequest = ([NSEvent modifierFlags] & NSAlternateKeyMask) != 0;
     NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
-    // if user holds down alt-key
-    /*if(userDBSelectionRequest)
-        // we ask the user to either select/create one, or quit open emu
-        [self OE_performDatabaseSelection];
-    else*/
-        [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:create];
+    [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:create];
 }
 
 - (void)OE_loadDatabaseAsynchronouslyFormURL:(NSURL*)url createIfNecessary:(BOOL)create
@@ -448,7 +442,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
         else
         {
             [self presentError:error];
-            [self OE_performDatabaseSelection];
         }
         return;
     }
@@ -457,76 +450,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:OELibraryDidLoadNotificationName object:[OELibraryDatabase defaultDatabase]];
     });
-}
-
-- (void)OE_performDatabaseSelection
-{
-    // setup alert, with options "Quit", "Select", "Create"
-    OEHUDAlert *alert = [[OEHUDAlert alloc] init];
-
-    alert.headlineText = OELocalizedString(@"Choose OpenEmu Library", @"");
-    alert.messageText  = OELocalizedString(@"OpenEmu needs a library to continue. You may choose an existing OpenEmu library or create a new one", @"");
-
-    alert.defaultButtonTitle   = OELocalizedString(@"Choose Library…", @"");
-    alert.alternateButtonTitle = OELocalizedString(@"Create Library…", @"");
-    alert.otherButtonTitle     = OELocalizedString(@"Quit", @"");
-
-    NSInteger result;
-    switch([alert runModal])
-    {
-        case NSAlertOtherReturn :
-        {
-            [[NSApplication sharedApplication] terminate:self];
-            return;
-        };
-        case NSAlertDefaultReturn :
-        {
-            NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-            [openPanel setCanChooseFiles:YES];
-            [openPanel setAllowedFileTypes:@[[OEDatabaseFileName pathExtension]]];
-            [openPanel setCanChooseDirectories:YES];
-            [openPanel setAllowsMultipleSelection:NO];
-            [openPanel beginWithCompletionHandler:^(NSInteger result) {
-                if(result == NSOKButton)
-                {
-                    NSURL *databaseURL = [openPanel URL];
-                    NSString *databasePath = [databaseURL path];
-
-                    BOOL isDir = NO;
-                    if([[NSFileManager defaultManager] fileExistsAtPath:databasePath isDirectory:&isDir] && !isDir)
-                        databaseURL = [databaseURL URLByDeletingLastPathComponent];
-
-                    [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:NO];
-                }
-                else
-                {
-                    [self OE_performDatabaseSelection];
-                }
-            }];
-            break;
-        }
-        case NSAlertAlternateReturn :
-        {
-            NSSavePanel *savePanel = [NSSavePanel savePanel];
-            [savePanel setNameFieldStringValue:@"OpenEmu Library"];
-            result = [savePanel runModal];
-
-            if(result == NSOKButton)
-            {
-                NSURL *databaseURL = [savePanel URL];
-                [[NSFileManager defaultManager] removeItemAtURL:databaseURL error:nil];
-                [[NSFileManager defaultManager] createDirectoryAtURL:databaseURL withIntermediateDirectories:YES attributes:nil error:nil];
-
-                [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:YES];
-            }
-            else
-            {
-                [self OE_performDatabaseSelection];
-            }
-
-            break;
-        }
-    }
 }
 
 #pragma mark -
