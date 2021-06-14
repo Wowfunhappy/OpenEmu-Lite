@@ -59,6 +59,7 @@
 #import "OECompositionPlugin.h"
 #import "OEShaderPlugin.h"
 #import "OEGameIntegralScalingDelegate.h"
+#import "OECheats.h"
 
 #import <OpenEmuSystem/OpenEmuSystem.h>
 
@@ -177,10 +178,28 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [filterSet filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF beginswith '_'"]];
     _filterPlugins = [[filterSet allObjects] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     
+    [self OE_loadCheats];
     [self extraMenuItemSetup];
     
     
 }
+
+#pragma mark - Cheats
+- (void)OE_loadCheats
+{
+    // In order to load cheats, we need the game core to be running and, consequently, the ROM to be set.
+    if(self.supportsCheats)
+    {
+        NSString *md5Hash = self.document.rom.md5Hash;
+        if(md5Hash)
+        {
+            OECheats *cheatsXML = [[OECheats alloc] initWithMd5Hash:md5Hash];
+            _cheats             = [cheatsXML.allCheats mutableCopy];
+            _cheatsLoaded       = YES;
+        }
+    }
+}
+
 
 //- (void)viewWillDisappear
 //{

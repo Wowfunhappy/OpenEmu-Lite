@@ -815,7 +815,6 @@ typedef enum : NSUInteger
 
 - (BOOL)shouldTerminateEmulation
 {
-    NSLog(@"Wowfunhappy Reporting: Self is: %@", self);
     [self enableOSSleep];
     [self setEmulationPaused:YES];
 
@@ -832,10 +831,10 @@ typedef enum : NSUInteger
     return YES;
 }
 
-+ (BOOL)autosavesInPlace
-{
-    return NO;
-}
+//+ (BOOL)autosavesInPlace
+//{
+//    return NO;
+//}
 
 - (BOOL)isDocumentEdited
 {
