@@ -815,18 +815,19 @@ typedef enum : NSUInteger
 
 - (BOOL)shouldTerminateEmulation
 {
+    NSLog(@"Wowfunhappy Reporting: Self is: %@", self);
     [self enableOSSleep];
     [self setEmulationPaused:YES];
 
     //[[self controlsWindow] setCanShow:NO];
 
-    /*if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
+    if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
     {
         //[[self controlsWindow] setCanShow:YES];
         [self disableOSSleep];
         [self setEmulationPaused:NO];
         return NO;
-    }*/
+    }
 
     return YES;
 }
