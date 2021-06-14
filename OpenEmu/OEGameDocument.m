@@ -241,7 +241,7 @@ typedef enum : NSUInteger
                                             code:OENoCoreError
                                         userInfo: @{
                                                     NSLocalizedFailureReasonErrorKey : OELocalizedString(@"OpenEmu could not find a Core to launch the game", @"No Core error reason."),
-                                                    NSLocalizedRecoverySuggestionErrorKey : OELocalizedString(@"Make sure your internet connection is active and download a suitable core.", @"No Core error recovery suggestion."),
+                                                    NSLocalizedRecoverySuggestionErrorKey : OELocalizedString(@"Please install a suitable core.", @"No Core error recovery suggestion."),
                                                     }];
         chosenCore = nil;
     }
@@ -250,10 +250,9 @@ typedef enum : NSUInteger
     else
     {
         NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
-        BOOL forceCorePicker = [standardUserDefaults boolForKey:OEForceCorePicker];
         NSString *coreIdentifier = [standardUserDefaults valueForKey:UDSystemCoreMappingKeyForSystemIdentifier([self systemIdentifier])];
         chosenCore = [OECorePlugin corePluginWithBundleIdentifier:coreIdentifier];
-        if(chosenCore == nil && !forceCorePicker)
+        if(chosenCore == nil)
         {
             validPlugins = [validPlugins sortedArrayUsingComparator:
                             ^ NSComparisonResult (id obj1, id obj2)
@@ -263,13 +262,6 @@ typedef enum : NSUInteger
 
             chosenCore = [validPlugins objectAtIndex:0];
             [standardUserDefaults setValue:[chosenCore bundleIdentifier] forKey:UDSystemCoreMappingKeyForSystemIdentifier([self systemIdentifier])];
-        }
-
-        if(forceCorePicker)
-        {
-            OECorePickerController *c = [[OECorePickerController alloc] initWithCoreList:validPlugins];
-            if([[NSApplication sharedApplication] runModalForWindow:[c window]] == 1)
-                chosenCore = [c selectedCore];
         }
     }
 
@@ -524,8 +516,9 @@ typedef enum : NSUInteger
     OEDBSaveState *state = [game autosaveForLastPlayedRom];
     if(state != nil /*&& [[OEHUDAlert loadAutoSaveGameAlert] runModal] == NSAlertDefaultReturn*/)
         return [self OE_setupDocumentWithSaveState:state error:outError];
-    else
+    else {
         return [self OE_setupDocumentWithROM:[game defaultROM] usingCorePlugin:nil error:outError];
+    }
 }
 
 #pragma mark - Menu Items
