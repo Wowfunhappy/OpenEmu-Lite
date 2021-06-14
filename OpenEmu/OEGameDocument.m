@@ -506,32 +506,9 @@ typedef enum : NSUInteger
             // import probably failed
             if(!romID) return;
             
-            OEHUDAlert *alert = [[OEHUDAlert alloc] init];
-
-            NSString *fileName    = [[absoluteURL lastPathComponent] stringByDeletingPathExtension];
-            NSString *messageText = [NSString stringWithFormat:OELocalizedString(@"The game '%@' was imported.", @""), fileName];
-            
-            alert.headlineText = OELocalizedString(@"Your game finished importing, do you want to play it now?", @"");
-            alert.messageText = messageText;
-            alert.defaultButtonTitle = OELocalizedString(@"Yes", @"");
-            alert.alternateButtonTitle = OELocalizedString(@"No", @"");
-
-            if([alert runModal] == NSAlertDefaultReturn)
-            {
-                NSManagedObjectContext *context = [[OELibraryDatabase defaultDatabase] mainThreadContext];
-                OEDBRom *rom = [OEDBRom objectWithID:romID inContext:context];
-
-                // Ugly hack to start imported games in main window
-                OEMainWindowController *mainWindowController = [(OEApplicationDelegate*)[NSApp delegate] mainWindowController];
-                /*if([mainWindowController mainWindowRunsGame] == NO)
-                {
-                    [mainWindowController startGame:[rom game]];
-                }
-                else
-                {*/
-                    [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[rom URL] display:NO completionHandler:nil];
-                //}
-            }
+            NSManagedObjectContext *context = [[OELibraryDatabase defaultDatabase] mainThreadContext];
+            OEDBRom *rom = [OEDBRom objectWithID:romID inContext:context];;
+            [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[rom URL] display:NO completionHandler:nil];
         };
 
         if([importer importItemAtURL:absoluteURL withCompletionHandler:completion])
@@ -545,7 +522,7 @@ typedef enum : NSUInteger
 
     // TODO: Load rom that was just imported instead of the default one
     OEDBSaveState *state = [game autosaveForLastPlayedRom];
-    if(state != nil && [[OEHUDAlert loadAutoSaveGameAlert] runModal] == NSAlertDefaultReturn)
+    if(state != nil /*&& [[OEHUDAlert loadAutoSaveGameAlert] runModal] == NSAlertDefaultReturn*/)
         return [self OE_setupDocumentWithSaveState:state error:outError];
     else
         return [self OE_setupDocumentWithROM:[game defaultROM] usingCorePlugin:nil error:outError];
@@ -850,13 +827,13 @@ typedef enum : NSUInteger
 
     //[[self controlsWindow] setCanShow:NO];
 
-    if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
+    /*if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
     {
         //[[self controlsWindow] setCanShow:YES];
         [self disableOSSleep];
         [self setEmulationPaused:NO];
         return NO;
-    }
+    }*/
 
     return YES;
 }

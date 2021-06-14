@@ -257,14 +257,14 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     
     NSMenu *mainMenu = [NSApp mainMenu];
     
-    //Edit Menu
-    NSMenuItem *editMenuItem = [mainMenu itemAtIndex:2];
-    NSMenu *editMenu = [editMenuItem submenu];
-    [editMenu addItem:[NSMenuItem separatorItem]];
+    //Emulation Menu
+    NSMenuItem *emulationMenuItem = [mainMenu itemAtIndex:2];
+    NSMenu *emulationMenu = [emulationMenuItem submenu];
+    [emulationMenu addItem:[NSMenuItem separatorItem]];
     
     NSMenuItem *item;
     item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Controls...", @"") action:@selector(editControls:) keyEquivalent:@""];
-    [editMenu addItem:item];
+    [emulationMenu addItem:item];
     
     // Setup Cheats Menu
     if([self supportsCheats])
@@ -273,7 +273,7 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
         [cheatsMenu setTitle:OELocalizedString(@"Select Cheat", @"")];
         item = [[NSMenuItem alloc] init];
         [item setTitle:OELocalizedString(@"Select Cheat", @"")];
-        [editMenu addItem:item];
+        [emulationMenu addItem:item];
         [item setSubmenu:cheatsMenu];
         
         NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
@@ -324,7 +324,7 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
         item.title = OELocalizedString(@"Select Core", @"");
         [item setSubmenu:coresMenu];
         if([[coresMenu itemArray] count] > 1)
-            [editMenu addItem:item];
+            [emulationMenu addItem:item];
     }
     
     
