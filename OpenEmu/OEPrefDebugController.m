@@ -27,7 +27,7 @@
 
 #import "OEPrefDebugController.h"
 #import "OELibraryDatabase.h"
-#import "OESidebarController.h"
+//#import "OESidebarController.h"
 
 #import "OEDBGame.h"
 #import "OEDBImage.h"
@@ -52,9 +52,9 @@
 #pragma mark Key sources
 #import "OEPreferencesController.h"
 //#import "OESetupAssistant.h"
-#import "OECollectionViewController.h"
+//#import "OECollectionViewController.h"
 #import "OEGameViewController.h"
-#import "OERetrodeDeviceManager.h"
+//#import "OERetrodeDeviceManager.h"
 #import "OEGridGameCell.h"
 #import "OEGameView.h"
 #import "OEControllerImageView.h"
@@ -149,7 +149,7 @@ NSString * const OptionsKey = @"options";
                                       ),
 
                               Group(@"Library Window"),
-                              Checkbox(OERetrodeSupportEnabledKey, @"Enable Retrode support"),
+                              //Checkbox(OERetrodeSupportEnabledKey, @"Enable Retrode support"),
                               Checkbox(OECoverGridViewGlossDisabledKey, @"Disable grid view gloss overlay"),
                               Checkbox(OECoverGridViewAutoDownloadEnabledKey, @"Download missing artwork on the fly"),
                               Checkbox(OEDisplayGameTitle, @"Show game titles instead of rom names"),

@@ -37,7 +37,7 @@
 
 #import "OEPreferencePane.h"
 
-#import "OEPrefLibraryController.h"
+//#import "OEPrefLibraryController.h"
 #import "OEPrefGameplayController.h"
 #import "OEPrefControlsController.h"
 #import "OEPrefDebugController.h"

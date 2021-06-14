@@ -39,8 +39,6 @@
 #import "NSImage+OEDrawingAdditions.h"
 #import "NSWindow+OEFullScreenAdditions.h"
 
-#import "OELibraryController.h"
-
 #import "OEHUDAlert+DefaultAlertsAdditions.h"
 #import "OEGameDocument.h"
 
@@ -57,7 +55,7 @@
 #import <OpenEmuSystem/OpenEmuSystem.h>
 #import "OEToolTipManager.h"
 
-#import "OERetrodeDeviceManager.h"
+//#import "OERetrodeDeviceManager.h"
 
 #import "OEXPCGameCoreManager.h"
 
@@ -207,8 +205,8 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
      }];
 
     // Start retrode support
-    if([[NSUserDefaults standardUserDefaults] boolForKey:OERetrodeSupportEnabledKey])
-        [OERetrodeDeviceManager class];
+    /*if([[NSUserDefaults standardUserDefaults] boolForKey:OERetrodeSupportEnabledKey])
+        [OERetrodeDeviceManager class];*/
 
 
     [[self startupQueue] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {

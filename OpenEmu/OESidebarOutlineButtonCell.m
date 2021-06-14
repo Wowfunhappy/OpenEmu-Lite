@@ -26,7 +26,7 @@
 
 
 #import "OESidebarOutlineButtonCell.h"
-#import "OESidebarOutlineView.h"
+//#import "OESidebarOutlineView.h"
 #import "NSImage+OEDrawingAdditions.h"
 #import "OETheme.h"
 @implementation OESidebarOutlineButtonCell
@@ -48,9 +48,9 @@
     shadowRect.origin.y -= 1;
     [triangle drawInRect:shadowRect fromRect:NSZeroRect operation:NSCompositeDestinationOver fraction:1 respectFlipped:YES hints:nil];
     
-    if([controlView isKindOfClass:[OESidebarOutlineView class]] && [(OESidebarOutlineView*)controlView isDrawingAboveDropHighlight])
+    /*if([controlView isKindOfClass:[OESidebarOutlineView class]] && [(OESidebarOutlineView*)controlView isDrawingAboveDropHighlight])
         [[(OESidebarOutlineView*)controlView dropBackgroundColor] setFill];
-    else
+    else*/
         [[NSColor colorWithDeviceWhite:(63/255.0) alpha:1.0] setFill];
     NSRectFillUsingOperation(triangleRect, NSCompositeDestinationOver);
 }

@@ -27,7 +27,7 @@
 #import "OESidebarCell.h"
 #import <AppKit/NSCell.h>
 #import "OESidebarFieldEditor.h"
-#import "OESidebarOutlineView.h"
+//#import "OESidebarOutlineView.h"
 
 
 const CGFloat BadgeSpacing = 2.0;
