@@ -48,8 +48,6 @@ NSString * const OEImportManualSystems = @"OEImportManualSystems";
 - (void)OE_performImportStepHash;
 - (void)OE_performImportStepCheckHash;
 - (void)OE_performImportStepDetermineSystem;
-- (void)OE_performImportStepOrganize;
-- (void)OE_performImportStepOrganizeAdditionalFiles;
 - (void)OE_performImportStepCreateCoreDataObjects;
 @end
 

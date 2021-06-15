@@ -627,42 +627,42 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     return count;
 }
 
-- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
-{
-    [item setState:NSOffState];
-    if([self cachedLastPlayedInfo] == nil)
-    {
-        [item setTitle:OELocalizedString(@"No game played yet!", @"")];
-        [item setEnabled:NO];
-        [item setIndentationLevel:0];
-        return YES;
-    }
-
-    id value = [[self cachedLastPlayedInfo] objectAtIndex:index];
-    if([value isKindOfClass:[NSString class]])
-    {
-        [item setTitle:value];
-        [item setEnabled:NO];
-        [item setIndentationLevel:0];
-        [item setAction:NULL];
-        [item setRepresentedObject:nil];
-    }
-    else
-    {
-        NSString *title = [(OEDBGame *)[value game] displayName];
-
-        if(!title) return NO;
-        
-        [item setIndentationLevel:1];
-        [item setTitle:title];
-        [item setEnabled:YES];
-        [item setRepresentedObject:value];
-        [item setAction:@selector(launchLastPlayedROM:)];
-        [item setTarget:[self mainWindowController]];
-    }
-
-    return YES;
-}
+//- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
+//{
+//    [item setState:NSOffState];
+//    if([self cachedLastPlayedInfo] == nil)
+//    {
+//        [item setTitle:OELocalizedString(@"No game played yet!", @"")];
+//        [item setEnabled:NO];
+//        [item setIndentationLevel:0];
+//        return YES;
+//    }
+//
+//    id value = [[self cachedLastPlayedInfo] objectAtIndex:index];
+//    if([value isKindOfClass:[NSString class]])
+//    {
+//        [item setTitle:value];
+//        [item setEnabled:NO];
+//        [item setIndentationLevel:0];
+//        [item setAction:NULL];
+//        [item setRepresentedObject:nil];
+//    }
+//    else
+//    {
+//        NSString *title = [(OEDBGame *)[value game] displayName];
+//
+//        if(!title) return NO;
+//        
+//        [item setIndentationLevel:1];
+//        [item setTitle:title];
+//        [item setEnabled:YES];
+//        [item setRepresentedObject:value];
+//        [item setAction:@selector(launchLastPlayedROM:)];
+//        [item setTarget:[self mainWindowController]];
+//    }
+//
+//    return YES;
+//}
 
 #pragma mark - KVO
 

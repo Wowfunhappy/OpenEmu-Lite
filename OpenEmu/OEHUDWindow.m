@@ -39,9 +39,6 @@ static const CGFloat _OEHUDWindowBottomBorder          =  1.0;
 static const CGFloat _OEHUDWindowTopBorder             = 22.0;
 
 @interface OEHUDWindow () <NSWindowDelegate>
-
-- (void)OE_commonHUDWindowInit;
-
 @end
 
 @implementation OEHUDWindow
