@@ -83,7 +83,7 @@ typedef enum : NSUInteger
     OEDBSaveState      *_saveStateForGameStart;
     NSDate             *_lastPlayStartDate;
     BOOL                _isMuted;
-    BOOL                _pausedByGoingToBackground;
+    //BOOL                _pausedByGoingToBackground;
     BOOL                _isTerminatingEmulation;
 }
 
@@ -319,21 +319,21 @@ typedef enum : NSUInteger
 
 - (void)windowDidResignMain:(NSNotification *)notification
 {
-    BOOL backgroundPause = [[NSUserDefaults standardUserDefaults] boolForKey:OEBackgroundPauseKey];
+    /*BOOL backgroundPause = [[NSUserDefaults standardUserDefaults] boolForKey:OEBackgroundPauseKey];
     if(backgroundPause && _emulationStatus == OEEmulationStatusPlaying)
     {
         [self setEmulationPaused:YES];
         _pausedByGoingToBackground = YES;
-    }
+    }*/
 }
 
 - (void)windowDidBecomeMain:(NSNotification *)notification
 {
-    if(_pausedByGoingToBackground)
+    /*if(_pausedByGoingToBackground)
     {
         [self setEmulationPaused:NO];
         _pausedByGoingToBackground = NO;
-    }
+    }*/
 }
 
 #pragma mark - Device Notifications

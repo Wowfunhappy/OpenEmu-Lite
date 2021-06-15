@@ -99,7 +99,7 @@ const NSInteger OpenVGDBSyncBatchSize = 5;
 - (void)OE_setupStateWatcher;
 - (void)OE_removeStateWatcher;
 //- (void)OE_setupAutoImportWatcher;
-- (void)OE_removeAutoImportWatcher;
+//- (void)OE_removeAutoImportWatcher;
 
 @property(strong) OEFSWatcher *saveStateWatcher, *autoImportWatcher;
 @property(copy)   NSURL       *databaseURL;
@@ -275,7 +275,7 @@ static OELibraryDatabase *defaultDatabase = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [self OE_removeStateWatcher];
-    [self OE_removeAutoImportWatcher];
+    //[self OE_removeAutoImportWatcher];
     [[self importer] saveQueue];
 
 
