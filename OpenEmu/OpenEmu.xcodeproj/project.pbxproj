@@ -838,6 +838,23 @@
 		AB095F2A2676E5FC00EC2CE8 /* NTSC.cgp in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94380783184E6AE100E2274B /* NTSC.cgp */; };
 		AB095F2B2676E5FC00EC2CE8 /* Pixellate.cg in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94539AFD187D096C00CD1BA9 /* Pixellate.cg */; };
 		ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7EC826780E90006EB243 /* cheats-database.xml */; };
+		ABAB7ED626783A26006EB243 /* _pass1.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECB26783A26006EB243 /* _pass1.cg */; };
+		ABAB7ED726783A26006EB243 /* _pass2.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECC26783A26006EB243 /* _pass2.cg */; };
+		ABAB7ED826783A26006EB243 /* _pass3.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECD26783A26006EB243 /* _pass3.cg */; };
+		ABAB7ED926783A26006EB243 /* compat_includes.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ECE26783A26006EB243 /* compat_includes.inc */; };
+		ABAB7EDA26783A26006EB243 /* compat_input_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */; };
+		ABAB7EDB26783A26006EB243 /* compat_macros.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED026783A26006EB243 /* compat_macros.inc */; };
+		ABAB7EDC26783A26006EB243 /* compat_orig_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */; };
+		ABAB7EDD26783A26006EB243 /* compat_prev_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */; };
+		ABAB7EDE26783A26006EB243 /* compat_vertex_in_out.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */; };
+		ABAB7EDF26783A26006EB243 /* GTUv3.cgp in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED526783A26006EB243 /* GTUv3.cgp */; };
+		ABAB7EE026783A34006EB243 /* compat_includes.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECE26783A26006EB243 /* compat_includes.inc */; };
+		ABAB7EE126783A34006EB243 /* compat_input_struct.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */; };
+		ABAB7EE226783A34006EB243 /* compat_macros.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED026783A26006EB243 /* compat_macros.inc */; };
+		ABAB7EE326783A34006EB243 /* compat_orig_struct.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */; };
+		ABAB7EE426783A34006EB243 /* compat_prev_struct.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */; };
+		ABAB7EE526783A34006EB243 /* compat_vertex_in_out.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */; };
+		ABAB7EE626783A34006EB243 /* config.h in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED426783A26006EB243 /* config.h */; };
 		C60238E61794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */; };
 		C6096192179B461C00239067 /* OEXPCGameCoreManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096191179B461C00239067 /* OEXPCGameCoreManager.m */; };
 		C609619A179B6E3F00239067 /* OpenEmuXPCHelperApp.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096199179B6E3F00239067 /* OpenEmuXPCHelperApp.m */; };
@@ -2714,6 +2731,17 @@
 		A6F3061118AF3BB7007CF986 /* INWindowButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = INWindowButton.m; sourceTree = "<group>"; };
 		AB095E9C2676D52B00EC2CE8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		ABAB7EC826780E90006EB243 /* cheats-database.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "cheats-database.xml"; sourceTree = "<group>"; };
+		ABAB7ECB26783A26006EB243 /* _pass1.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _pass1.cg; sourceTree = "<group>"; };
+		ABAB7ECC26783A26006EB243 /* _pass2.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _pass2.cg; sourceTree = "<group>"; };
+		ABAB7ECD26783A26006EB243 /* _pass3.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _pass3.cg; sourceTree = "<group>"; };
+		ABAB7ECE26783A26006EB243 /* compat_includes.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_includes.inc; sourceTree = "<group>"; };
+		ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_input_struct.inc; sourceTree = "<group>"; };
+		ABAB7ED026783A26006EB243 /* compat_macros.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_macros.inc; sourceTree = "<group>"; };
+		ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_orig_struct.inc; sourceTree = "<group>"; };
+		ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_prev_struct.inc; sourceTree = "<group>"; };
+		ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_vertex_in_out.inc; sourceTree = "<group>"; };
+		ABAB7ED426783A26006EB243 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		ABAB7ED526783A26006EB243 /* GTUv3.cgp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GTUv3.cgp; sourceTree = "<group>"; };
 		C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenEmuXPCCommunicator.framework; sourceTree = "<group>"; };
 		C60238E8179510C600F4AF6C /* OEGameCoreHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEGameCoreHelper.h; sourceTree = "<group>"; };
 		C609618F179B278C00239067 /* OEXPCGameCoreHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEXPCGameCoreHelper.h; sourceTree = "<group>"; };
@@ -5561,9 +5589,28 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		ABAB7ECA26783A26006EB243 /* GTU */ = {
+			isa = PBXGroup;
+			children = (
+				ABAB7ECB26783A26006EB243 /* _pass1.cg */,
+				ABAB7ECC26783A26006EB243 /* _pass2.cg */,
+				ABAB7ECD26783A26006EB243 /* _pass3.cg */,
+				ABAB7ECE26783A26006EB243 /* compat_includes.inc */,
+				ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */,
+				ABAB7ED026783A26006EB243 /* compat_macros.inc */,
+				ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */,
+				ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */,
+				ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */,
+				ABAB7ED426783A26006EB243 /* config.h */,
+				ABAB7ED526783A26006EB243 /* GTUv3.cgp */,
+			);
+			path = GTU;
+			sourceTree = "<group>";
+		};
 		C344D5F6174C45050011579E /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				ABAB7ECA26783A26006EB243 /* GTU */,
 				94380773184E6AE100E2274B /* Themaister NTSC */,
 				94539AFD187D096C00CD1BA9 /* Pixellate.cg */,
 			);
@@ -6842,6 +6889,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABAB7EE026783A34006EB243 /* compat_includes.inc in Resources */,
+				ABAB7EE126783A34006EB243 /* compat_input_struct.inc in Resources */,
+				ABAB7EE226783A34006EB243 /* compat_macros.inc in Resources */,
+				ABAB7EE326783A34006EB243 /* compat_orig_struct.inc in Resources */,
+				ABAB7EE426783A34006EB243 /* compat_prev_struct.inc in Resources */,
+				ABAB7EE526783A34006EB243 /* compat_vertex_in_out.inc in Resources */,
+				ABAB7EE626783A34006EB243 /* config.h in Resources */,
 				1BFC26D0116C1CA300B95689 /* OpenEmuHelperApp in Resources */,
 				C67A36AA0FE7F1F500A665E2 /* OECorePluginIcon.icns in Resources */,
 				C69DCCED0FE99415009AE5A6 /* OEFilterPluginIcon.icns in Resources */,
@@ -6972,6 +7026,7 @@
 				83B867B9171D63510038988C /* retrode.png in Resources */,
 				EC350F7317401AC1005DA3B2 /* background_lighting@2x.png in Resources */,
 				EC350F7417401AC1005DA3B2 /* blank_slate_arrow@2x.png in Resources */,
+				ABAB7EDF26783A26006EB243 /* GTUv3.cgp in Resources */,
 				EC350F7517401AC1005DA3B2 /* blank_slate_box@2x.png in Resources */,
 				EC350F7617401AC1005DA3B2 /* blank_slate_core_icon@2x.png in Resources */,
 				EC350F7717401AC1005DA3B2 /* closed_weblink_arrow@2x.png in Resources */,
@@ -7010,6 +7065,7 @@
 				EC350F9517401AC1005DA3B2 /* track_vertical_spacer@2x.png in Resources */,
 				EC350F9617401AC1005DA3B2 /* track_vertical@2x.png in Resources */,
 				AB095E9D2676D52B00EC2CE8 /* MainMenu.xib in Resources */,
+				ABAB7ED826783A26006EB243 /* _pass3.cg in Resources */,
 				83D94FB419A4D43B007583E1 /* bios_tab_icon.png in Resources */,
 				EC350FA417401B0B005DA3B2 /* menu_item_mixed_state@2x.png in Resources */,
 				EC350FA517401B0B005DA3B2 /* menu_item_tick_mark@2x.png in Resources */,
@@ -7029,7 +7085,9 @@
 				EC350FCA17401B44005DA3B2 /* hud_alert_window@2x.png in Resources */,
 				EC350FCB17401B44005DA3B2 /* hud_bar@2x.png in Resources */,
 				EC350FCC17401B44005DA3B2 /* hud_button@2x.png in Resources */,
+				ABAB7ED626783A26006EB243 /* _pass1.cg in Resources */,
 				EC350FCD17401B44005DA3B2 /* hud_close_button@2x.png in Resources */,
+				ABAB7ED726783A26006EB243 /* _pass2.cg in Resources */,
 				EC350FCE17401B44005DA3B2 /* hud_fullscreen_glyph@2x.png in Resources */,
 				EC350FCF17401B44005DA3B2 /* hud_glyphs@2x.png in Resources */,
 				EC350FD017401B44005DA3B2 /* hud_power_glyph@2x.png in Resources */,
@@ -7753,6 +7811,8 @@
 				53439AEB13B92E91005C0CC8 /* OELibrarySplitView.m in Sources */,
 				53439AEE13B92E9A005C0CC8 /* OEMainWindow.m in Sources */,
 				53439AF413B92EA8005C0CC8 /* OESearchFieldCell.m in Sources */,
+				ABAB7EDA26783A26006EB243 /* compat_input_struct.inc in Sources */,
+				ABAB7EDB26783A26006EB243 /* compat_macros.inc in Sources */,
 				53439AF713B92EAD005C0CC8 /* OESlider.m in Sources */,
 				53439AFA13B92EB3005C0CC8 /* OEImageButton.m in Sources */,
 				53439AFD13B92EB9005C0CC8 /* OEScroller.m in Sources */,
@@ -7794,7 +7854,9 @@
 				831C2AE4144F41E4009533C0 /* OEApplicationDelegate.m in Sources */,
 				832FA8801455526E00BBBD94 /* NSControl+OEAdditions.m in Sources */,
 				8301557B1456BF7A0093D681 /* OEGameViewController.m in Sources */,
+				ABAB7EDD26783A26006EB243 /* compat_prev_struct.inc in Sources */,
 				A6F3061218AF3BB7007CF986 /* INWindowButton.m in Sources */,
+				ABAB7ED926783A26006EB243 /* compat_includes.inc in Sources */,
 				83025E60146BDD5E00A06EF9 /* OECoreTableButtonCell.m in Sources */,
 				83025E66146BE68E00A06EF9 /* OECoreTableProgressCell.m in Sources */,
 				83CAD4D4147BB641004C0E9B /* NSClipView+OEAnimatedScrolling.m in Sources */,
@@ -7809,6 +7871,7 @@
 				3D15428114E20E22009C3DEE /* OENonARCHacks.m in Sources */,
 				C6D6FA7E14E2264C0083C75D /* NSViewController+OEAdditions.m in Sources */,
 				83096F0314E98FC000F7EBC2 /* NSFileManager+OEHashingAdditions.m in Sources */,
+				ABAB7EDE26783A26006EB243 /* compat_vertex_in_out.inc in Sources */,
 				EFBD5D7814EFE19A00FBD1E0 /* NSColor+OEAdditions.m in Sources */,
 				EFBD5D7F14EFE26300FBD1E0 /* OEGridView.m in Sources */,
 				83753F1714F537C400D708A7 /* OEPrefDebugController.m in Sources */,
@@ -7878,6 +7941,7 @@
 				83B867A8171D62DA0038988C /* OEStorageDevice.m in Sources */,
 				836AEA6E19755FE300B86935 /* OEOutlinedButtonCell.m in Sources */,
 				83B867A9171D62DA0038988C /* OEStorageDeviceManager.m in Sources */,
+				ABAB7EDC26783A26006EB243 /* compat_orig_struct.inc in Sources */,
 				83D175B318FF155700E5ED34 /* OEBlankSlateBackgroundView.m in Sources */,
 				8304D88A193E1EB8001E7357 /* INAppStoreWindowSwizzling.c in Sources */,
 				8304D88C193E1EB8001E7357 /* NSDocument+INAppStoreWindowFixes.m in Sources */,
