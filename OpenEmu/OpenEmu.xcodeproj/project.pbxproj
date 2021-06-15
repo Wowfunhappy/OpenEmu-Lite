@@ -848,13 +848,6 @@
 		ABAB7EDD26783A26006EB243 /* compat_prev_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */; };
 		ABAB7EDE26783A26006EB243 /* compat_vertex_in_out.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */; };
 		ABAB7EDF26783A26006EB243 /* GTUv3.cgp in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED526783A26006EB243 /* GTUv3.cgp */; };
-		ABAB7EE026783A34006EB243 /* compat_includes.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECE26783A26006EB243 /* compat_includes.inc */; };
-		ABAB7EE126783A34006EB243 /* compat_input_struct.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */; };
-		ABAB7EE226783A34006EB243 /* compat_macros.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED026783A26006EB243 /* compat_macros.inc */; };
-		ABAB7EE326783A34006EB243 /* compat_orig_struct.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */; };
-		ABAB7EE426783A34006EB243 /* compat_prev_struct.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */; };
-		ABAB7EE526783A34006EB243 /* compat_vertex_in_out.inc in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */; };
-		ABAB7EE626783A34006EB243 /* config.h in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED426783A26006EB243 /* config.h */; };
 		C60238E61794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */; };
 		C6096192179B461C00239067 /* OEXPCGameCoreManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096191179B461C00239067 /* OEXPCGameCoreManager.m */; };
 		C609619A179B6E3F00239067 /* OpenEmuXPCHelperApp.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096199179B6E3F00239067 /* OpenEmuXPCHelperApp.m */; };
@@ -6889,13 +6882,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ABAB7EE026783A34006EB243 /* compat_includes.inc in Resources */,
-				ABAB7EE126783A34006EB243 /* compat_input_struct.inc in Resources */,
-				ABAB7EE226783A34006EB243 /* compat_macros.inc in Resources */,
-				ABAB7EE326783A34006EB243 /* compat_orig_struct.inc in Resources */,
-				ABAB7EE426783A34006EB243 /* compat_prev_struct.inc in Resources */,
-				ABAB7EE526783A34006EB243 /* compat_vertex_in_out.inc in Resources */,
-				ABAB7EE626783A34006EB243 /* config.h in Resources */,
 				1BFC26D0116C1CA300B95689 /* OpenEmuHelperApp in Resources */,
 				C67A36AA0FE7F1F500A665E2 /* OECorePluginIcon.icns in Resources */,
 				C69DCCED0FE99415009AE5A6 /* OEFilterPluginIcon.icns in Resources */,
@@ -10535,6 +10521,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Quartz.framework/Versions/A/Frameworks\"",
 				);
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREFIX_HEADER = OpenEmu_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -10568,6 +10555,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Quartz.framework/Versions/A/Frameworks\"",
 				);
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREFIX_HEADER = OpenEmu_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",

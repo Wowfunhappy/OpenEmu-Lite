@@ -408,7 +408,7 @@ typedef enum : NSUInteger
     // including untitled (new) documents.
     NSString *displayName = [[[self rom] game] displayName];
 #if DEBUG_PRINT
-    displayName = [displayName stringByAppendingString:@" (DEBUG BUILD)"];
+    //displayName = [displayName stringByAppendingString:@" (DEBUG BUILD)"];
 #endif
 
     return displayName ? : @"";
@@ -527,7 +527,19 @@ typedef enum : NSUInteger
 {
     SEL action = [menuItem action];
     
-    if(action == @selector(setCheat:)) {
+    if(action == @selector(toggleEmulationPaused:))
+    {
+        if(_emulationStatus == OEEmulationStatusPaused)
+        {
+            [menuItem setTitle:OELocalizedString(@"Resume Emulation", @"")];
+            return YES;
+        }
+        
+        [menuItem setTitle:OELocalizedString(@"Pause Emulation", @"")];
+        return _emulationStatus == OEEmulationStatusPlaying;
+    }
+    
+    else if(action == @selector(setCheat:)) {
         if ([[[menuItem representedObject] objectForKey:@"enabled"] isEqualToValue:@YES]) {
             [menuItem setState:NSOnState];
         } else {
