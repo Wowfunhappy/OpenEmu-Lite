@@ -837,6 +837,7 @@
 		AB095F292676E5FC00EC2CE8 /* _ntsc-stock.cg in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94380782184E6AE100E2274B /* _ntsc-stock.cg */; };
 		AB095F2A2676E5FC00EC2CE8 /* NTSC.cgp in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94380783184E6AE100E2274B /* NTSC.cgp */; };
 		AB095F2B2676E5FC00EC2CE8 /* Pixellate.cg in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94539AFD187D096C00CD1BA9 /* Pixellate.cg */; };
+		ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7EC826780E90006EB243 /* cheats-database.xml */; };
 		C60238E61794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */; };
 		C6096192179B461C00239067 /* OEXPCGameCoreManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096191179B461C00239067 /* OEXPCGameCoreManager.m */; };
 		C609619A179B6E3F00239067 /* OpenEmuXPCHelperApp.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096199179B6E3F00239067 /* OpenEmuXPCHelperApp.m */; };
@@ -2712,6 +2713,7 @@
 		A6F3061018AF3BB7007CF986 /* INWindowButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = INWindowButton.h; sourceTree = "<group>"; };
 		A6F3061118AF3BB7007CF986 /* INWindowButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = INWindowButton.m; sourceTree = "<group>"; };
 		AB095E9C2676D52B00EC2CE8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		ABAB7EC826780E90006EB243 /* cheats-database.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "cheats-database.xml"; sourceTree = "<group>"; };
 		C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenEmuXPCCommunicator.framework; sourceTree = "<group>"; };
 		C60238E8179510C600F4AF6C /* OEGameCoreHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEGameCoreHelper.h; sourceTree = "<group>"; };
 		C609618F179B278C00239067 /* OEXPCGameCoreHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEXPCGameCoreHelper.h; sourceTree = "<group>"; };
@@ -3763,6 +3765,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				ABAB7EC826780E90006EB243 /* cheats-database.xml */,
 				83B04E3A196860B800CB985E /* Credits.rtf */,
 				83FA054F13B9DFC20055A520 /* Frameworks */,
 				C68A54E41516AD3C001053F2 /* OEDatabase.xcdatamodeld */,
@@ -6877,6 +6880,7 @@
 				53439C0E13B93920005C0CC8 /* list_indicators.png in Resources */,
 				53439C0F13B93920005C0CC8 /* list_rating.png in Resources */,
 				53439C1013B93920005C0CC8 /* missing_artwork.pdf in Resources */,
+				ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */,
 				53439C1113B93920005C0CC8 /* missing_rom.pdf in Resources */,
 				53439C1213B93920005C0CC8 /* noise.png in Resources */,
 				53439C1A13B93920005C0CC8 /* controls_background.jpg in Resources */,

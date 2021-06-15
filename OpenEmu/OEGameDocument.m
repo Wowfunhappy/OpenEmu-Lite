@@ -526,26 +526,13 @@ typedef enum : NSUInteger
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     SEL action = [menuItem action];
-    if(action == @selector(quickLoad:))
-    {
-        NSInteger slot = [menuItem representedObject] ? [[menuItem representedObject] integerValue] : [menuItem tag];
-        return [[self rom] quickSaveStateInSlot:slot]!=nil;
-    }
-    else if(action == @selector(quickSave:))
-    {
-        if(![self supportsSaveStates])
-            return NO;
-    }
-    else if(action == @selector(toggleEmulationPaused:))
-    {
-        if(_emulationStatus == OEEmulationStatusPaused)
-        {
-            [menuItem setTitle:OELocalizedString(@"Resume Emulation", @"")];
-            return YES;
+    
+    if(action == @selector(setCheat:)) {
+        if ([[[menuItem representedObject] objectForKey:@"enabled"] isEqualToValue:@YES]) {
+            [menuItem setState:NSOnState];
+        } else {
+            [menuItem setState:NSOffState];
         }
-
-        [menuItem setTitle:OELocalizedString(@"Pause Emulation", @"")];
-        return _emulationStatus == OEEmulationStatusPlaying;
     }
     return YES;
 }

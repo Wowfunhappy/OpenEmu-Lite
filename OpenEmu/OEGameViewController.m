@@ -60,6 +60,7 @@
 #import "OEShaderPlugin.h"
 #import "OEGameIntegralScalingDelegate.h"
 #import "OECheats.h"
+BOOL extraMenuItemsSetupDone; //Warning! Global for app! (Sorry!)
 
 #import <OpenEmuSystem/OpenEmuSystem.h>
 
@@ -178,8 +179,13 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [filterSet filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF beginswith '_'"]];
     _filterPlugins = [[filterSet allObjects] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     
-    [self OE_loadCheats];
-    [self extraMenuItemSetup];
+    if(!_cheatsLoaded)
+        [self OE_loadCheats];
+    
+    if(!extraMenuItemsSetupDone)
+        [self extraMenuItemSetup];
+    
+    [self cheatsMenuItemSetup];
     
     
 }
@@ -265,13 +271,12 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
             [menuItem setState:NSOffState];
         }
     }
-    
     return YES;
 }
 
 
 
-- (BOOL)extraMenuItemSetup {
+- (void)extraMenuItemSetup {
     //Wowfunhappy
     
     NSMenu *mainMenu = [NSApp mainMenu];
@@ -279,43 +284,8 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     //Emulation Menu
     NSMenuItem *emulationMenuItem = [mainMenu itemAtIndex:2];
     NSMenu *emulationMenu = [emulationMenuItem submenu];
-    [emulationMenu addItem:[NSMenuItem separatorItem]];
     
     NSMenuItem *item;
-    item = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Controls...", @"") action:@selector(editControls:) keyEquivalent:@""];
-    [emulationMenu addItem:item];
-    
-    // Setup Cheats Menu
-    if([self supportsCheats])
-    {
-        NSMenu *cheatsMenu = [[NSMenu alloc] init];
-        [cheatsMenu setTitle:OELocalizedString(@"Select Cheat", @"")];
-        item = [[NSMenuItem alloc] init];
-        [item setTitle:OELocalizedString(@"Select Cheat", @"")];
-        [emulationMenu addItem:item];
-        [item setSubmenu:cheatsMenu];
-        
-        NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
-                                                                  action:@selector(addCheat:)
-                                                           keyEquivalent:@""];
-        [addCheatMenuItem setRepresentedObject:_cheats];
-        [cheatsMenu addItem:addCheatMenuItem];
-        
-        if([_cheats count] != 0)
-            [cheatsMenu addItem:[NSMenuItem separatorItem]];
-        
-        for(NSDictionary *cheatObject in _cheats)
-        {
-            NSString *description = [cheatObject objectForKey:@"description"];
-            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
-            
-            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
-            [cheatsMenuItem setRepresentedObject:cheatObject];
-            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
-            
-            [cheatsMenu addItem:cheatsMenuItem];
-        }
-    }
     
     // Setup Core selection menu
     NSMenu *coresMenu = [[NSMenu alloc] init];
@@ -404,11 +374,51 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     else
         [item setEnabled:NO];
     
-    
-    return true;
+    extraMenuItemsSetupDone = true;
 }
 
 
+
+- (void)cheatsMenuItemSetup {
+    //Wowfunhappy. Unlike "extra" menu items, runs for each document.
+    
+    if([self supportsCheats] && [_cheats count] != 0)
+    {
+        NSMenu *mainMenu = [NSApp mainMenu];
+        
+        //Emulation Menu
+        NSMenuItem *emulationMenuItem = [mainMenu itemAtIndex:2];
+        NSMenu *emulationMenu = [emulationMenuItem submenu];
+        
+        NSMenu *cheatsMenu = [[NSMenu alloc] init];
+        [cheatsMenu setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[[self document]rom]game]displayName]]];
+        NSMenuItem *item = [[NSMenuItem alloc] init];
+        [item setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[[self document]rom]game]displayName]]];
+        [emulationMenu addItem:item];
+        [item setSubmenu:cheatsMenu];
+        
+        /*NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
+         action:@selector(addCheat:)
+         keyEquivalent:@""];
+         [addCheatMenuItem setRepresentedObject:_cheats];
+         [cheatsMenu addItem:addCheatMenuItem];*/
+        
+        /*if([_cheats count] != 0)
+         [cheatsMenu addItem:[NSMenuItem separatorItem]];*/
+        
+        for(NSDictionary *cheatObject in _cheats)
+        {
+            NSString *description = [cheatObject objectForKey:@"description"];
+            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
+            
+            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
+            [cheatsMenuItem setRepresentedObject:cheatObject];
+            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
+            
+            [cheatsMenu addItem:cheatsMenuItem];
+        }
+    }
+}
 
 
 
