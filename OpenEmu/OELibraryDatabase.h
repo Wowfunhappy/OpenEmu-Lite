@@ -92,7 +92,7 @@ extern NSString *const OEManagedObjectContextHasDirectChangesKey;
 //- (NSURL *)autoImportFolderURL;
 
 #pragma mark - OpenVGDB Sync
-- (void)startOpenVGDBSync;
+//- (void)startOpenVGDBSync;
 
 #pragma mark - Debug
 - (void)dump;

@@ -163,7 +163,7 @@ static OELibraryDatabase *defaultDatabase = nil;
 
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^{
-        [defaultDatabase startOpenVGDBSync];
+        //[defaultDatabase startOpenVGDBSync];
         [romImporter start];
     });
 
@@ -910,7 +910,7 @@ static OELibraryDatabase *defaultDatabase = nil;
 
 #pragma mark - GameInfo Sync
 
-- (void)startOpenVGDBSync
+/*- (void)startOpenVGDBSync
 {
     @synchronized(_syncThread)
     {
@@ -1028,7 +1028,7 @@ static OELibraryDatabase *defaultDatabase = nil;
             [mainContext save:nil];
         }];
     };
-}
+}*/
 #pragma mark - Debug
 
 - (void)dump

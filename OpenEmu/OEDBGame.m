@@ -133,7 +133,7 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
     {
         [self setStatus:[NSNumber numberWithInt:OEDBGameStatusProcessing]];
         [self save];
-        [[self libraryDatabase] startOpenVGDBSync];
+        //[[self libraryDatabase] startOpenVGDBSync];
     }
 }
 
@@ -152,7 +152,7 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
     {
         [self setStatus:@(OEDBGameStatusProcessing)];
         [self save];
-        [[self libraryDatabase] startOpenVGDBSync];
+        //[[self libraryDatabase] startOpenVGDBSync];
     }
 }
 

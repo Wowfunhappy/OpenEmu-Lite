@@ -314,10 +314,10 @@ NSString * const OEImportManualSystems = @"OEImportManualSystems";
             // start sync thread
             if([[[rom game] status] intValue] == OEDBGameStatusProcessing)
             {
-                OELibraryDatabase *database = [[self importer] database];
+                /*OELibraryDatabase *database = [[self importer] database];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     [database startOpenVGDBSync];
-                });
+                });*/
             }
         }
     }

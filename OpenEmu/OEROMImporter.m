@@ -77,9 +77,9 @@ NSString *const OEImportErrorDomainSuccess    = @"OEImportSuccessDomain";
     if(self != [OEROMImporter class]) return;
 
     NSDictionary *defaults = @{
-                              OEOrganizeLibraryKey      : @(YES),
-                              OECopyToLibraryKey        : @(YES),
-                              OEAutomaticallyGetInfoKey : @(YES),
+                              OEOrganizeLibraryKey      : @(NO),
+                              OECopyToLibraryKey        : @(NO),
+                              OEAutomaticallyGetInfoKey : @(NO),
                               };
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
