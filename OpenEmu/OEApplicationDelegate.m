@@ -117,7 +117,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
                                       OEDefaultDatabasePathKey : path,
                                              OEDatabasePathKey : path,
                                      OEAutomaticallyGetInfoKey : @YES,
-                                   OEGameDefaultVideoFilterKey : @"GTU v3",
+                                   OEGameDefaultVideoFilterKey : @"GTU",
                                                OEGameVolumeKey : @0.5f,
                               @"defaultCore.openemu.system.gb" : @"org.openemu.Gambatte",
                              @"defaultCore.openemu.system.gba" : @"org.openemu.VisualBoyAdvance",

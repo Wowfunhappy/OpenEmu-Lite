@@ -115,6 +115,11 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
     {
         [defaultFileManager hashFileAtURL:url md5:&md5 crc32:&crc error:outError];
         OEDBRom *rom = [OEDBRom romWithMD5HashString:md5 inContext:context error:outError];
+        
+        //Wowfunhappy: We definitely don't care what the rom URL used to be! We care what it is _now_! It might have been moved or renamed.
+        //No idea if OpenEmu used to have logic for this which I inadvertently ripped out...
+        [rom setURL: url];
+        
         if(!rom) rom = [OEDBRom romWithCRC32HashString:crc inContext:context error:outError];
         if(rom) game = [rom game];
     }
