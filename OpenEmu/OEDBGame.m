@@ -122,6 +122,11 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
         
         if(!rom) rom = [OEDBRom romWithCRC32HashString:crc inContext:context error:outError];
         if(rom) game = [rom game];
+        
+        //Wowfunhappy: See above—now we also need to reset the game title, as it might have been renamed.
+        NSString *gameTitleWithSuffix = [url lastPathComponent];
+        NSString *gameTitleWithoutSuffix = [gameTitleWithSuffix stringByDeletingPathExtension];
+        [game setName:gameTitleWithoutSuffix];
     }
     
     if(!urlReachable)
