@@ -6122,6 +6122,7 @@
 				828ED4F00E7D98F60059F397 /* Copy Frameworks to App Frameworks */,
 				948E540C1571D739002D26E0 /* Copy System Plugins to App Plugins */,
 				8309A77E166CE51E0013AD4A /* Copy Files (1 item) */,
+				ABAB7EEB26B70823006EB243 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -7688,6 +7689,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# For Build All + Experimental scheme, tell Sparkle where to find experimental app and cores\n/usr/libexec/PlistBuddy -c \"Set :OECoreListURL https://raw.github.com/OpenEmu/OpenEmu-Update/master/oecores-experimental.xml\" OpenEmu-Info.plist\n\n/usr/libexec/PlistBuddy -c \"Set :SUFeedURL https://raw.github.com/OpenEmu/OpenEmu-Update/master/appcast-experimental.xml\" OpenEmu-Info.plist";
+		};
+		ABAB7EEB26B70823006EB243 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Debug/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Macintosh HD-1/Applications/OpenEmu.app/Contents/MacOS/OpenEmu\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
