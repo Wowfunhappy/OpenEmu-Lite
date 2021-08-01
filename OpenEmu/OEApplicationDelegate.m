@@ -220,6 +220,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     if([OEXPCGameCoreManager canUseXPCGameCoreManager])
         [[OEXPCCAgentConfiguration defaultConfiguration] tearDownAgent];
+    
+    //Wowfunhappy: Delete the database.
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender

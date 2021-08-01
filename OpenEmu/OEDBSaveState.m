@@ -218,6 +218,7 @@ NSString *const OESaveStateQuicksaveName        = @"OESpecialState_quick";
 
 + (OEDBSaveState*)updateOrCreateStateWithURL:(NSURL *)url inContext:(NSManagedObjectContext *)context
 {
+    NSLog(@"updateOrCreateStateWithURL: %@", url);
     OEDBSaveState *saveState = [self createSaveStateByImportingBundleURL:url intoContext:context];
 
     [saveState readFromDisk];
@@ -493,7 +494,10 @@ NSString *const OESaveStateQuicksaveName        = @"OESpecialState_quick";
     if([[[url absoluteURL] standardizedURL] isEqualTo:[[currentURL absoluteURL] standardizedURL]]) return YES;
 
     // check if url is already take, determine unique url if so
-    if([url checkResourceIsReachableAndReturnError:nil])
+    
+    //Wowfunhappy - Nope, we _want_ save states to be overwritten, you should only have one autosave.
+    
+    /*if([url checkResourceIsReachableAndReturnError:nil])
     {
         NSUInteger count = 1;
         do {
@@ -504,7 +508,7 @@ NSString *const OESaveStateQuicksaveName        = @"OESpecialState_quick";
     }
 
     // only proceed if the location has changed
-    if([[[url absoluteURL] standardizedURL] isEqualTo:[[currentURL absoluteURL] standardizedURL]]) return YES;
+    if([[[url absoluteURL] standardizedURL] isEqualTo:[[currentURL absoluteURL] standardizedURL]]) return YES;*/
 
     NSError *error = nil;
     if(![[NSFileManager defaultManager] moveItemAtURL:currentURL toURL:url error:&error])

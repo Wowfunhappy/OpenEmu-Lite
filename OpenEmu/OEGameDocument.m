@@ -513,9 +513,15 @@ typedef enum : NSUInteger
     }
 
     // TODO: Load rom that was just imported instead of the default one
-    OEDBSaveState *state = [game autosaveForLastPlayedRom];
+  
+    //OEDBSaveState *state = [game autosaveForLastPlayedRom];
+    //Wowfunhappy: Instead of retreiving the autosave from the database (as above), we  want to always try loading Auto Save State.oesavestate.
+    OEDBSaveState *state = [OEDBSaveState createSaveStateByImportingBundleURL: [[[OELibraryDatabase defaultDatabase]  stateFolderURLForROM:[game defaultROM]] URLByAppendingPathComponent:@"Auto Save State.oesavestate/"] intoContext:[[OELibraryDatabase defaultDatabase] mainThreadContext]];
+    
     if(state != nil /*&& [[OEHUDAlert loadAutoSaveGameAlert] runModal] == NSAlertDefaultReturn*/)
+    {
         return [self OE_setupDocumentWithSaveState:state error:outError];
+    }
     else {
         return [self OE_setupDocumentWithROM:[game defaultROM] usingCorePlugin:nil error:outError];
     }
