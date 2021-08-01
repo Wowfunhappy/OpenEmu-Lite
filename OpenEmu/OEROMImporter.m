@@ -302,7 +302,7 @@ NSString *const OEImportErrorDomainSuccess    = @"OEImportSuccessDomain";
 
 - (void(^)(void))OE_completionHandlerForOperation:(OEImportOperation*)op
 {
-    __block __unsafe_unretained OEImportOperation *blockOperation = op;
+    __block OEImportOperation *blockOperation = op;
     __block OEROMImporter     *importer = self;
     return ^{
         OEImportExitStatus state = [blockOperation exitStatus];
