@@ -410,7 +410,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 #pragma mark - Loading the Library Database
 - (void)loadDatabase
 {
-    //Wowfunhappy: Always create new databse
+    //Wowfunhappy: Always create new database
     
     /*NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -424,7 +424,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
        [databasePath isEqual:defaultDatabasePath])
         create = YES;*/
 
-    NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Temp" stringByExpandingTildeInPath];
+    NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Game Library" stringByExpandingTildeInPath];
     
     NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
     [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:YES];
