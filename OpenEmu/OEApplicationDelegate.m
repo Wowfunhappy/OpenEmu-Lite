@@ -220,20 +220,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     if([OEXPCGameCoreManager canUseXPCGameCoreManager])
         [[OEXPCCAgentConfiguration defaultConfiguration] tearDownAgent];
-    
-    //Wowfunhappy: Delete the database.
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-    //Wowfunhappy: Delete the database
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];
-    
-    [self performSelector:@selector(openDocument:) withObject:sender afterDelay:1];
-    
     return NO;
 }
 
@@ -362,8 +352,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
          if([[error domain] isEqualToString:OEGameDocumentErrorDomain] && [error code] == OEImportRequiredError)
          {
              if(completionHandler != nil) {
-                 completionHandler(document, documentWasAlreadyOpen, nil);
-                 //completionHandler(nil, NO, nil);
+                 completionHandler(nil, NO, nil);
              }
              
              return;
@@ -421,20 +410,24 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 #pragma mark - Loading the Library Database
 - (void)loadDatabase
 {
-    NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
+    //Wowfunhappy: Always create new databse
+    
+    /*NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
 
     NSString *databasePath = [[standardDefaults valueForKey:OEDatabasePathKey] stringByExpandingTildeInPath];
     NSString *defaultDatabasePath = [[standardDefaults valueForKey:OEDefaultDatabasePathKey] stringByExpandingTildeInPath];
 
-    if(databasePath == nil) databasePath = defaultDatabasePath;
+    if(databasePath == nil) databasePath = defaultDatabasePath;*/
 
-    BOOL create = NO;
+    /*BOOL create = NO;
     if(![[NSFileManager defaultManager] fileExistsAtPath:databasePath isDirectory:NULL] &&
        [databasePath isEqual:defaultDatabasePath])
-        create = YES;
+        create = YES;*/
 
+    NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Temp" stringByExpandingTildeInPath];
+    
     NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
-    [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:create];
+    [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:YES];
 }
 
 - (void)OE_loadDatabaseAsynchronouslyFormURL:(NSURL*)url createIfNecessary:(BOOL)create

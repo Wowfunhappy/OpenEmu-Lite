@@ -166,7 +166,7 @@ static OELibraryDatabase *defaultDatabase = nil;
         //[defaultDatabase startOpenVGDBSync];
         [romImporter start];
     });
-
+    
     return YES;
 }
 
@@ -288,6 +288,10 @@ static OELibraryDatabase *defaultDatabase = nil;
 
         [NSApp presentError:error];
     }
+    
+    //Wowfunhappy: Delete the database
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -847,13 +851,15 @@ static OELibraryDatabase *defaultDatabase = nil;
 
 - (NSURL *)stateFolderURLForROM:(OEDBRom *)rom
 {
-    NSString *fileName = [rom fileName];
+    /*NSString *fileName = [rom fileName];
     if(fileName == nil)
         fileName = [[rom URL] lastPathComponent];
     if(fileName == nil)
-        fileName = [[rom sourceURL] lastPathComponent];
+        fileName = [[rom sourceURL] lastPathComponent];*/
+    
+    //Wowfunhappy: Switch to using md5 hash in case rom is renamed.
 
-    NSURL *result = [[self stateFolderURLForSystem:[[rom game] system]] URLByAppendingPathComponent:[fileName stringByDeletingPathExtension]];
+    NSURL *result = [[self stateFolderURLForSystem:[[rom game] system]] URLByAppendingPathComponent:[[rom md5Hash] stringByDeletingPathExtension]];
     [[NSFileManager defaultManager] createDirectoryAtURL:result withIntermediateDirectories:YES attributes:nil error:nil];
     return [result standardizedURL];
 }
