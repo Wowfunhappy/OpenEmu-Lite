@@ -228,6 +228,12 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
+    //Wowfunhappy: Delete the database
+    /*NSFileManager *fileManager = [NSFileManager defaultManager];
+    [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];*/
+    
+    [self openDocument:nil];
+    
     return NO;
 }
 
@@ -292,7 +298,8 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
         return;
     }
 
-    if([[OEHUDAlert quitApplicationAlert] runModal] == NSAlertDefaultReturn)
+    //if([[OEHUDAlert quitApplicationAlert] runModal] == NSAlertDefaultReturn)
+    if (true)
         [self closeAllDocumentsWithDelegate:delegate didCloseAllSelector:didReviewAllSelector contextInfo:contextInfo];
     else
         SEND_CALLBACK(delegate, didReviewAllSelector, self, NO, contextInfo);
@@ -354,8 +361,11 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
          
          if([[error domain] isEqualToString:OEGameDocumentErrorDomain] && [error code] == OEImportRequiredError)
          {
-             if(completionHandler != nil)
-                 completionHandler(nil, NO, nil);
+             if(completionHandler != nil) {
+                 completionHandler(document, documentWasAlreadyOpen, nil);
+                 //completionHandler(nil, NO, nil);
+             }
+             
              return;
          }
          

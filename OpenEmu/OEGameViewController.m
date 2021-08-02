@@ -255,7 +255,10 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     else
         DLog(@"Invalid argument passed: %@", sender);
 
-    [_gameView setFilterName:filterName];
+    //Wowfunhappy: This is stupid, but some complex filters (namely GTU) won't switch properly unless we set to Nearest Neighbor first.
+    [_gameView setFilterName:@"Nearest Neighbor"];
+    [_gameView performSelector:@selector(setFilterName:) withObject:filterName afterDelay:0.05];
+    
     [[NSUserDefaults standardUserDefaults] setObject:filterName forKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, [[self document] systemIdentifier]]];
 }
 

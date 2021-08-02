@@ -118,15 +118,15 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
         
         //Wowfunhappy: We definitely don't care what the rom URL used to be! We care what it is _now_! It might have been moved or renamed.
         //No idea if OpenEmu used to have logic for this which I inadvertently ripped out...
-        [rom setURL: url];
+        //[rom setURL: url];
         
         if(!rom) rom = [OEDBRom romWithCRC32HashString:crc inContext:context error:outError];
         if(rom) game = [rom game];
         
         //Wowfunhappy: See above—now we also need to reset the game title, as it might have been renamed.
-        NSString *gameTitleWithSuffix = [url lastPathComponent];
-        NSString *gameTitleWithoutSuffix = [gameTitleWithSuffix stringByDeletingPathExtension];
-        [game setName:gameTitleWithoutSuffix];
+        //NSString *gameTitleWithSuffix = [url lastPathComponent];
+        //NSString *gameTitleWithoutSuffix = [gameTitleWithSuffix stringByDeletingPathExtension];
+        //[game setName:gameTitleWithoutSuffix];
     }
     
     if(!urlReachable)
