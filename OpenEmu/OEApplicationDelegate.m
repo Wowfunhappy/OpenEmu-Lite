@@ -232,7 +232,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];
     
-    [self performSelector:@selector(openDocument:) withObject:sender afterDelay:0.1];
+    [self performSelector:@selector(openDocument:) withObject:sender afterDelay:1];
     
     return NO;
 }
