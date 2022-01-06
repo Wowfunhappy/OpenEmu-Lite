@@ -155,10 +155,9 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(libraryDatabaseDidLoad:) name:OELibraryDidLoadNotificationName object:nil];
 
     //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self loadDatabase];
-    });
+
+    //[self loadDatabase];
+
 }
 
 - (void)libraryDatabaseDidLoad:(NSNotification*)notification
@@ -262,21 +261,21 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 #pragma mark - NSDocumentController Overrides
 
-- (void)addDocument:(NSDocument *)document
-{
-    if([document isKindOfClass:[OEGameDocument class]])
-        [_gameDocuments addObject:document];
+//- (void)addDocument:(NSDocument *)document
+//{
+//    if([document isKindOfClass:[OEGameDocument class]]) {
+//        [_gameDocuments addObject:document];
+//    }
+//    [super addDocument:document];
+//}
 
-    [super addDocument:document];
-}
-
-- (void)removeDocument:(NSDocument *)document
-{
-    if([document isKindOfClass:[OEGameDocument class]])
-        [_gameDocuments removeObject:document];
-
-    [super removeDocument:document];
-}
+//- (void)removeDocument:(NSDocument *)document
+//{
+//    if([document isKindOfClass:[OEGameDocument class]])
+//        [_gameDocuments removeObject:document];
+//
+//    [super removeDocument:document];
+//}
 
 #define SEND_CALLBACK ((void(*)(id, SEL, NSDocumentController *, BOOL, void *))objc_msgSend)
 
@@ -341,6 +340,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
+    if ([OELibraryDatabase defaultDatabase] == nil) {
+        [self setupTempDatabaseSyncronously];
+    }
+
     [super openDocumentWithContentsOfURL:url display:NO completionHandler:
      ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
      {
@@ -358,11 +361,21 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
              return;
          }
          
-         if(completionHandler != nil)
+         if(completionHandler != nil) {
              completionHandler(document, documentWasAlreadyOpen, error);
+         }
          
          //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
      }];
+}
+
+- (void)setupTempDatabaseSyncronously {
+    //Wowfunhappy's!
+    NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Game Library" stringByExpandingTildeInPath];
+    NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
+    [[NSFileManager defaultManager] createDirectoryAtURL:databaseURL withIntermediateDirectories:YES attributes:nil error:nil];
+    [OELibraryDatabase loadFromURL:databaseURL error:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OELibraryDidLoadNotificationName object:[OELibraryDatabase defaultDatabase]];
 }
 
 - (void)openGameDocumentWithGame:(OEDBGame *)game display:(BOOL)displayDocument fullScreen:(BOOL)fullScreen completionHandler:(void (^)(OEGameDocument *document, NSError *error))completionHandler;
@@ -424,40 +437,39 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
        [databasePath isEqual:defaultDatabasePath])
         create = YES;*/
 
-    NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Game Library" stringByExpandingTildeInPath];
+    //NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Game Library" stringByExpandingTildeInPath];
     
-    NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
-    [self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:YES];
+    //[self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:YES];
 }
 
-- (void)OE_loadDatabaseAsynchronouslyFormURL:(NSURL*)url createIfNecessary:(BOOL)create
-{
-    if(create)
-    {
-        [[NSFileManager defaultManager] createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-
-    NSError *error = nil;
-    if(![OELibraryDatabase loadFromURL:url error:&error]) // if the database could not be loaded
-    {
-        if([error domain] == NSCocoaErrorDomain && [error code] == NSPersistentStoreIncompatibleVersionHashError)
-        {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                [self OE_loadDatabaseAsynchronouslyFormURL:url createIfNecessary:create];
-            });
-        }
-        else
-        {
-            [self presentError:error];
-        }
-        return;
-    }
-
-    NSAssert([OELibraryDatabase defaultDatabase] != nil, @"No database available!");
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:OELibraryDidLoadNotificationName object:[OELibraryDatabase defaultDatabase]];
-    });
-}
+//- (void)OE_loadDatabaseAsynchronouslyFormURL:(NSURL*)url createIfNecessary:(BOOL)create
+//{
+//    if(create)
+//    {
+//        [[NSFileManager defaultManager] createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:nil];
+//    }
+//
+//    NSError *error = nil;
+//    if(![OELibraryDatabase loadFromURL:url error:&error]) // if the database could not be loaded
+//    {
+//        if([error domain] == NSCocoaErrorDomain && [error code] == NSPersistentStoreIncompatibleVersionHashError)
+//        {
+//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//                [self OE_loadDatabaseAsynchronouslyFormURL:url createIfNecessary:create];
+//            });
+//        }
+//        else
+//        {
+//            [self presentError:error];
+//        }
+//        return;
+//    }
+//
+//    NSAssert([OELibraryDatabase defaultDatabase] != nil, @"No database available!");
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [[NSNotificationCenter defaultCenter] postNotificationName:OELibraryDidLoadNotificationName object:[OELibraryDatabase defaultDatabase]];
+//    });
+//}
 
 #pragma mark -
 - (void)OE_loadPlugins

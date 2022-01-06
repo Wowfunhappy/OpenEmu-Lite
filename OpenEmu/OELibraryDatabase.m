@@ -281,17 +281,18 @@ static OELibraryDatabase *defaultDatabase = nil;
 
     NSError *error = nil;
 
-    if(![_writerContext save:&error])
+    /*if(![_writerContext save:&error])
     {
         NSLog(@"Could not save databse: ");
         NSLog(@"%@", error);
 
         [NSApp presentError:error];
-    }
+    }*/
     
     //Wowfunhappy: Delete the database
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtURL:[[OELibraryDatabase defaultDatabase]databaseFolderURL] error:nil];
+    
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

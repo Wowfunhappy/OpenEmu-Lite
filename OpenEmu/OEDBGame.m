@@ -127,6 +127,8 @@ NSString *const OEGameArtworkPropertiesKey = @"artworkProperties";
         //NSString *gameTitleWithSuffix = [url lastPathComponent];
         //NSString *gameTitleWithoutSuffix = [gameTitleWithSuffix stringByDeletingPathExtension];
         //[game setName:gameTitleWithoutSuffix];
+        
+        
     }
     
     if(!urlReachable)
