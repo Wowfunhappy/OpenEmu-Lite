@@ -157,6 +157,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
 
     //[self loadDatabase];
+    [self setupTempDatabaseSyncronously];
 
 }
 
