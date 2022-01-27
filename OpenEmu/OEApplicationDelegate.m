@@ -157,7 +157,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
 
     //[self loadDatabase];
-    [self setupTempDatabaseSyncronously];
+    //[self setupTempDatabaseSyncronously];
 
 }
 
@@ -227,56 +227,68 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     return NO;
 }
 
-//- (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
-//{
-//    /*if(![[NSUserDefaults standardUserDefaults] boolForKey:OESetupAssistantHasFinishedKey]){
-//        [NSApp replyToOpenOrPrint:NSApplicationDelegateReplyCancel];
-//        return;
-//    }*/
-//
-//    void(^block)(void) = ^{
-//        DLog();
-//        if([filenames count] == 1)
-//        {
-//            NSURL *url = [NSURL fileURLWithPath:[filenames lastObject]];
-//            [self openDocumentWithContentsOfURL:url display:YES completionHandler:
-//             ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
-//             {
-//                 NSApplicationDelegateReply reply = (document != nil) ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure;
-//                 [NSApp replyToOpenOrPrint:reply];
-//             }];
-//        }
-//        else
-//        {
-//            NSApplicationDelegateReply reply = NSApplicationDelegateReplyFailure;
-//            OEROMImporter *importer = [[OELibraryDatabase defaultDatabase] importer];
-//            if([importer importItemsAtPaths:filenames])
-//                reply = NSApplicationDelegateReplySuccess;
-//            
-//            [NSApp replyToOpenOrPrint:reply];
-//        }
-//    };
-//    if(_libraryLoaded) block();
-//    else [[self startupQueue] addObject:block];
-//}
+- (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
+{
+    /*if(![[NSUserDefaults standardUserDefaults] boolForKey:OESetupAssistantHasFinishedKey]){
+        [NSApp replyToOpenOrPrint:NSApplicationDelegateReplyCancel];
+        return;
+    }*/
+    
+    if ([OELibraryDatabase defaultDatabase] == nil) {
+        [self setupTempDatabaseSyncronously];
+    }
+
+
+    for (NSString *fileString in filenames) {
+        NSURL *url = [NSURL fileURLWithPath:fileString];
+        [self openDocumentWithContentsOfURL:url display:YES completionHandler:
+         ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
+         {
+             NSApplicationDelegateReply reply = (document != nil) ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure;
+             [NSApp replyToOpenOrPrint:reply];
+         }];
+    }
+        /*if([filenames count] == 1)
+        {
+            NSURL *url = [NSURL fileURLWithPath:[filenames lastObject]];
+            [self openDocumentWithContentsOfURL:url display:YES completionHandler:
+             ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
+             {
+                 NSApplicationDelegateReply reply = (document != nil) ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure;
+                 [NSApp replyToOpenOrPrint:reply];
+             }];
+        }
+        else
+        {
+            NSApplicationDelegateReply reply = NSApplicationDelegateReplyFailure;
+            OEROMImporter *importer = [[OELibraryDatabase defaultDatabase] importer];
+            if([importer importItemsAtPaths:filenames])
+                reply = NSApplicationDelegateReplySuccess;
+            
+            [NSApp replyToOpenOrPrint:reply];
+        }*/
+
+    /*if(_libraryLoaded) block();
+    else [[self startupQueue] addObject:block];*/
+}
 
 #pragma mark - NSDocumentController Overrides
 
-//- (void)addDocument:(NSDocument *)document
-//{
-//    if([document isKindOfClass:[OEGameDocument class]]) {
-//        [_gameDocuments addObject:document];
-//    }
-//    [super addDocument:document];
-//}
+- (void)addDocument:(NSDocument *)document
+{
+    if([document isKindOfClass:[OEGameDocument class]]) {
+        [_gameDocuments addObject:document];
+    }
+    [super addDocument:document];
+}
 
-//- (void)removeDocument:(NSDocument *)document
-//{
-//    if([document isKindOfClass:[OEGameDocument class]])
-//        [_gameDocuments removeObject:document];
-//
-//    [super removeDocument:document];
-//}
+- (void)removeDocument:(NSDocument *)document
+{
+    if([document isKindOfClass:[OEGameDocument class]])
+        [_gameDocuments removeObject:document];
+
+    [super removeDocument:document];
+}
 
 #define SEND_CALLBACK ((void(*)(id, SEL, NSDocumentController *, BOOL, void *))objc_msgSend)
 
@@ -341,10 +353,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
-    if ([OELibraryDatabase defaultDatabase] == nil) {
-        [self setupTempDatabaseSyncronously];
-    }
-
     [super openDocumentWithContentsOfURL:url display:NO completionHandler:
      ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
      {
@@ -554,7 +562,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     // TODO: Think of a way to register for document types without manipulating the plist
     // as it's generally bad to modify the bundle's contents and we may not have write access
-    NSArray             *systemPlugins = [OESystemPlugin allPlugins];
+    /*NSArray             *systemPlugins = [OESystemPlugin allPlugins];
     NSMutableDictionary *allTypes      = [NSMutableDictionary dictionaryWithCapacity:[systemPlugins count]];
 
     for(OESystemPlugin *plugin in systemPlugins)
@@ -596,7 +604,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     if(updated != nil)
         [updated writeToFile:infoPlistPath atomically:YES];
     else
-        NSLog(@"Error: %@", error);
+        NSLog(@"Error: %@", error);*/
 }
 
 - (NSString *)appVersion
@@ -616,36 +624,36 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 #pragma mark - NSMenu Delegate
 
-- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
-{
-    OELibraryDatabase *database = [OELibraryDatabase defaultDatabase];
-    NSDictionary *lastPlayedInfo = [database lastPlayedRomsBySystem];
-    __block NSUInteger count = [[lastPlayedInfo allKeys] count];
-
-    if(lastPlayedInfo == nil || count == 0)
-    {
-        [self setCachedLastPlayedInfo:nil];
-        return 1;
-    }
-
-    [[lastPlayedInfo allValues] enumerateObjectsUsingBlock:
-     ^(id romArray, NSUInteger idx, BOOL *stop)
-     {
-         count += [romArray count];
-     }];
-
-    NSMutableArray *lastPlayed = [NSMutableArray arrayWithCapacity:count];
-    NSArray *sortedSystems = [[lastPlayedInfo allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    [sortedSystems enumerateObjectsUsingBlock:
-     ^(id obj, NSUInteger idx, BOOL *stop)
-     {
-         [lastPlayed addObject:obj];
-         [lastPlayed addObjectsFromArray:[lastPlayedInfo valueForKey:obj]];
-     }];
-
-    [self setCachedLastPlayedInfo:lastPlayed];
-    return count;
-}
+//- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
+//{
+//    OELibraryDatabase *database = [OELibraryDatabase defaultDatabase];
+//    NSDictionary *lastPlayedInfo = [database lastPlayedRomsBySystem];
+//    __block NSUInteger count = [[lastPlayedInfo allKeys] count];
+//
+//    if(lastPlayedInfo == nil || count == 0)
+//    {
+//        [self setCachedLastPlayedInfo:nil];
+//        return 1;
+//    }
+//
+//    [[lastPlayedInfo allValues] enumerateObjectsUsingBlock:
+//     ^(id romArray, NSUInteger idx, BOOL *stop)
+//     {
+//         count += [romArray count];
+//     }];
+//
+//    NSMutableArray *lastPlayed = [NSMutableArray arrayWithCapacity:count];
+//    NSArray *sortedSystems = [[lastPlayedInfo allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+//    [sortedSystems enumerateObjectsUsingBlock:
+//     ^(id obj, NSUInteger idx, BOOL *stop)
+//     {
+//         [lastPlayed addObject:obj];
+//         [lastPlayed addObjectsFromArray:[lastPlayedInfo valueForKey:obj]];
+//     }];
+//
+//    [self setCachedLastPlayedInfo:lastPlayed];
+//    return count;
+//}
 
 //- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
 //{

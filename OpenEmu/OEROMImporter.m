@@ -338,142 +338,142 @@ NSString *const OEImportErrorDomainSuccess    = @"OEImportSuccessDomain";
     };
 }
 #pragma mark - Spotlight importing -
-- (void)discoverRoms:(NSArray *)volumes
-{
-    DLog();
-    // TODO: limit searching or results to the volume URLs only.
-    
-    NSMutableArray *supportedFileExtensions = [[OESystemPlugin supportedTypeExtensions] mutableCopy];
-    
-    // We skip common types by default.
-    NSArray *commonTypes = @[@"zip", @"elf"];
-    
-    [supportedFileExtensions removeObjectsInArray:commonTypes];
-    
-    //NSLog(@"Supported search Extensions are: %@", supportedFileExtensions);
-    
-    NSString *searchString = @"";
-    for(NSString *extension in supportedFileExtensions)
-    {
-        searchString = [searchString stringByAppendingFormat:@"(kMDItemDisplayName == *.%@)", extension];
-        searchString = [searchString stringByAppendingString:@" || "];
-    }
-    
-    searchString = [searchString substringWithRange:NSMakeRange(0, [searchString length] - 4)];
-    
-    DLog(@"SearchString: %@", searchString);
-    
-    MDQueryRef searchQuery = MDQueryCreate(kCFAllocatorDefault, (__bridge CFStringRef)searchString, NULL, NULL);
-    
-    if(searchQuery != NULL)
-    {
-        // Limit Scope to selected volumes / URLs only
-        MDQuerySetSearchScope(searchQuery, (__bridge CFArrayRef) volumes, 0);
-        
-        [[self spotlightSearchResults] removeAllObjects];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finalizeSearchResults:)
-                                                     name:(NSString *)kMDQueryDidFinishNotification
-                                                   object:(__bridge id)searchQuery];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSearchResults:)
-                                                     name:(NSString *)kMDQueryProgressNotification
-                                                   object:(__bridge id)searchQuery];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSearchResults:)
-                                                     name:(NSString *)kMDQueryDidUpdateNotification
-                                                   object:(__bridge id)searchQuery];
-        
-        if(MDQueryExecute(searchQuery, kMDQueryWantsUpdates))
-            DLog(@"Searching for importable roms");
-        else
-        {
-            CFRelease(searchQuery);
-            searchQuery = nil;
-            // leave this log message in...
-            DLog(@"MDQuery failed to start.");
-        }
-        
-    }
-    else
-        DLog(@"Invalid Search Query");
-}
+//- (void)discoverRoms:(NSArray *)volumes
+//{
+//    DLog();
+//    // TODO: limit searching or results to the volume URLs only.
+//    
+//    NSMutableArray *supportedFileExtensions = [[OESystemPlugin supportedTypeExtensions] mutableCopy];
+//    
+//    // We skip common types by default.
+//    NSArray *commonTypes = @[@"zip", @"elf"];
+//    
+//    [supportedFileExtensions removeObjectsInArray:commonTypes];
+//    
+//    //NSLog(@"Supported search Extensions are: %@", supportedFileExtensions);
+//    
+//    NSString *searchString = @"";
+//    for(NSString *extension in supportedFileExtensions)
+//    {
+//        searchString = [searchString stringByAppendingFormat:@"(kMDItemDisplayName == *.%@)", extension];
+//        searchString = [searchString stringByAppendingString:@" || "];
+//    }
+//    
+//    searchString = [searchString substringWithRange:NSMakeRange(0, [searchString length] - 4)];
+//    
+//    DLog(@"SearchString: %@", searchString);
+//    
+//    MDQueryRef searchQuery = MDQueryCreate(kCFAllocatorDefault, (__bridge CFStringRef)searchString, NULL, NULL);
+//    
+//    if(searchQuery != NULL)
+//    {
+//        // Limit Scope to selected volumes / URLs only
+//        MDQuerySetSearchScope(searchQuery, (__bridge CFArrayRef) volumes, 0);
+//        
+//        [[self spotlightSearchResults] removeAllObjects];
+//        
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finalizeSearchResults:)
+//                                                     name:(NSString *)kMDQueryDidFinishNotification
+//                                                   object:(__bridge id)searchQuery];
+//        
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSearchResults:)
+//                                                     name:(NSString *)kMDQueryProgressNotification
+//                                                   object:(__bridge id)searchQuery];
+//        
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSearchResults:)
+//                                                     name:(NSString *)kMDQueryDidUpdateNotification
+//                                                   object:(__bridge id)searchQuery];
+//        
+//        if(MDQueryExecute(searchQuery, kMDQueryWantsUpdates))
+//            DLog(@"Searching for importable roms");
+//        else
+//        {
+//            CFRelease(searchQuery);
+//            searchQuery = nil;
+//            // leave this log message in...
+//            DLog(@"MDQuery failed to start.");
+//        }
+//        
+//    }
+//    else
+//        DLog(@"Invalid Search Query");
+//}
 
-- (void)updateSearchResults:(NSNotification *)notification
-{
-    DLog();
-    
-    MDQueryRef searchQuery = (__bridge MDQueryRef)[notification object];
-    
-    
-    // If you're going to have the same array for every iteration,
-    // don't allocate it inside the loop !
-    NSArray *excludedPaths = @[
-                               @"System",
-                               @"Library",
-                               @"Developer",
-                               @"Volumes",
-                               @"Applications",
-                               @"cores",
-                               @"dev",
-                               @"etc",
-                               @"home",
-                               @"net",
-                               @"sbin",
-                               @"private",
-                               @"tmp",
-                               @"usr",
-                               @"var",
-                               @"ReadMe", // markdown
-                               @"readme", // markdown
-                               @"README", // markdown
-                               @"Readme", // markdown
-                               ];
-    
-    // assume the latest result is the last index?
-    for(CFIndex index = 0, limit = MDQueryGetResultCount(searchQuery); index < limit; index++)
-    {
-        MDItemRef resultItem = (MDItemRef)MDQueryGetResultAtIndex(searchQuery, index);
-        NSString *resultPath = (__bridge_transfer NSString *)MDItemCopyAttribute(resultItem, kMDItemPath);
-        
-        // Nothing in common
-        if([[resultPath pathComponents] firstObjectCommonWithArray:excludedPaths] == nil)
-        {
-            NSDictionary *resultDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                        resultPath, @"Path",
-                                        [[resultPath lastPathComponent] stringByDeletingPathExtension], @"Name",
-                                        nil];
-            
-            if(![[self spotlightSearchResults] containsObject:resultDict])
-            {
-                [[self spotlightSearchResults] addObject:resultDict];
-                
-                //                NSLog(@"Result Path: %@", resultPath);
-            }
-        }
-    }
-}
-
-- (void)finalizeSearchResults:(NSNotification *)notification
-{
-    MDQueryRef searchQuery = (__bridge_retained MDQueryRef)[notification object];
-    DLog(@"Finished searching, found: %lu items", MDQueryGetResultCount(searchQuery));
-    
-    if(MDQueryGetResultCount(searchQuery))
-    {
-        [self importSpotlightResultsInBackground];
-        
-        MDQueryStop(searchQuery);
-    }
-    
-    CFRelease(searchQuery);
-}
-
-- (void)importSpotlightResultsInBackground;
-{
-    DLog();
-    [self importItemsAtPaths:[[self spotlightSearchResults] valueForKey:@"Path"]];
-}
+//- (void)updateSearchResults:(NSNotification *)notification
+//{
+//    DLog();
+//    
+//    MDQueryRef searchQuery = (__bridge MDQueryRef)[notification object];
+//    
+//    
+//    // If you're going to have the same array for every iteration,
+//    // don't allocate it inside the loop !
+//    NSArray *excludedPaths = @[
+//                               @"System",
+//                               @"Library",
+//                               @"Developer",
+//                               @"Volumes",
+//                               @"Applications",
+//                               @"cores",
+//                               @"dev",
+//                               @"etc",
+//                               @"home",
+//                               @"net",
+//                               @"sbin",
+//                               @"private",
+//                               @"tmp",
+//                               @"usr",
+//                               @"var",
+//                               @"ReadMe", // markdown
+//                               @"readme", // markdown
+//                               @"README", // markdown
+//                               @"Readme", // markdown
+//                               ];
+//    
+//    // assume the latest result is the last index?
+//    for(CFIndex index = 0, limit = MDQueryGetResultCount(searchQuery); index < limit; index++)
+//    {
+//        MDItemRef resultItem = (MDItemRef)MDQueryGetResultAtIndex(searchQuery, index);
+//        NSString *resultPath = (__bridge_transfer NSString *)MDItemCopyAttribute(resultItem, kMDItemPath);
+//        
+//        // Nothing in common
+//        if([[resultPath pathComponents] firstObjectCommonWithArray:excludedPaths] == nil)
+//        {
+//            NSDictionary *resultDict = [[NSDictionary alloc] initWithObjectsAndKeys:
+//                                        resultPath, @"Path",
+//                                        [[resultPath lastPathComponent] stringByDeletingPathExtension], @"Name",
+//                                        nil];
+//            
+//            if(![[self spotlightSearchResults] containsObject:resultDict])
+//            {
+//                [[self spotlightSearchResults] addObject:resultDict];
+//                
+//                //                NSLog(@"Result Path: %@", resultPath);
+//            }
+//        }
+//    }
+//}
+//
+//- (void)finalizeSearchResults:(NSNotification *)notification
+//{
+//    MDQueryRef searchQuery = (__bridge_retained MDQueryRef)[notification object];
+//    DLog(@"Finished searching, found: %lu items", MDQueryGetResultCount(searchQuery));
+//    
+//    if(MDQueryGetResultCount(searchQuery))
+//    {
+//        [self importSpotlightResultsInBackground];
+//        
+//        MDQueryStop(searchQuery);
+//    }
+//    
+//    CFRelease(searchQuery);
+//}
+//
+//- (void)importSpotlightResultsInBackground;
+//{
+//    DLog();
+//    [self importItemsAtPaths:[[self spotlightSearchResults] valueForKey:@"Path"]];
+//}
 
 #pragma mark - Controlling Import -
 - (void)start
