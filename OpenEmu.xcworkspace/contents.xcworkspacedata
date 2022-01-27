@@ -11,6 +11,9 @@
       location = "group:iPhoneRemote/iPhoneRemote.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:mGBA/mGBA.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:4DO/4DO.xcodeproj">
    </FileRef>
    <FileRef
@@ -78,9 +81,6 @@
    </FileRef>
    <FileRef
       location = "group:VirtualJaguar/VirtualJaguar.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:VisualBoyAdvance/VisualBoyAdvance.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:yabause/yabause/Yabause.xcodeproj">
