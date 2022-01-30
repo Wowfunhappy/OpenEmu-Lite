@@ -1,3 +1,9 @@
+OpenEmu Lite is a stripped-down version of OpenEmu created by Wowfunhappy (that's me!) to simplify the user interface and maintain compatibility with legacy operating systems. Although I am extremely happy with the final, compiled product, the source is an absolute mess in dire need of cleanup.
+
+You can download OpenEmu Lite from my website, jonathanalland.com/old-osx-projects. The original OpenEmu's readme is below. 
+
+---
+
 OpenEmu is an open source project to bring game emulation to OS X as a first class citizen, leveraging modern OS X technologies such as Cocoa, Core Animation and Quartz, and 3rd party libraries like Sparkle for auto-updating. OpenEmu is based on a modular architecture, allowing for game-engine plugins, this means OpenEmu can support a host of different emulation engines and back-ends while retaining a familiar OS X native front-end. 
 
 Currently OpenEmu can load the following game engines as plugins:
