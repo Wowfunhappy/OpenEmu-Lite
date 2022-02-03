@@ -552,6 +552,7 @@ typedef enum : NSUInteger
             [menuItem setState:NSOffState];
         }
     }
+    
     return YES;
 }
 
@@ -584,8 +585,8 @@ typedef enum : NSUInteger
               [_gameSystemResponder setGlobalEventsHandler:self];
 
               [self disableOSSleep];
-              [[self rom] incrementPlayCount];
-              [[self rom] markAsPlayedNow];
+              //[[self rom] incrementPlayCount];
+              //[[self rom] markAsPlayedNow];
               _lastPlayStartDate = [NSDate date];
 
               if(_saveStateForGameStart)
@@ -872,7 +873,7 @@ typedef enum : NSUInteger
               _gameSystemResponder  = nil;
               _gameCoreManager      = nil;
 
-              [[self rom] addTimeIntervalToPlayTime:ABS([_lastPlayStartDate timeIntervalSinceNow])];
+              //[[self rom] addTimeIntervalToPlayTime:ABS([_lastPlayStartDate timeIntervalSinceNow])];
               _lastPlayStartDate = nil;
           }];
          
