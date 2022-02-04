@@ -354,6 +354,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
     if (url == nil) {
+        NSLog(@"library: %@", [OELibraryDatabase defaultDatabase]);
         return;
     }
     [super openDocumentWithContentsOfURL:url display:NO completionHandler:

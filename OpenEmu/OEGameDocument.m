@@ -496,11 +496,10 @@ typedef enum : NSUInteger
         ^(NSManagedObjectID *romID){
             
             // import probably failed
-            if(!romID) return;
-            
-            NSManagedObjectContext *context = [[OELibraryDatabase defaultDatabase] mainThreadContext];
-            OEDBRom *rom = [OEDBRom objectWithID:romID inContext:context];;
-            [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[rom URL] display:NO completionHandler:nil];
+            if(!romID) {
+                return;
+            }
+            [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:absoluteURL display:NO completionHandler:nil];
         };
 
         if([importer importItemAtURL:absoluteURL withCompletionHandler:completion])
@@ -537,12 +536,22 @@ typedef enum : NSUInteger
     {
         if(_emulationStatus == OEEmulationStatusPaused)
         {
-            [menuItem setTitle:OELocalizedString(@"Resume Emulation", @"")];
+            [menuItem setState:NSOnState];
             return YES;
         }
         
-        [menuItem setTitle:OELocalizedString(@"Pause Emulation", @"")];
+        [menuItem setState:NSOffState];
         return _emulationStatus == OEEmulationStatusPlaying;
+    }
+    
+    if(action == @selector(toggleAudioMute:))
+    {
+        if(_isMuted)
+        {
+            [menuItem setState:NSOnState];
+        } else {
+            [menuItem setState:NSOffState];
+        }
     }
     
     else if(action == @selector(setCheat:)) {
@@ -756,7 +765,7 @@ typedef enum : NSUInteger
         DLog(@"Invalid argument passed: %@", sender);
 }
 
-- (void)toggleAudioMute:(id)sender;
+- (IBAction)toggleAudioMute:(id)sender;
 {
     if(_isMuted)
         [self unmute:sender];
