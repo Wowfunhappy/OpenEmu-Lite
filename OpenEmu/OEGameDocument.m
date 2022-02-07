@@ -773,6 +773,11 @@ typedef enum : NSUInteger
         [self mute:sender];
 }
 
+- (IBAction)toggleSquarePixels:(id)sender;
+{
+    [_gameCoreManager setDrawSquarePixels:true];
+}
+
 - (IBAction)mute:(id)sender;
 {
     _isMuted = YES;
