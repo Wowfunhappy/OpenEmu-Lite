@@ -238,7 +238,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
         [self setupTempDatabaseSyncronously];
     }
 
-
     for (NSString *fileString in filenames) {
         NSURL *url = [NSURL fileURLWithPath:fileString];
         [self openDocumentWithContentsOfURL:url display:YES completionHandler:
@@ -354,20 +353,27 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
     if (url == nil) {
-        NSLog(@"library: %@", [OELibraryDatabase defaultDatabase]);
         return;
     }
+    if ([OELibraryDatabase defaultDatabase] == nil) {
+        [self setupTempDatabaseSyncronously];
+    }
+    
     [super openDocumentWithContentsOfURL:url display:NO completionHandler:
      ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
      {
+         NSLog(@"1");
          if([document isKindOfClass:[OEGameDocument class]])
          {
+             NSLog(@"2");
              [self OE_setupGameDocument:(OEGameDocument*)document display:YES fullScreen:NO completionHandler:nil];
          }
          
          if([[error domain] isEqualToString:OEGameDocumentErrorDomain] && [error code] == OEImportRequiredError)
          {
+             NSLog(@"3");
              if(completionHandler != nil) {
+                 NSLog(@"4");
                  completionHandler(nil, NO, nil);
              }
              
@@ -375,6 +381,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
          }
          
          if(completionHandler != nil) {
+              NSLog(@"5");
              completionHandler(document, documentWasAlreadyOpen, error);
          }
          

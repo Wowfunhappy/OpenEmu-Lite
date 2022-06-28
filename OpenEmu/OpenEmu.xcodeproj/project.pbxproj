@@ -7701,7 +7701,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Release/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Macintosh HD-1/Applications/OpenEmu.app/Contents/MacOS/OpenEmu\"\n\n#cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Release/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Jonathan/Desktop/OpenEmu.app/Contents/MacOS/OpenEmu\"";
+			shellScript = "cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Release/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Macintosh HD-1/Applications/OpenEmu.app/Contents/MacOS/OpenEmu\"\n\nchmod 755 \"/Volumes/Macintosh HD-1/Applications/OpenEmu.app/Contents/MacOS/OpenEmu\"\n\n#cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Release/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Jonathan/Desktop/OpenEmu.app/Contents/MacOS/OpenEmu\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
