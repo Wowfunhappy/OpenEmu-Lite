@@ -18,3 +18,5 @@ xcuserdata
 profile
 *.moved-aside
 icon?
+
+**/.claude/settings.local.json
