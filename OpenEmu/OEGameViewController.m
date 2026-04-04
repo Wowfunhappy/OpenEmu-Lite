@@ -26,10 +26,7 @@
 
 #import "OEGameViewController.h"
 
-#import "OEDBRom.h"
-#import "OEDBSystem.h"
-#import "OEDBGame.h"
-#import "OEDBScreenshot.h"
+#import "OERom.h"
 
 #import "OEGameView.h"
 #import "OECorePickerController.h"
@@ -42,7 +39,7 @@
 #import "OESystemPlugin.h"
 #import "OECorePlugin.h"
 
-#import "OEDBSaveState.h"
+#import "OESaveState.h"
 
 #import "OEGameDocument.h"
 #import "OEAudioDeviceManager.h"
@@ -53,7 +50,6 @@
 #import "NSViewController+OEAdditions.h"
 
 #import "OEPreferencesController.h"
-#import "OELibraryDatabase.h"
 
 //Wowfunhappy
 #import "OECompositionPlugin.h"
@@ -394,9 +390,9 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
         NSMenu *emulationMenu = [emulationMenuItem submenu];
         
         NSMenu *cheatsMenu = [[NSMenu alloc] init];
-        [cheatsMenu setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[[self document]rom]game]displayName]]];
+        [cheatsMenu setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[self document]rom]name]]];
         NSMenuItem *item = [[NSMenuItem alloc] init];
-        [item setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[[self document]rom]game]displayName]]];
+        [item setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[self document]rom]name]]];
         [emulationMenu addItem:item];
         [item setSubmenu:cheatsMenu];
         
@@ -449,18 +445,16 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH.mm.ss"];
     NSString *timeStamp = [dateFormatter stringFromDate:[NSDate date]];
 
-    NSString *fileName = [NSString stringWithFormat:@"%@ %@.png", [[[[self document] rom] game] displayName], timeStamp];
-    NSString *temporaryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-    NSURL *temporaryURL = [NSURL fileURLWithPath:temporaryPath];
+    NSString *fileName = [NSString stringWithFormat:@"%@ %@.png", [[[self document] rom] name], timeStamp];
+    NSString *screenshotDir = [@"~/Library/Application Support/OpenEmu/Screenshots" stringByExpandingTildeInPath];
+    [[NSFileManager defaultManager] createDirectoryAtPath:screenshotDir withIntermediateDirectories:YES attributes:nil error:nil];
+    NSString *screenshotPath = [screenshotDir stringByAppendingPathComponent:fileName];
+    NSURL *screenshotURL = [NSURL fileURLWithPath:screenshotPath];
 
     __autoreleasing NSError *error;
-    if(![imageData writeToURL:temporaryURL options:NSDataWritingAtomic error:&error])
+    if(![imageData writeToURL:screenshotURL options:NSDataWritingAtomic error:&error])
     {
-        NSLog(@"Could not save screenshot at URL: %@, with error: %@", temporaryURL, error);
-    } else {
-        OEDBRom *rom = [[self document] rom];
-        OEDBScreenshot *screenshot = [OEDBScreenshot createObjectInContext:[rom managedObjectContext] forROM:rom withFile:temporaryURL];
-        [screenshot save];
+        NSLog(@"Could not save screenshot at URL: %@, with error: %@", screenshotURL, error);
     }
 }
 

@@ -35,9 +35,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import "OEUtilities.h"
 
-#import "OEDBRom.h"
-#import "OEDBGame.h"
-#import "OEDBSystem.h"
+#import "OERom.h"
+#import "OESystemPlugin.h"
 
 #pragma mark - Private variables
 
@@ -118,7 +117,7 @@ typedef enum
     if(document != nil)
     {
         OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
-        NSString *systemIdentifier               = [[[[[gameViewController document] rom] game] system] systemIdentifier];
+        NSString *systemIdentifier               = [[[[gameViewController document] rom] systemPlugin] systemIdentifier];
         NSUserDefaults *defaults                 = [NSUserDefaults standardUserDefaults];
         unsigned int maxScale                    = [self maximumIntegralScale];
         NSDictionary *integralScaleInfo          = [defaults objectForKey:[NSString stringWithFormat:_OESystemIntegralScaleKeyFormat, systemIdentifier]];
@@ -408,7 +407,7 @@ typedef enum
     OEGameViewController *gameViewController = [[self OE_gameDocument] gameViewController];
 
     const NSSize windowSize         = ([[self window] isFullScreen] ? _frameForNonFullScreenMode.size : [[self window] frame].size);
-    NSString *systemIdentifier      = [[[[[gameViewController document] rom] game] system] systemIdentifier];
+    NSString *systemIdentifier      = [[[[gameViewController document] rom] systemPlugin] systemIdentifier];
     NSUserDefaults *userDefaults    = [NSUserDefaults standardUserDefaults];
     NSString *systemKey             = [NSString stringWithFormat:_OESystemIntegralScaleKeyFormat, systemIdentifier];
     NSDictionary *integralScaleInfo = @{

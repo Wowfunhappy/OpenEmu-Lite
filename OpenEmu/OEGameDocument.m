@@ -31,16 +31,14 @@
 #import "OEBackgroundColorView.h"
 #import "OECorePickerController.h"
 #import "OECorePlugin.h"
-#import "OEDBRom.h"
-#import "OEDBGame.h"
-#import "OEDBSaveState.h"
+#import "OERom.h"
+#import "OESaveState.h"
 #import "OEDOGameCoreManager.h"
 #import "OEGameCoreManager.h"
 #import "OEGameView.h"
 #import "OEGameViewController.h"
 #import "OEHUDAlert+DefaultAlertsAdditions.h"
 #import "OEHUDWindow.h"
-#import "OELibraryDatabase.h"
 #import "OEPopoutGameWindowController.h"
 #import "OEPreferencesController.h"
 #import "OESystemPlugin.h"
@@ -80,7 +78,7 @@ typedef enum : NSUInteger
     NSTimer            *_systemSleepTimer;
 
     OEEmulationStatus   _emulationStatus;
-    OEDBSaveState      *_saveStateForGameStart;
+    OESaveState        *_saveStateForGameStart;
     NSDate             *_lastPlayStartDate;
     BOOL                _isMuted;
     //BOOL                _pausedByGoingToBackground;
@@ -105,7 +103,7 @@ typedef enum : NSUInteger
     return self;
 }
 
-- (id)initWithRom:(OEDBRom *)rom core:(OECorePlugin *)core error:(NSError **)outError
+- (id)initWithRom:(OERom *)rom core:(OECorePlugin *)core error:(NSError **)outError
 {
     if(!(self = [self init]))
         return nil;
@@ -116,12 +114,7 @@ typedef enum : NSUInteger
     return self;
 }
 
-- (id)initWithGame:(OEDBGame *)game core:(OECorePlugin *)core error:(NSError **)outError
-{
-    return [self initWithRom:[game defaultROM] core:core error:outError];
-}
-
-- (id)initWithSaveState:(OEDBSaveState *)state error:(NSError **)outError
+- (id)initWithSaveState:(OESaveState *)state error:(NSError **)outError
 {
     if(!(self = [self init]))
         return nil;
@@ -134,7 +127,7 @@ typedef enum : NSUInteger
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@ %p, ROM: '%@', System: '%@', Core: '%@'>", [self class], self, [[[self rom] game] displayName], [_systemPlugin systemIdentifier], [_corePlugin bundleIdentifier]];
+    return [NSString stringWithFormat:@"<%@ %p, ROM: '%@', System: '%@', Core: '%@'>", [self class], self, [[self rom] name], [_systemPlugin systemIdentifier], [_corePlugin bundleIdentifier]];
 }
 
 - (NSString *)coreIdentifier;
@@ -147,24 +140,22 @@ typedef enum : NSUInteger
     return [_gameSystemController systemIdentifier];
 }
 
-- (BOOL)OE_setupDocumentWithSaveState:(OEDBSaveState *)saveState error:(NSError **)outError
+- (BOOL)OE_setupDocumentWithSaveState:(OESaveState *)saveState error:(NSError **)outError
 {
-    if(![self OE_setupDocumentWithROM:[saveState rom] usingCorePlugin:[OECorePlugin corePluginWithBundleIdentifier:[saveState coreIdentifier]] error:outError])
-        return NO;
-
+    // We don't have the ROM object yet — the caller should set up the ROM first
+    // and pass the save state separately via _saveStateForGameStart
     _saveStateForGameStart = saveState;
-
     return YES;
 }
 
-- (BOOL)OE_setupDocumentWithROM:(OEDBRom *)rom usingCorePlugin:(OECorePlugin *)core error:(NSError **)outError
+- (BOOL)OE_setupDocumentWithROM:(OERom *)rom usingCorePlugin:(OECorePlugin *)core error:(NSError **)outError
 {
-    NSURL *fileURL = [rom URL];
+    NSURL *fileURL = [rom url];
 
     _rom = rom;
     _romFileURL = fileURL;
     _corePlugin = core;
-    _systemPlugin = [[[[self rom] game] system] plugin];
+    _systemPlugin = [rom systemPlugin];
     _gameSystemController = [_systemPlugin controller];
 
     if(_corePlugin == nil)
@@ -223,9 +214,6 @@ typedef enum : NSUInteger
     [[NSUserDefaults standardUserDefaults] setValue:[_corePlugin bundleIdentifier] forKey:UDSystemCoreMappingKeyForSystemIdentifier([self systemIdentifier])];
 
     NSString *path = [[self romFileURL] path];
-     // if file is in an archive append :entryIndex to path, so the core manager can figure out which entry to load
-    if([[self rom] archiveFileIndex])
-        path = [path stringByAppendingFormat:@":%d",[[[self rom] archiveFileIndex] intValue]];
 
     return [[managerClass alloc] initWithROMPath:path corePlugin:_corePlugin systemController:_gameSystemController displayHelper:self];
 }
@@ -271,7 +259,7 @@ typedef enum : NSUInteger
 - (void)dealloc
 {
     NSURL *url = [self romFileURL];
-    if([url isNotEqualTo:[[self rom] URL]])
+    if([url isNotEqualTo:[[self rom] url]])
     {
         [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
     }
@@ -406,7 +394,7 @@ typedef enum : NSUInteger
     // If we do not have a title yet, return an empty string instead of [super displayName].
     // The latter uses Cocoa document architecture and relies on documents having URLs,
     // including untitled (new) documents.
-    NSString *displayName = [[[self rom] game] displayName];
+    NSString *displayName = [[self rom] name];
 #if DEBUG_PRINT
     //displayName = [displayName stringByAppendingString:@" (DEBUG BUILD)"];
 #endif
@@ -450,13 +438,17 @@ typedef enum : NSUInteger
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     DLog(@"%@", absoluteURL);
-    DLog(@"%@", typeName);
+
     if([typeName isEqualToString:@"org.openemu.savestate"])
     {
-        NSManagedObjectContext *context = [[OELibraryDatabase defaultDatabase] mainThreadContext];
-        OEDBSaveState *state = [OEDBSaveState updateOrCreateStateWithURL:absoluteURL inContext:context];
-        if(state && [self OE_setupDocumentWithSaveState:state error:outError])
-            return YES;
+        OESaveState *state = [OESaveState saveStateWithBundleURL:absoluteURL];
+        if(state)
+        {
+            [self OE_setupDocumentWithSaveState:state error:outError];
+            // We still need a ROM to set up the document
+            // For now, save states opened directly aren't supported without the ROM
+            return NO;
+        }
         return NO;
     }
 
@@ -476,54 +468,28 @@ typedef enum : NSUInteger
                           nil]];
         }
         DLog(@"File does not exist");
-
         return NO;
     }
 
-    // get rom by path
     if(![absoluteURL isFileURL])
     {
         DLog(@"URLs that are not file urls are currently not supported!");
-        // TODO: Handle URLS, by downloading to temp folder
-    }
-
-    OEDBGame *game = [OEDBGame gameWithURL:absoluteURL inDatabase:[OELibraryDatabase defaultDatabase] error:outError];
-    if(game == nil)
-    {
-        // Could not find game in database. Try to import the file
-        OEROMImporter *importer = [[OELibraryDatabase defaultDatabase] importer];
-        OEImportItemCompletionBlock completion =
-        ^(NSManagedObjectID *romID){
-            
-            // import probably failed
-            if(!romID) {
-                return;
-            }
-            [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:absoluteURL display:NO completionHandler:nil];
-        };
-
-        if([importer importItemAtURL:absoluteURL withCompletionHandler:completion])
-        {
-            if(outError != NULL)
-                *outError = [NSError errorWithDomain:OEGameDocumentErrorDomain code:OEImportRequiredError userInfo:nil];
-        }
-
         return NO;
     }
 
-    // TODO: Load rom that was just imported instead of the default one
-  
-    //OEDBSaveState *state = [game autosaveForLastPlayedRom];
-    //Wowfunhappy: Instead of retreiving the autosave from the database (as above), we  want to always try loading Auto Save State.oesavestate.
-    OEDBSaveState *state = [OEDBSaveState createSaveStateByImportingBundleURL: [[[OELibraryDatabase defaultDatabase]  stateFolderURLForROM:[game defaultROM]] URLByAppendingPathComponent:@"Auto Save State.oesavestate/"] intoContext:[[OELibraryDatabase defaultDatabase] mainThreadContext]];
-    
-    if(state != nil /*&& [[OEHUDAlert loadAutoSaveGameAlert] runModal] == NSAlertDefaultReturn*/)
+    OERom *rom = [OERom romWithURL:absoluteURL];
+
+    // Try to restore autosave so the user picks up where they left off
+    OESaveState *autosave = [rom autosaveState];
+    if(autosave != nil)
     {
-        return [self OE_setupDocumentWithSaveState:state error:outError];
+        if(![self OE_setupDocumentWithROM:rom usingCorePlugin:[OECorePlugin corePluginWithBundleIdentifier:[autosave coreIdentifier]] error:outError])
+            return NO;
+        _saveStateForGameStart = autosave;
+        return YES;
     }
-    else {
-        return [self OE_setupDocumentWithROM:[game defaultROM] usingCorePlugin:nil error:outError];
-    }
+
+    return [self OE_setupDocumentWithROM:rom usingCorePlugin:nil error:outError];
 }
 
 #pragma mark - Menu Items
@@ -649,13 +615,11 @@ typedef enum : NSUInteger
     {
         [self enableOSSleep];
         _emulationStatus = OEEmulationStatusPaused;
-        [[self rom] addTimeIntervalToPlayTime:ABS([_lastPlayStartDate timeIntervalSinceNow])];
         _lastPlayStartDate = nil;
     }
     else
     {
         [self disableOSSleep];
-        [[self rom] markAsPlayedNow];
         _lastPlayStartDate = [NSDate date];
         _emulationStatus = OEEmulationStatusPlaying;
     }
@@ -1084,7 +1048,7 @@ typedef enum : NSUInteger
     
     BOOL didPauseEmulation = [self OE_pauseEmulationIfNeeded];
 
-    NSInteger   saveGameNo    = [[self rom] saveStateCount] + 1;
+    NSInteger   saveGameNo    = 1;
     // TODO: properly format date
     NSDate *date = [NSDate date];
     NSString *format = OELocalizedString(@"Save-Game-%ld %@", @"default save game name");
@@ -1116,7 +1080,7 @@ typedef enum : NSUInteger
     else if([sender respondsToSelector:@selector(tag)])
         slot = [sender tag];
 
-    NSString *name = [OEDBSaveState nameOfQuickSaveInSlot:slot];
+    NSString *name = [OESaveState nameOfQuickSaveInSlot:slot];
     BOOL didPauseEmulation = [self OE_pauseEmulationIfNeeded];
 
     [self OE_saveStateWithName:name completionHandler:
@@ -1154,21 +1118,18 @@ typedef enum : NSUInteger
              return;
          }
 
-         OEDBSaveState *state;
+         OESaveState *state;
          if([stateName hasPrefix:OESaveStateSpecialNamePrefix])
          {
              state = [[self rom] saveStateWithName:stateName];
 
-             NSString *coreIdentifier = [core bundleIdentifier];
-             NSString *coreVersion = [core version];
-             [state setCoreIdentifier:coreIdentifier];
-             [state setCoreVersion:coreVersion];
+             [state setCoreIdentifier:[core bundleIdentifier]];
+             [state setCoreVersion:[core version]];
          }
 
          if(state == nil)
          {
-             NSManagedObjectContext *context = [[OELibraryDatabase defaultDatabase] mainThreadContext];
-             state = [OEDBSaveState createSaveStateNamed:stateName forRom:[self rom] core:core withFile:temporaryStateFileURL inContext:context];
+             state = [OESaveState createSaveStateNamed:stateName forRom:[self rom] core:core withFile:temporaryStateFileURL];
          }
          else
          {
@@ -1176,11 +1137,7 @@ typedef enum : NSUInteger
              [state setTimestamp:[NSDate date]];
          }
 
-         [state save];
-         NSManagedObjectContext *mainContext = [state managedObjectContext];
-         [mainContext performBlock:^{
-             [mainContext save:nil];
-         }];
+         [state writeToDisk];
 
          NSData *TIFFData = [[[self gameViewController] takeNativeScreenshot] TIFFRepresentation];
          NSBitmapImageRep *bitmapImageRep = [NSBitmapImageRep imageRepWithData:TIFFData];
@@ -1205,10 +1162,10 @@ typedef enum : NSUInteger
     // calling pauseGame here because it might need some time to execute
     [self OE_pauseEmulationIfNeeded];
 
-    OEDBSaveState *state = nil;
-    if([sender isKindOfClass:[OEDBSaveState class]])
+    OESaveState *state = nil;
+    if([sender isKindOfClass:[OESaveState class]])
         state = sender;
-    else if([sender respondsToSelector:@selector(representedObject)] && [[sender representedObject] isKindOfClass:[OEDBSaveState class]])
+    else if([sender respondsToSelector:@selector(representedObject)] && [[sender representedObject] isKindOfClass:[OESaveState class]])
         state = [sender representedObject];
     else
     {
@@ -1231,14 +1188,8 @@ typedef enum : NSUInteger
     if(quicksaveState!= nil) [self loadState:quicksaveState];
 }
 
-- (void)OE_loadState:(OEDBSaveState *)state
+- (void)OE_loadState:(OESaveState *)state
 {
-    if([state rom] != [self rom])
-    {
-        DLog(@"Invalid save state for current rom");
-        return;
-    }
-
     void (^loadState)(void) =
     ^{
         [_gameCoreManager loadStateFromFileAtPath:[[state dataFileURL] path] completionHandler:
@@ -1269,10 +1220,10 @@ typedef enum : NSUInteger
 // delete save state expects sender or [sender representedObject] to be an OEDBSaveState object and prompts the user for confirmation
 - (IBAction)deleteSaveState:(id)sender;
 {
-    OEDBSaveState *state;
-    if([sender isKindOfClass:[OEDBSaveState class]])
+    OESaveState *state;
+    if([sender isKindOfClass:[OESaveState class]])
         state = sender;
-    else if([sender respondsToSelector:@selector(representedObject)] && [[sender representedObject] isKindOfClass:[OEDBSaveState class]])
+    else if([sender respondsToSelector:@selector(representedObject)] && [[sender representedObject] isKindOfClass:[OESaveState class]])
         state = [sender representedObject];
     else
     {
@@ -1283,7 +1234,7 @@ typedef enum : NSUInteger
     NSString *stateName = [state name];
     OEHUDAlert *alert = [OEHUDAlert deleteStateAlertWithStateName:stateName];
 
-    if([alert runModal]) [state deleteAndRemoveFiles];
+    if([alert runModal]) [state deleteFromDisk];
 }
 
 #pragma mark - OEGameViewControllerDelegate methods

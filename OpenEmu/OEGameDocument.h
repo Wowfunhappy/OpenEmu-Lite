@@ -46,22 +46,20 @@ enum _OEGameDocumentErrorCodes
 };
 
 @class OECorePlugin;
-@class OEDBGame;
-@class OEDBRom;
-@class OEDBSaveState;
+@class OERom;
+@class OESaveState;
 @class OEGameViewController;
 @class OESystemPlugin;
 
 @interface OEGameDocument : NSDocument <OEGlobalEventsHandler>
 
-- (id)initWithRom:(OEDBRom *)rom core:(OECorePlugin *)core error:(NSError **)outError;
-- (id)initWithGame:(OEDBGame *)game core:(OECorePlugin *)core error:(NSError **)outError;
-- (id)initWithSaveState:(OEDBSaveState *)state error:(NSError **)outError;
+- (id)initWithRom:(OERom *)rom core:(OECorePlugin *)core error:(NSError **)outError;
+- (id)initWithSaveState:(OESaveState *)state error:(NSError **)outError;
 
 - (void)setupGameWithCompletionHandler:(void(^)(BOOL success, NSError *error))handler;
 - (void)showInSeparateWindowInFullScreen:(BOOL)fullScreen;
 
-@property(readonly) OEDBRom *rom;
+@property(readonly) OERom *rom;
 @property(readonly) NSURL   *romFileURL;
 @property(readonly) OECorePlugin *corePlugin;
 @property(readonly) OESystemPlugin *systemPlugin;

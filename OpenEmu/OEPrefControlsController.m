@@ -31,11 +31,9 @@
 #import "OEPrefControlsController.h"
 #import "OEBackgroundGradientView.h"
 #import "OEBackgroundImageView.h"
-#import "OELibraryDatabase.h"
 
 #import "OEPlugin.h"
-#import "OEDBSystem.h"
-#import "OESystemPlugin.h"
+#import "OESystemPlugin.h"\n#import "OESystemPlugin.h"
 
 #import "OEControllerImageView.h"
 #import "OEControlsButtonSetupView.h"
@@ -148,7 +146,6 @@ static CFHashCode _OEHIDEventHashSetCallback(OEHIDEvent *value)
     [[self controllerView] setWantsLayer:YES];
 
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(systemsChanged) name:OEDBSystemsDidChangeNotification object:nil];
     [center addObserver:self selector:@selector(OE_preparePaneWithNotification:) name:OEPreferencesOpenPaneNotificationName object:nil];
     [center addObserver:self selector:@selector(OE_preparePaneWithNotification:) name:OEPreferencesSetupPaneNotificationName object:nil];
 
@@ -789,19 +786,15 @@ static CFHashCode _OEHIDEventHashSetCallback(OEHIDEvent *value)
 - (void)OE_rebuildSystemsMenu
 {
     NSMenu *consolesMenu    = [[NSMenu alloc] init];
-    OELibraryDatabase *database = [OELibraryDatabase defaultDatabase];
-    NSManagedObjectContext *context = [database mainThreadContext];
-    NSArray *enabledSystems = [OEDBSystem enabledSystemsinContext:context];
 
-    for(OEDBSystem *system in enabledSystems)
+    for(OESystemPlugin *plugin in [OESystemPlugin allPlugins])
     {
-        OESystemPlugin *plugin = [system plugin];
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:[plugin systemName] action:@selector(changeSystem:) keyEquivalent:@""];
         [item setTarget:self];
         [item setRepresentedObject:[plugin systemIdentifier]];
-        
+
         [item setImage:[plugin systemIcon]];
-        
+
         [consolesMenu addItem:item];
     }
     

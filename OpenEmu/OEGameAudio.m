@@ -121,7 +121,7 @@ static OSStatus RenderCallback(void                       *in,
     {
         _gameCore = core;
     }
-    
+
     return self;
 }
 
@@ -142,6 +142,22 @@ static OSStatus RenderCallback(void                       *in,
 
 - (void)startAudio
 {
+    // Fix: briefly start and stop a default output unit to prime USB audio.
+    // Without this, some cores produce no audio on USB audio devices when
+    // they are the first core launched in a session.
+    AudioComponentDescription desc = {
+        .componentType         = kAudioUnitType_Output,
+        .componentSubType      = kAudioUnitSubType_DefaultOutput,
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+    };
+    AudioComponent comp = AudioComponentFindNext(NULL, &desc);
+    AudioUnit unit;
+    AudioComponentInstanceNew(comp, &unit);
+    AudioUnitInitialize(unit);
+    AudioOutputUnitStart(unit);
+    AudioOutputUnitStop(unit);
+    AudioComponentInstanceDispose(unit);
+
     [self createGraph];
 }
 
@@ -239,7 +255,7 @@ static OSStatus RenderCallback(void                       *in,
         
         err = AudioUnitSetProperty(_converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &mDataFormat, sizeof(AudioStreamBasicDescription));
         if(err) NSLog(@"couldn't set player's input stream format");
-        
+
         err = AUGraphConnectNodeInput(_graph, _converterNode, 0, _mixerNode, i);
         if(err) NSLog(@"Couldn't connect the converter to the mixer");
     }

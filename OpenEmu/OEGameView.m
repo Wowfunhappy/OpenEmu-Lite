@@ -1216,10 +1216,15 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
             .rowBytes = _gameScreenSize.width * 3
         };
 
-        // Convert IOSurface pixel format to NSBitmapImageRep
-        const uint8_t permuteMap[] = {3,2,1,0};
-        vImagePermuteChannels_ARGB8888(&src, &src, permuteMap, 0);
-        vImageConvert_ARGB8888toRGB888(&src, &dest, 0);
+        // Convert IOSurface pixel format to RGB for NSBitmapImageRep.
+        // Use a temporary buffer so we don't corrupt the live IOSurface.
+        void *tempData = malloc(src.rowBytes * src.height);
+        vImage_Buffer temp = { .data = tempData, .width = src.width, .height = src.height, .rowBytes = src.rowBytes };
+
+        const uint8_t permuteMap[] = {3,2,1,0}; // BGRA → ARGB
+        vImagePermuteChannels_ARGB8888(&src, &temp, permuteMap, 0);
+        vImageConvert_ARGB8888toRGB888(&temp, &dest, 0);
+        free(tempData);
     }
     IOSurfaceUnlock(_gameSurfaceRef, kIOSurfaceLockReadOnly, NULL);
 

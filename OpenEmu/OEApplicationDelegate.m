@@ -26,8 +26,6 @@
 
 #import "OEApplicationDelegate.h"
 
-#import "OELibraryDatabase.h"
-
 #import "OEPlugin.h"
 #import "OECorePlugin.h"
 
@@ -42,8 +40,7 @@
 #import "OEHUDAlert+DefaultAlertsAdditions.h"
 #import "OEGameDocument.h"
 
-#import "OEDBRom.h"
-#import "OEDBGame.h"
+#import "OERom.h"
 
 #import "OEBuildVersion.h"
 
@@ -62,7 +59,7 @@
 #import <OpenEmuXPCCommunicator/OpenEmuXPCCommunicator.h>
 #import <objc/message.h>
 
-#import "OEDBSaveState.h"
+#import "OESaveState.h"
 
 NSString *const OEWebSiteURL      = @"http://openemu.org/";
 NSString *const OEUserGuideURL    = @"https://github.com/OpenEmu/OpenEmu/wiki/User-guide";
@@ -108,22 +105,15 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     if(self == [OEApplicationDelegate class])
     {
-        NSString *path = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"OpenEmu/Game Library"] path];
-        path = [path stringByAbbreviatingWithTildeInPath];
-
         [[NSUserDefaults standardUserDefaults] registerDefaults:
          @{
                                        OEWiimoteSupportEnabled : @YES,
-                                      OEDefaultDatabasePathKey : path,
-                                             OEDatabasePathKey : path,
-                                     OEAutomaticallyGetInfoKey : @YES,
                                    OEGameDefaultVideoFilterKey : @"GTU",
                                                OEGameVolumeKey : @0.5f,
                               @"defaultCore.openemu.system.gb" : @"org.openemu.Gambatte",
                              @"defaultCore.openemu.system.gba" : @"org.openemu.VisualBoyAdvance",
                              @"defaultCore.openemu.system.nes" : @"org.openemu.Nestopia",
                             @"defaultCore.openemu.system.snes" : @"org.openemu.SNES9x",
-                                            OEDisplayGameTitle : @YES,
                                           OEBackgroundPauseKey : @YES,
                                               @"logsHIDEvents" : @NO,
                                     @"logsHIDEventsNoKeyboard" : @NO,
@@ -150,32 +140,24 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 }
 
 #pragma mark -
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+- (void)OE_ensureInitialized
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(libraryDatabaseDidLoad:) name:OELibraryDidLoadNotificationName object:nil];
-
-    //[[NSDocumentController sharedDocumentController] clearRecentDocuments:nil];
-
-    //[self loadDatabase];
-    if ([OELibraryDatabase defaultDatabase] == nil) {
-        [self setupTempDatabaseSyncronously];
-    }
-
-}
-
-- (void)libraryDatabaseDidLoad:(NSNotification*)notification
-{
+    if(_libraryLoaded) return;
     _libraryLoaded = YES;
 
     [self OE_loadPlugins];
+    _gameDocuments = [NSMutableArray array];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    [self OE_ensureInitialized];
 
     DLog();
     //mainWindowController  = [[OEMainWindowController alloc]  initWithWindowNibName:@"MainWindow"];
     //[mainWindowController loadWindow];
     preferencesController = [[OEPreferencesController alloc] initWithWindowNibName:@"Preferences"];
     [preferencesController loadWindow];
-
-    _gameDocuments = [NSMutableArray array];
 
     // Remove the Open Recent menu item
     /*NSMenu *fileMenu = [self fileMenu];
@@ -231,14 +213,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
 {
-    /*if(![[NSUserDefaults standardUserDefaults] boolForKey:OESetupAssistantHasFinishedKey]){
-        [NSApp replyToOpenOrPrint:NSApplicationDelegateReplyCancel];
-        return;
-    }*/
-    
-    if ([OELibraryDatabase defaultDatabase] == nil) {
-        [self setupTempDatabaseSyncronously];
-    }
+    [self OE_ensureInitialized];
 
     for (NSString *fileString in filenames) {
         NSURL *url = [NSURL fileURLWithPath:fileString];
@@ -352,15 +327,18 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
      }];
 }
 
+- (void)reopenDocumentForURL:(NSURL *)urlOrNil withContentsOfURL:(NSURL *)contentsURL display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
+{
+    [self OE_ensureInitialized];
+    [self openDocumentWithContentsOfURL:contentsURL display:displayDocument completionHandler:completionHandler];
+}
+
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
+    [self OE_ensureInitialized];
     if (url == nil) {
         return;
     }
-    if ([OELibraryDatabase defaultDatabase] == nil) {
-        [self setupTempDatabaseSyncronously];
-    }
-    
     [super openDocumentWithContentsOfURL:url display:NO completionHandler:
      ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
      {
@@ -386,30 +364,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
      }];
 }
 
-- (void)setupTempDatabaseSyncronously {
-    //Wowfunhappy's!
-    NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Game Library" stringByExpandingTildeInPath];
-    NSURL *databaseURL = [NSURL fileURLWithPath:databasePath];
-    [[NSFileManager defaultManager] createDirectoryAtURL:databaseURL withIntermediateDirectories:YES attributes:nil error:nil];
-    [OELibraryDatabase loadFromURL:databaseURL error:nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:OELibraryDidLoadNotificationName object:[OELibraryDatabase defaultDatabase]];
-}
-
-- (void)openGameDocumentWithGame:(OEDBGame *)game display:(BOOL)displayDocument fullScreen:(BOOL)fullScreen completionHandler:(void (^)(OEGameDocument *document, NSError *error))completionHandler;
-{
-    NSError *error = nil;
-    OEGameDocument *document = [[OEGameDocument alloc] initWithGame:game core:nil error:&error];
-
-    if(document == nil)
-    {
-        completionHandler(nil, error);
-        return;
-    }
-
-    [self OE_setupGameDocument:document display:displayDocument fullScreen:fullScreen completionHandler:completionHandler];
-}
-
-- (void)openGameDocumentWithRom:(OEDBRom *)rom display:(BOOL)displayDocument fullScreen:(BOOL)fullScreen completionHandler:(void (^)(OEGameDocument *document, NSError *error))completionHandler;
+- (void)openGameDocumentWithRom:(OERom *)rom display:(BOOL)displayDocument fullScreen:(BOOL)fullScreen completionHandler:(void (^)(OEGameDocument *document, NSError *error))completionHandler;
 {
     NSError *error = nil;
     OEGameDocument *document = [[OEGameDocument alloc] initWithRom:rom core:nil error:&error];
@@ -422,71 +377,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
     [self OE_setupGameDocument:document display:displayDocument fullScreen:fullScreen completionHandler:completionHandler];
 }
-
-- (void)openGameDocumentWithSaveState:(OEDBSaveState *)state display:(BOOL)displayDocument fullScreen:(BOOL)fullScreen completionHandler:(void (^)(OEGameDocument *document, NSError *error))completionHandler;
-{
-    NSError *error = nil;
-    OEGameDocument *document = [[OEGameDocument alloc] initWithSaveState:state error:&error];
-
-    if(document == nil)
-    {
-        completionHandler(nil, error);
-        return;
-    }
-
-    [self OE_setupGameDocument:document display:displayDocument fullScreen:fullScreen completionHandler:completionHandler];
-}
-
-#pragma mark - Loading the Library Database
-- (void)loadDatabase
-{
-    //Wowfunhappy: Always create new database
-    
-    /*NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-
-    NSString *databasePath = [[standardDefaults valueForKey:OEDatabasePathKey] stringByExpandingTildeInPath];
-    NSString *defaultDatabasePath = [[standardDefaults valueForKey:OEDefaultDatabasePathKey] stringByExpandingTildeInPath];
-
-    if(databasePath == nil) databasePath = defaultDatabasePath;*/
-
-    /*BOOL create = NO;
-    if(![[NSFileManager defaultManager] fileExistsAtPath:databasePath isDirectory:NULL] &&
-       [databasePath isEqual:defaultDatabasePath])
-        create = YES;*/
-
-    //NSString *databasePath = [@"~/Library/Application Support/OpenEmu/Game Library" stringByExpandingTildeInPath];
-    
-    //[self OE_loadDatabaseAsynchronouslyFormURL:databaseURL createIfNecessary:YES];
-}
-
-//- (void)OE_loadDatabaseAsynchronouslyFormURL:(NSURL*)url createIfNecessary:(BOOL)create
-//{
-//    if(create)
-//    {
-//        [[NSFileManager defaultManager] createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:nil];
-//    }
-//
-//    NSError *error = nil;
-//    if(![OELibraryDatabase loadFromURL:url error:&error]) // if the database could not be loaded
-//    {
-//        if([error domain] == NSCocoaErrorDomain && [error code] == NSPersistentStoreIncompatibleVersionHashError)
-//        {
-//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//                [self OE_loadDatabaseAsynchronouslyFormURL:url createIfNecessary:create];
-//            });
-//        }
-//        else
-//        {
-//            [self presentError:error];
-//        }
-//        return;
-//    }
-//
-//    NSAssert([OELibraryDatabase defaultDatabase] != nil, @"No database available!");
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:OELibraryDidLoadNotificationName object:[OELibraryDatabase defaultDatabase]];
-//    });
-//}
 
 #pragma mark -
 - (void)OE_loadPlugins
@@ -504,10 +394,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
     // Preload composition plugins
     [OECompositionPlugin allPlugins];
-
-    OELibraryDatabase *library = [OELibraryDatabase defaultDatabase];
-    [library disableSystemsWithoutPlugin];
-    [[library mainThreadContext] save:nil];
 
     [[OECorePlugin class] addObserver:self forKeyPath:@"allPlugins" options:0xF context:_OEApplicationDelegateAllPluginsContext];
 }

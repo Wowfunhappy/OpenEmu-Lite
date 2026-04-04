@@ -29,9 +29,7 @@
 #import "OECompositionPlugin.h"
 #import "OEShaderPlugin.h"
 #import "OEGameViewController.h"
-#import "OEDBSystem.h"
-#import "OELibraryDatabase.h"
-
+#import "OESystemPlugin.h"\n
 @implementation OEPrefGameplayController
 @synthesize filterSelection;
 
@@ -103,15 +101,12 @@
 
 - (IBAction)changeFilter:(id)sender
 {
-    OELibraryDatabase *database = [OELibraryDatabase defaultDatabase];
-    NSManagedObjectContext *context = [database mainThreadContext];
     NSString *filterName = [[[self filterSelection] selectedItem] title];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *allSystemIdentifiers = [OEDBSystem allSystemIdentifiersInContext:context];
-    
-    for(OECorePlugin *systemIdentifiers in allSystemIdentifiers)
+
+    for(OESystemPlugin *plugin in [OESystemPlugin allPlugins])
     {
-        [defaults removeObjectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, systemIdentifiers]];
+        [defaults removeObjectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, [plugin systemIdentifier]]];
     }
 
 	[defaults setObject:filterName forKey:OEGameDefaultVideoFilterKey];
