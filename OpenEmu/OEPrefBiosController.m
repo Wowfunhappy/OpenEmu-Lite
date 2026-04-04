@@ -25,7 +25,6 @@
  */
 #import "OEPrefBiosController.h"
 
-#import "OELibraryDatabase.h"
 #import "OECorePlugin.h"
 
 #import "OETableView.h"
