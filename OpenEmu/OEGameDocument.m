@@ -1201,6 +1201,18 @@ typedef enum : NSUInteger
                  return;
              }
 
+             // Release all possible buttons to clear any input state
+             // captured in the save state. Without this, buttons held
+             // when the state was saved would appear stuck on restore.
+             for(NSUInteger key = 0; key < 32; key++)
+             {
+                 for(NSUInteger player = 1; player <= 8; player++)
+                 {
+                     OESystemKey *sysKey = [OESystemKey systemKeyWithKey:key player:player isAnalogic:NO];
+                     [_gameSystemResponder releaseEmulatorKey:sysKey];
+                 }
+             }
+
              [self setEmulationPaused:NO];
          }];
     };
