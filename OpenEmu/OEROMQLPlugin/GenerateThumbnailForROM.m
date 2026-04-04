@@ -45,6 +45,85 @@ static NSString *OE_md5ForFileAtURL(NSURL *url)
         digest[12], digest[13], digest[14], digest[15]];
 }
 
+#pragma mark - NDS Icon Extraction
+
+static NSImage *OE_iconFromNDSROM(NSURL *romURL)
+{
+    NSFileHandle *handle = [NSFileHandle fileHandleForReadingFromURL:romURL error:nil];
+    if(!handle) return nil;
+
+    // Read icon/title offset from NDS header at 0x68
+    [handle seekToFileOffset:0x68];
+    NSData *offsetData = [handle readDataOfLength:4];
+    if([offsetData length] < 4) { [handle closeFile]; return nil; }
+
+    uint32_t bannerOffset = *(const uint32_t *)[offsetData bytes];
+    if(bannerOffset == 0) { [handle closeFile]; return nil; }
+
+    // Read banner: skip 32 bytes header, then 512 bytes tile data + 32 bytes palette
+    [handle seekToFileOffset:bannerOffset + 0x20];
+    NSData *tileData = [handle readDataOfLength:512];
+    NSData *paletteData = [handle readDataOfLength:32];
+    [handle closeFile];
+
+    if([tileData length] < 512 || [paletteData length] < 32) return nil;
+
+    const uint8_t *tiles = [tileData bytes];
+    const uint16_t *palette = [paletteData bytes];
+
+    // Decode 32x32 icon from 4x4 grid of 8x8 tiles, 4bpp indexed color
+    uint8_t pixels[32 * 32 * 4]; // RGBA
+    memset(pixels, 0, sizeof(pixels));
+
+    for(int tileY = 0; tileY < 4; tileY++) {
+        for(int tileX = 0; tileX < 4; tileX++) {
+            int tileIdx = tileY * 4 + tileX;
+            const uint8_t *tileBytes = tiles + tileIdx * 32;
+
+            for(int py = 0; py < 8; py++) {
+                for(int px = 0; px < 8; px += 2) {
+                    uint8_t byte = tileBytes[py * 4 + px / 2];
+                    uint8_t idx0 = byte & 0x0F;
+                    uint8_t idx1 = (byte >> 4) & 0x0F;
+
+                    int x0 = tileX * 8 + px;
+                    int y0 = tileY * 8 + py;
+                    int x1 = x0 + 1;
+
+                    for(int pass = 0; pass < 2; pass++) {
+                        uint8_t idx = (pass == 0) ? idx0 : idx1;
+                        int x = (pass == 0) ? x0 : x1;
+                        int offset = (y0 * 32 + x) * 4;
+
+                        if(idx == 0) {
+                            pixels[offset + 3] = 0; // transparent
+                        } else {
+                            uint16_t color = palette[idx];
+                            uint8_t r = ((color >> 10) & 0x1F);
+                            uint8_t g = ((color >> 5) & 0x1F);
+                            uint8_t b = (color & 0x1F);
+                            pixels[offset + 0] = (r << 3) | (r >> 2);
+                            pixels[offset + 1] = (g << 3) | (g >> 2);
+                            pixels[offset + 2] = (b << 3) | (b >> 2);
+                            pixels[offset + 3] = 0xFF;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    NSBitmapImageRep *rep = [[NSBitmapImageRep alloc]
+        initWithBitmapDataPlanes:NULL pixelsWide:32 pixelsHigh:32
+        bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO
+        colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:32*4 bitsPerPixel:32];
+    memcpy([rep bitmapData], pixels, sizeof(pixels));
+
+    NSImage *image = [[NSImage alloc] initWithSize:NSMakeSize(32, 32)];
+    [image addRepresentation:rep];
+    return image;
+}
+
 #pragma mark - Save State Screenshot Lookup
 
 static NSImage *OE_screenshotForROMAtURL(NSURL *romURL)
@@ -254,8 +333,18 @@ OSStatus GenerateThumbnailForURL(void *thisInterface, QLThumbnailRequestRef thum
 {
     @autoreleasepool {
         NSURL *romURL = (__bridge NSURL *)url;
-        NSImage *screenshot = OE_screenshotForROMAtURL(romURL);
-        NSImage *consoleImage = screenshot ? nil : OE_consoleImageForExtension([[romURL pathExtension] lowercaseString]);
+        NSString *ext = [[romURL pathExtension] lowercaseString];
+
+        // For NDS ROMs, always use the game's embedded icon instead of a screenshot
+        NSImage *screenshot = nil;
+        NSImage *consoleImage = nil;
+        if([ext isEqualToString:@"nds"]) {
+            consoleImage = OE_iconFromNDSROM(romURL);
+        } else {
+            screenshot = OE_screenshotForROMAtURL(romURL);
+            if(!screenshot)
+                consoleImage = OE_consoleImageForExtension(ext);
+        }
 
         // If we have neither a screenshot nor a console image, let Finder use default icon
         if(!screenshot && !consoleImage) return noErr;
@@ -283,7 +372,8 @@ void CancelThumbnailGeneration(void *thisInterface, QLThumbnailRequestRef thumbn
 OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options)
 {
     @autoreleasepool {
-        NSImage *screenshot = OE_screenshotForROMAtURL((__bridge NSURL *)url);
+        NSURL *romURL = (__bridge NSURL *)url;
+        NSImage *screenshot = OE_screenshotForROMAtURL(romURL);
         if(!screenshot) return noErr;
 
         NSSize imgSize = [screenshot size];

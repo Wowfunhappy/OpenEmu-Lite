@@ -47,12 +47,8 @@
 #import "OEPreferencesController.h"
 #import "OEGameViewController.h"
 
-//#import "OEFiniteStateMachine.h"
-
 #import <OpenEmuSystem/OpenEmuSystem.h>
 #import "OEToolTipManager.h"
-
-//#import "OERetrodeDeviceManager.h"
 
 #import "OEXPCGameCoreManager.h"
 
@@ -224,28 +220,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
              [NSApp replyToOpenOrPrint:reply];
          }];
     }
-        /*if([filenames count] == 1)
-        {
-            NSURL *url = [NSURL fileURLWithPath:[filenames lastObject]];
-            [self openDocumentWithContentsOfURL:url display:YES completionHandler:
-             ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
-             {
-                 NSApplicationDelegateReply reply = (document != nil) ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure;
-                 [NSApp replyToOpenOrPrint:reply];
-             }];
-        }
-        else
-        {
-            NSApplicationDelegateReply reply = NSApplicationDelegateReplyFailure;
-            OEROMImporter *importer = [[OELibraryDatabase defaultDatabase] importer];
-            if([importer importItemsAtPaths:filenames])
-                reply = NSApplicationDelegateReplySuccess;
-            
-            [NSApp replyToOpenOrPrint:reply];
-        }*/
-
-    /*if(_libraryLoaded) block();
-    else [[self startupQueue] addObject:block];*/
 }
 
 #pragma mark - NSDocumentController Overrides
@@ -329,8 +303,14 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)reopenDocumentForURL:(NSURL *)urlOrNil withContentsOfURL:(NSURL *)contentsURL display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
-    [self OE_ensureInitialized];
-    [self openDocumentWithContentsOfURL:contentsURL display:displayDocument completionHandler:completionHandler];
+	// Only restore previously-open documents if none are already open.
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue(), ^{
+	    [self OE_ensureInitialized];
+		
+		if ([_gameDocuments count] < 1) {
+			[self openDocumentWithContentsOfURL:contentsURL display:displayDocument completionHandler:completionHandler];
+		}
+	});
 }
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
@@ -339,6 +319,19 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     if (url == nil) {
         return;
     }
+
+    // If this ROM is already open, bring its window to front
+    NSURL *standardizedURL = [url URLByStandardizingPath];
+    for(OEGameDocument *doc in _gameDocuments)
+    {
+        if([[[doc romFileURL] URLByStandardizingPath] isEqual:standardizedURL])
+        {
+            [[[doc gameWindowController] window] makeKeyAndOrderFront:nil];
+            if(completionHandler) completionHandler(doc, YES, nil);
+            return;
+        }
+    }
+
     [super openDocumentWithContentsOfURL:url display:NO completionHandler:
      ^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error)
      {
@@ -515,76 +508,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     return [NSAttributedString hyperlinkFromString:@"http://openemu.org" withURL:[NSURL URLWithString:@"http://openemu.org"]];
 }
-
-#pragma mark - NSMenu Delegate
-
-//- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
-//{
-//    OELibraryDatabase *database = [OELibraryDatabase defaultDatabase];
-//    NSDictionary *lastPlayedInfo = [database lastPlayedRomsBySystem];
-//    __block NSUInteger count = [[lastPlayedInfo allKeys] count];
-//
-//    if(lastPlayedInfo == nil || count == 0)
-//    {
-//        [self setCachedLastPlayedInfo:nil];
-//        return 1;
-//    }
-//
-//    [[lastPlayedInfo allValues] enumerateObjectsUsingBlock:
-//     ^(id romArray, NSUInteger idx, BOOL *stop)
-//     {
-//         count += [romArray count];
-//     }];
-//
-//    NSMutableArray *lastPlayed = [NSMutableArray arrayWithCapacity:count];
-//    NSArray *sortedSystems = [[lastPlayedInfo allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-//    [sortedSystems enumerateObjectsUsingBlock:
-//     ^(id obj, NSUInteger idx, BOOL *stop)
-//     {
-//         [lastPlayed addObject:obj];
-//         [lastPlayed addObjectsFromArray:[lastPlayedInfo valueForKey:obj]];
-//     }];
-//
-//    [self setCachedLastPlayedInfo:lastPlayed];
-//    return count;
-//}
-
-//- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
-//{
-//    [item setState:NSOffState];
-//    if([self cachedLastPlayedInfo] == nil)
-//    {
-//        [item setTitle:OELocalizedString(@"No game played yet!", @"")];
-//        [item setEnabled:NO];
-//        [item setIndentationLevel:0];
-//        return YES;
-//    }
-//
-//    id value = [[self cachedLastPlayedInfo] objectAtIndex:index];
-//    if([value isKindOfClass:[NSString class]])
-//    {
-//        [item setTitle:value];
-//        [item setEnabled:NO];
-//        [item setIndentationLevel:0];
-//        [item setAction:NULL];
-//        [item setRepresentedObject:nil];
-//    }
-//    else
-//    {
-//        NSString *title = [(OEDBGame *)[value game] displayName];
-//
-//        if(!title) return NO;
-//        
-//        [item setIndentationLevel:1];
-//        [item setTitle:title];
-//        [item setEnabled:YES];
-//        [item setRepresentedObject:value];
-//        [item setAction:@selector(launchLastPlayedROM:)];
-//        [item setTarget:[self mainWindowController]];
-//    }
-//
-//    return YES;
-//}
 
 #pragma mark - KVO
 
