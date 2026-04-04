@@ -15,9 +15,9 @@ uniform float blackLevel;
 uniform float contrast;
 #endif
 
-#include "config.h"
+#include "_gtu-config.h"
 
-#include "compat_includes.inc"
+#include "_gtu-compat_includes.inc"
 uniform COMPAT_Texture2D(decal) : TEXUNIT0;
 uniform float4x4 modelViewProj;
 

@@ -31,7 +31,7 @@
    <FileRef
       location = "group:FCEU/FCEU.xcodeproj">
    </FileRef>
-   <FileRef
+<FileRef
       location = "group:Gambatte/Gambatte.xcodeproj">
    </FileRef>
    <FileRef

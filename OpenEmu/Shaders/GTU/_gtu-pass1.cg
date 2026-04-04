@@ -5,8 +5,8 @@
 ////////////////////////////////////////////////////////
 #pragma parameter compositeConnection "Composite Connection Enable" 0.0 0.0 1.0 1.0
 
-#include "config.h"
-#include "compat_includes.inc"
+#include "_gtu-config.h"
+#include "_gtu-compat_includes.inc"
 uniform COMPAT_Texture2D(decal) : TEXUNIT0;
 uniform float4x4 modelViewProj;
 

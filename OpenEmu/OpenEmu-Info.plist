@@ -9,23 +9,21 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>tar.gz</string>
-				<string>tar</string>
-				<string>gz</string>
-				<string>zip</string>
-				<string>7z</string>
-				<string>rar</string>
+				<string>smc</string>
+				<string>sfc</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string></string>
+			<string>OpenEmuGame.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Archived Game</string>
+			<string>Super Nintendo (SNES) Game</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
 			<key>NSDocumentClass</key>
 			<string>OEGameDocument</string>
 		</dict>
@@ -47,6 +45,110 @@
 			</array>
 			<key>LSTypeIsPackage</key>
 			<true/>
+			<key>NSDocumentClass</key>
+			<string>OEGameDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>smd</string>
+				<string>md</string>
+				<string>gen</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenEmuGame.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Sega Genesis Game</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>NSDocumentClass</key>
+			<string>OEGameDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>nds</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenEmuGame.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Nintendo DS Game</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>NSDocumentClass</key>
+			<string>OEGameDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>gb</string>
+				<string>gbc</string>
+				<string>sgb</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenEmuGame.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Game Boy Game</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>NSDocumentClass</key>
+			<string>OEGameDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>nes</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenEmuGame.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Nintendo (NES) Game</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>NSDocumentClass</key>
+			<string>OEGameDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>gba</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenEmuGame.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Game Boy Advance Game</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
 			<key>NSDocumentClass</key>
 			<string>OEGameDocument</string>
 		</dict>
@@ -120,7 +222,7 @@
 	<key>CFBundleSignature</key>
 	<string>OpEm</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.4 Lite</string>
+	<string>1.0.4.7 Lite</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.games</string>
 	<key>LSMinimumSystemVersion</key>
@@ -129,12 +231,6 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>OEBundlePath</key>
-	<string>~/Library/Application Support/OpenEmu/Cores/</string>
-	<key>OECoreListURL</key>
-	<string>https://raw.github.com/OpenEmu/OpenEmu-Update/master/oecores.xml</string>
-	<key>SUFeedURL</key>
-	<string>https://raw.github.com/OpenEmu/OpenEmu-Update/master/appcast.xml</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>

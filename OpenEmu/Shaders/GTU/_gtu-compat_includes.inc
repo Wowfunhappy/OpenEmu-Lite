@@ -1,0 +1,5 @@
+#include "_gtu-compat_input_struct.inc"
+#include "_gtu-compat_macros.inc"
+#include "_gtu-compat_orig_struct.inc"
+#include "_gtu-compat_prev_struct.inc"
+#include "_gtu-compat_vertex_in_out.inc"

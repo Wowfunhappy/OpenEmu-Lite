@@ -10,9 +10,6 @@
 [submodule "Gambatte"]
 	path = Gambatte
 	url = https://github.com/Wowfunhappy/Gambatte-Core.git
-[submodule "DeSmuME"]
-	path = DeSmuME
-	url = https://github.com/OpenEmu/DeSmuME-Core.git
 [submodule "Nestopia"]
 	path = Nestopia
 	url = https://github.com/Wowfunhappy/Nestopia-Core.git

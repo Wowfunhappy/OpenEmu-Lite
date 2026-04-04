@@ -838,16 +838,16 @@
 		AB095F2A2676E5FC00EC2CE8 /* NTSC.cgp in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94380783184E6AE100E2274B /* NTSC.cgp */; };
 		AB095F2B2676E5FC00EC2CE8 /* Pixellate.cg in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94539AFD187D096C00CD1BA9 /* Pixellate.cg */; };
 		ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7EC826780E90006EB243 /* cheats-database.xml */; };
-		ABAB7ED626783A26006EB243 /* _pass1.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECB26783A26006EB243 /* _pass1.cg */; };
-		ABAB7ED726783A26006EB243 /* _pass2.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECC26783A26006EB243 /* _pass2.cg */; };
-		ABAB7ED826783A26006EB243 /* _pass3.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECD26783A26006EB243 /* _pass3.cg */; };
+		ABAB7ED626783A26006EB243 /* _gtu-pass1.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECB26783A26006EB243 /* _gtu-pass1.cg */; };
+		ABAB7ED726783A26006EB243 /* _gtu-pass2.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECC26783A26006EB243 /* _gtu-pass2.cg */; };
+		ABAB7ED826783A26006EB243 /* _gtu-pass3.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECD26783A26006EB243 /* _gtu-pass3.cg */; };
 		ABAB7ED926783A26006EB243 /* compat_includes.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ECE26783A26006EB243 /* compat_includes.inc */; };
 		ABAB7EDA26783A26006EB243 /* compat_input_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */; };
 		ABAB7EDB26783A26006EB243 /* compat_macros.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED026783A26006EB243 /* compat_macros.inc */; };
 		ABAB7EDC26783A26006EB243 /* compat_orig_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */; };
 		ABAB7EDD26783A26006EB243 /* compat_prev_struct.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */; };
 		ABAB7EDE26783A26006EB243 /* compat_vertex_in_out.inc in Sources */ = {isa = PBXBuildFile; fileRef = ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */; };
-		ABAB7EDF26783A26006EB243 /* GTUv3.cgp in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED526783A26006EB243 /* GTUv3.cgp */; };
+		ABAB7EDF26783A26006EB243 /* GTU.cgp in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED526783A26006EB243 /* GTU.cgp */; };
 		C60238E61794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */; };
 		C6096192179B461C00239067 /* OEXPCGameCoreManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096191179B461C00239067 /* OEXPCGameCoreManager.m */; };
 		C609619A179B6E3F00239067 /* OpenEmuXPCHelperApp.m in Sources */ = {isa = PBXBuildFile; fileRef = C6096199179B6E3F00239067 /* OpenEmuXPCHelperApp.m */; };
@@ -1110,6 +1110,15 @@
 		FEB6627C187B812800D14713 /* Keyboard-Mappings.plist in Resources */ = {isa = PBXBuildFile; fileRef = FEB66279187B812800D14713 /* Keyboard-Mappings.plist */; };
 		FEB6627F187B81BA00D14713 /* controller_msx_mask.png in Resources */ = {isa = PBXBuildFile; fileRef = FEB6627D187B81BA00D14713 /* controller_msx_mask.png */; };
 		FEB66282187B876600D14713 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6711810136368330034379A /* Cocoa.framework */; };
+		AA000001AABB000100000001 /* OpenEmuGame.icns in Resources */ = {isa = PBXBuildFile; fileRef = AA000002AABB000100000001 /* OpenEmuGame.icns */; };
+		AA000011AABB001100000011 /* Gambatte.oecoreplugin in Copy Cores to App Plugins */ = {isa = PBXBuildFile; fileRef = 82FA7A6D0F4B8DE900576F05 /* Gambatte.oecoreplugin */; };
+		AA000012AABB001200000012 /* GenesisPlus.oecoreplugin in Copy Cores to App Plugins */ = {isa = PBXBuildFile; fileRef = 82FA7A990F4B8F0400576F05 /* GenesisPlus.oecoreplugin */; };
+		AA000013AABB001300000013 /* Nestopia.oecoreplugin in Copy Cores to App Plugins */ = {isa = PBXBuildFile; fileRef = 82FA7AB30F4B8F6100576F05 /* Nestopia.oecoreplugin */; };
+		AA000014AABB001400000014 /* SNES9x.oecoreplugin in Copy Cores to App Plugins */ = {isa = PBXBuildFile; fileRef = 82FA7ACE0F4B902200576F05 /* SNES9x.oecoreplugin */; };
+		AA000015AABB001500000015 /* mGBA.oecoreplugin in Copy Cores to App Plugins */ = {isa = PBXBuildFile; fileRef = 82FA7A500F4B8CE700576F05 /* mGBA.oecoreplugin */; };
+		AA000020AABB002000000020 /* _gtu-config.h in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ED426783A26006EB243 /* _gtu-config.h */; };
+		AA000031AABB003100000031 /* NDSROM.qlgenerator in Copy Files */ = {isa = PBXBuildFile; fileRef = AA000030AABB003000000030 /* NDSROM.qlgenerator */; };
+		AA000041AABB004100000041 /* DeSmuME.oecoreplugin in Copy Cores to App Plugins */ = {isa = PBXBuildFile; fileRef = AA000040AABB004000000040 /* DeSmuME.oecoreplugin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1436,6 +1445,17 @@
 				AB095F292676E5FC00EC2CE8 /* _ntsc-stock.cg in Copy Filters Folder To App Resources */,
 				AB095F2A2676E5FC00EC2CE8 /* NTSC.cgp in Copy Filters Folder To App Resources */,
 				AB095F2B2676E5FC00EC2CE8 /* Pixellate.cg in Copy Filters Folder To App Resources */,
+				ABAB7EDF26783A26006EB243 /* GTU.cgp in Copy Filters Folder To App Resources */,
+				ABAB7ED626783A26006EB243 /* _gtu-pass1.cg in Copy Filters Folder To App Resources */,
+				ABAB7ED726783A26006EB243 /* _gtu-pass2.cg in Copy Filters Folder To App Resources */,
+				ABAB7ED826783A26006EB243 /* _gtu-pass3.cg in Copy Filters Folder To App Resources */,
+				ABAB7ED926783A26006EB243 /* _gtu-compat_includes.inc in Copy Filters Folder To App Resources */,
+				ABAB7EDA26783A26006EB243 /* _gtu-compat_input_struct.inc in Copy Filters Folder To App Resources */,
+				ABAB7EDB26783A26006EB243 /* _gtu-compat_macros.inc in Copy Filters Folder To App Resources */,
+				ABAB7EDC26783A26006EB243 /* _gtu-compat_orig_struct.inc in Copy Filters Folder To App Resources */,
+				ABAB7EDD26783A26006EB243 /* _gtu-compat_prev_struct.inc in Copy Filters Folder To App Resources */,
+				ABAB7EDE26783A26006EB243 /* _gtu-compat_vertex_in_out.inc in Copy Filters Folder To App Resources */,
+				AA000020AABB002000000020 /* _gtu-config.h in Copy Filters Folder To App Resources */,
 			);
 			name = "Copy Filters Folder To App Resources";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1475,6 +1495,7 @@
 			dstSubfolderSpec = 1;
 			files = (
 				8309A77F166CE52D0013AD4A /* OESaveStateQLPlugin.qlgenerator in Copy Files (1 item) */,
+				AA000031AABB003100000031 /* NDSROM.qlgenerator in Copy Files */,
 			);
 			name = "Copy Files (1 item)";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1485,19 +1506,12 @@
 			dstPath = Systems;
 			dstSubfolderSpec = 13;
 			files = (
-				946C7ABB19EE4AF4000F9466 /* Atari 2600.oesystemplugin in Copy System Plugins to App Plugins */,
-				94CEB29C17A8D507005A2107 /* Sega 32X.oesystemplugin in Copy System Plugins to App Plugins */,
-				940553B917A35FB4009B505D /* PC Engine.oesystemplugin in Copy System Plugins to App Plugins */,
-				94454F31178B4ABA006C057B /* Virtual Boy.oesystemplugin in Copy System Plugins to App Plugins */,
 				94DEA000171896AE00073397 /* NDS.oesystemplugin in Copy System Plugins to App Plugins */,
-				948E540E1571D78D002D26E0 /* SegaMasterSystem.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E540F1571D78D002D26E0 /* NES.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E54101571D78D002D26E0 /* SuperNES.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E54111571D78D002D26E0 /* GameBoy.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E54121571D78D002D26E0 /* Genesis.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E54131571D78D002D26E0 /* GameBoy Advance.oesystemplugin in Copy System Plugins to App Plugins */,
-				948E54141571D78D002D26E0 /* NeoGeo Pocket.oesystemplugin in Copy System Plugins to App Plugins */,
-				948E54151571D78D002D26E0 /* GameGear.oesystemplugin in Copy System Plugins to App Plugins */,
 			);
 			name = "Copy System Plugins to App Plugins";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1530,6 +1544,22 @@
 				94EBBD18183F4AEB00743756 /* Atari 7800.oesystemplugin in CopyFiles */,
 				94EBBD01183F48C900743756 /* Atari 5200.oesystemplugin in CopyFiles */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000010AABB001000000010 /* Copy Cores to App Plugins */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Cores;
+			dstSubfolderSpec = 13;
+			files = (
+				AA000041AABB004100000041 /* DeSmuME.oecoreplugin in Copy Cores to App Plugins */,
+				AA000011AABB001100000011 /* Gambatte.oecoreplugin in Copy Cores to App Plugins */,
+				AA000012AABB001200000012 /* GenesisPlus.oecoreplugin in Copy Cores to App Plugins */,
+				AA000013AABB001300000013 /* Nestopia.oecoreplugin in Copy Cores to App Plugins */,
+				AA000014AABB001400000014 /* SNES9x.oecoreplugin in Copy Cores to App Plugins */,
+				AA000015AABB001500000015 /* mGBA.oecoreplugin in Copy Cores to App Plugins */,
+			);
+			name = "Copy Cores to App Plugins";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -2724,17 +2754,17 @@
 		A6F3061118AF3BB7007CF986 /* INWindowButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = INWindowButton.m; sourceTree = "<group>"; };
 		AB095E9C2676D52B00EC2CE8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		ABAB7EC826780E90006EB243 /* cheats-database.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "cheats-database.xml"; sourceTree = "<group>"; };
-		ABAB7ECB26783A26006EB243 /* _pass1.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _pass1.cg; sourceTree = "<group>"; };
-		ABAB7ECC26783A26006EB243 /* _pass2.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _pass2.cg; sourceTree = "<group>"; };
-		ABAB7ECD26783A26006EB243 /* _pass3.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _pass3.cg; sourceTree = "<group>"; };
-		ABAB7ECE26783A26006EB243 /* compat_includes.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_includes.inc; sourceTree = "<group>"; };
-		ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_input_struct.inc; sourceTree = "<group>"; };
-		ABAB7ED026783A26006EB243 /* compat_macros.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_macros.inc; sourceTree = "<group>"; };
-		ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_orig_struct.inc; sourceTree = "<group>"; };
-		ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_prev_struct.inc; sourceTree = "<group>"; };
-		ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = compat_vertex_in_out.inc; sourceTree = "<group>"; };
-		ABAB7ED426783A26006EB243 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		ABAB7ED526783A26006EB243 /* GTUv3.cgp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GTUv3.cgp; sourceTree = "<group>"; };
+		ABAB7ECB26783A26006EB243 /* _gtu-pass1.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass1.cg; sourceTree = "<group>"; };
+		ABAB7ECC26783A26006EB243 /* _gtu-pass2.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass2.cg; sourceTree = "<group>"; };
+		ABAB7ECD26783A26006EB243 /* _gtu-pass3.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass3.cg; sourceTree = "<group>"; };
+		ABAB7ECE26783A26006EB243 /* compat_includes.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "_gtu-compat_includes.inc"; sourceTree = "<group>"; };
+		ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "_gtu-compat_input_struct.inc"; sourceTree = "<group>"; };
+		ABAB7ED026783A26006EB243 /* compat_macros.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "_gtu-compat_macros.inc"; sourceTree = "<group>"; };
+		ABAB7ED126783A26006EB243 /* compat_orig_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "_gtu-compat_orig_struct.inc"; sourceTree = "<group>"; };
+		ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "_gtu-compat_prev_struct.inc"; sourceTree = "<group>"; };
+		ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = "_gtu-compat_vertex_in_out.inc"; sourceTree = "<group>"; };
+		ABAB7ED426783A26006EB243 /* _gtu-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "_gtu-config.h"; sourceTree = "<group>"; };
+		ABAB7ED526783A26006EB243 /* GTU.cgp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GTU.cgp; sourceTree = "<group>"; };
 		C60238E41794FB1B00F4AF6C /* OpenEmuXPCCommunicator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenEmuXPCCommunicator.framework; sourceTree = "<group>"; };
 		C60238E8179510C600F4AF6C /* OEGameCoreHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEGameCoreHelper.h; sourceTree = "<group>"; };
 		C609618F179B278C00239067 /* OEXPCGameCoreHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEXPCGameCoreHelper.h; sourceTree = "<group>"; };
@@ -3008,6 +3038,14 @@
 		FEB66278187B812800D14713 /* Controller-Preferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Preferences.plist"; sourceTree = "<group>"; };
 		FEB66279187B812800D14713 /* Keyboard-Mappings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyboard-Mappings.plist"; sourceTree = "<group>"; };
 		FEB6627D187B81BA00D14713 /* controller_msx_mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controller_msx_mask.png; sourceTree = "<group>"; };
+		AA000002AABB000100000001 /* OpenEmuGame.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = OpenEmuGame.icns; sourceTree = "<group>"; };
+		82FA7A6D0F4B8DE900576F05 /* Gambatte.oecoreplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Gambatte.oecoreplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		82FA7A990F4B8F0400576F05 /* GenesisPlus.oecoreplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GenesisPlus.oecoreplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		82FA7AB30F4B8F6100576F05 /* Nestopia.oecoreplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Nestopia.oecoreplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		82FA7ACE0F4B902200576F05 /* SNES9x.oecoreplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SNES9x.oecoreplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		82FA7A500F4B8CE700576F05 /* mGBA.oecoreplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = mGBA.oecoreplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000030AABB003000000030 /* NDSROM.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper.cfbundle; path = NDSROM.qlgenerator; sourceTree = "<group>"; };
+		AA000040AABB004000000040 /* DeSmuME.oecoreplugin */ = {isa = PBXFileReference; lastKnownFileType = wrapper.cfbundle; path = DeSmuME.oecoreplugin; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3506,9 +3544,16 @@
 			children = (
 				8D15AC370486D014006FF6A4 /* OpenEmu.app */,
 				3887A7F61024D1F9000FC4CF /* OESaveStateQLPlugin.qlgenerator */,
+				AA000030AABB003000000030 /* NDSROM.qlgenerator */,
 				1BEF2A9411682A530090F72B /* OpenEmuHelperApp */,
 				C671180F136368330034379A /* SegaMasterSystem.oesystemplugin */,
 				C64BB08D136478E600C1AB23 /* NES.oesystemplugin */,
+				AA000040AABB004000000040 /* DeSmuME.oecoreplugin */,
+				82FA7A6D0F4B8DE900576F05 /* Gambatte.oecoreplugin */,
+				82FA7A990F4B8F0400576F05 /* GenesisPlus.oecoreplugin */,
+				82FA7AB30F4B8F6100576F05 /* Nestopia.oecoreplugin */,
+				82FA7ACE0F4B902200576F05 /* SNES9x.oecoreplugin */,
+				82FA7A500F4B8CE700576F05 /* mGBA.oecoreplugin */,
 				C6480FC113648F670094FA33 /* SuperNES.oesystemplugin */,
 				C6B947AF1364ECA600A425F0 /* GameBoy.oesystemplugin */,
 				C6B947E61365080B00A425F0 /* Genesis.oesystemplugin */,
@@ -5585,9 +5630,9 @@
 		ABAB7ECA26783A26006EB243 /* GTU */ = {
 			isa = PBXGroup;
 			children = (
-				ABAB7ECB26783A26006EB243 /* _pass1.cg */,
-				ABAB7ECC26783A26006EB243 /* _pass2.cg */,
-				ABAB7ECD26783A26006EB243 /* _pass3.cg */,
+				ABAB7ECB26783A26006EB243 /* _gtu-pass1.cg */,
+				ABAB7ECC26783A26006EB243 /* _gtu-pass2.cg */,
+				ABAB7ECD26783A26006EB243 /* _gtu-pass3.cg */,
 				ABAB7ECE26783A26006EB243 /* compat_includes.inc */,
 				ABAB7ECF26783A26006EB243 /* compat_input_struct.inc */,
 				ABAB7ED026783A26006EB243 /* compat_macros.inc */,
@@ -5595,7 +5640,7 @@
 				ABAB7ED226783A26006EB243 /* compat_prev_struct.inc */,
 				ABAB7ED326783A26006EB243 /* compat_vertex_in_out.inc */,
 				ABAB7ED426783A26006EB243 /* config.h */,
-				ABAB7ED526783A26006EB243 /* GTUv3.cgp */,
+				ABAB7ED526783A26006EB243 /* GTU.cgp */,
 			);
 			path = GTU;
 			sourceTree = "<group>";
@@ -6121,6 +6166,7 @@
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				828ED4F00E7D98F60059F397 /* Copy Frameworks to App Frameworks */,
 				948E540C1571D739002D26E0 /* Copy System Plugins to App Plugins */,
+				AA000010AABB001000000010 /* Copy Cores to App Plugins */,
 				8309A77E166CE51E0013AD4A /* Copy Files (1 item) */,
 				ABAB7EEB26B70823006EB243 /* ShellScript */,
 			);
@@ -6886,241 +6932,40 @@
 				1BFC26D0116C1CA300B95689 /* OpenEmuHelperApp in Resources */,
 				C67A36AA0FE7F1F500A665E2 /* OECorePluginIcon.icns in Resources */,
 				C69DCCED0FE99415009AE5A6 /* OEFilterPluginIcon.icns in Resources */,
-				83FE966019685F7D00DD8DB9 /* OECorePicker.xib in Resources */,
 				82DD29DB12369F1100B58A8F /* KeyboardUsages.plist in Resources */,
-				833ADC4D196B078E00217D9A /* CollectionView.xib in Resources */,
-				83FE965119685A6A00DD8DB9 /* Preferences.xib in Resources */,
-				53439BF213B93920005C0CC8 /* arrow_down.png in Resources */,
-				53439BF313B93920005C0CC8 /* arrow_left.png in Resources */,
-				53439BF413B93920005C0CC8 /* arrow_right.png in Resources */,
-				83495DDF19A3A4EB009DB6E5 /* bios_missing.png in Resources */,
-				53439BF513B93920005C0CC8 /* arrow_up.png in Resources */,
-				53439BF613B93920005C0CC8 /* background_lighting.png in Resources */,
-				53439BFA13B93920005C0CC8 /* box_gloss.pdf in Resources */,
 				83DEF7C1196C403400C7DF57 /* ControlLabels.strings in Resources */,
-				53439BFB13B93920005C0CC8 /* collections.png in Resources */,
-				53439BFD13B93920005C0CC8 /* hud_bar.png in Resources */,
 				53439BFE13B93920005C0CC8 /* hud_button.png in Resources */,
-				53439BFF13B93920005C0CC8 /* hud_close_button.png in Resources */,
-				53439C0013B93920005C0CC8 /* hud_fullscreen_glyph.png in Resources */,
-				53439C0113B93920005C0CC8 /* hud_glyphs.png in Resources */,
-				53439C0213B93920005C0CC8 /* hud_slider_level.png in Resources */,
-				53439C0313B93920005C0CC8 /* hud_slider_thumb.png in Resources */,
-				53439C0413B93920005C0CC8 /* hud_slider_track.png in Resources */,
-				53439C0513B93920005C0CC8 /* hud_volume.png in Resources */,
 				53439C0613B93920005C0CC8 /* hud_window.png in Resources */,
-				53439C0713B93920005C0CC8 /* grid_rating.png in Resources */,
-				53439C0813B93920005C0CC8 /* grid_slider_large.png in Resources */,
-				53439C0913B93920005C0CC8 /* grid_slider_small.png in Resources */,
-				53439C0A13B93920005C0CC8 /* grid_slider_thumb.png in Resources */,
-				53439C0B13B93920005C0CC8 /* grid_slider_track.png in Resources */,
-				53439C0C13B93920005C0CC8 /* knob_horizontal.png in Resources */,
-				53439C0D13B93920005C0CC8 /* knob_vertical.png in Resources */,
 				83B04E421968610F00CB985E /* Localizable.strings in Resources */,
-				11DC4D4718681E64006CE75D /* controls_triangle@2x.png in Resources */,
-				53439C0E13B93920005C0CC8 /* list_indicators.png in Resources */,
-				53439C0F13B93920005C0CC8 /* list_rating.png in Resources */,
-				53439C1013B93920005C0CC8 /* missing_artwork.pdf in Resources */,
 				ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */,
-				53439C1113B93920005C0CC8 /* missing_rom.pdf in Resources */,
-				53439C1213B93920005C0CC8 /* noise.png in Resources */,
 				53439C1A13B93920005C0CC8 /* controls_background.jpg in Resources */,
-				53439C1B13B93920005C0CC8 /* controls_tab_icon.png in Resources */,
-				53439C1C13B93920005C0CC8 /* core_triangle.png in Resources */,
-				53439C1D13B93920005C0CC8 /* cores_tab_icon.png in Resources */,
-				53439C1E13B93920005C0CC8 /* dark_box.png in Resources */,
-				53439C1F13B93920005C0CC8 /* dark_button.png in Resources */,
 				53439C2013B93920005C0CC8 /* dark_checkbox.png in Resources */,
 				53439C2113B93920005C0CC8 /* dark_inset_box.png in Resources */,
-				53439C2413B93920005C0CC8 /* dark_popup_button.png in Resources */,
-				53439C2613B93920005C0CC8 /* gameplay_tab_icon.png in Resources */,
-				53439C2E13B93920005C0CC8 /* library_tab_icon.png in Resources */,
-				53439C2F13B93920005C0CC8 /* mark_slider_thumb.png in Resources */,
-				53439C3013B93920005C0CC8 /* mark_slider_track.png in Resources */,
-				53439C3113B93920005C0CC8 /* tab_selector.png in Resources */,
 				53439C3213B93920005C0CC8 /* wood_inset_box.png in Resources */,
 				53439C3313B93920005C0CC8 /* wood_popup_button.png in Resources */,
-				53439C3413B93920005C0CC8 /* resizer.png in Resources */,
 				53439C3513B93920005C0CC8 /* scrollbar_corner.png in Resources */,
-				53439C3613B93920005C0CC8 /* search_cancel.png in Resources */,
-				53439C3713B93920005C0CC8 /* search_field.png in Resources */,
-				53439C3813B93920005C0CC8 /* search_loupe.png in Resources */,
-				53439C3913B93920005C0CC8 /* selector_ring.png in Resources */,
-				53439C3A13B93920005C0CC8 /* sort_arrow.png in Resources */,
-				53439C3B13B93920005C0CC8 /* spinner.pdf in Resources */,
-				53439C3C13B93920005C0CC8 /* table_header.png in Resources */,
-				53439C3D13B93920005C0CC8 /* toolbar_add_button.png in Resources */,
-				53439C3E13B93920005C0CC8 /* toolbar_sidebar_button.png in Resources */,
-				53439C3F13B93920005C0CC8 /* toolbar_view_buttons.png in Resources */,
-				53439C4013B93920005C0CC8 /* track_horizontal.png in Resources */,
-				53439C4113B93920005C0CC8 /* track_horizontal_spacer.png in Resources */,
-				53439C4213B93920005C0CC8 /* track_vertical.png in Resources */,
-				53439C4313B93920005C0CC8 /* track_vertical_spacer.png in Resources */,
-				83FE9642196859B100DD8DB9 /* OEPrefCoresController.xib in Resources */,
-				83FE9646196859D300DD8DB9 /* OEPrefGameplayController.xib in Resources */,
-				83FE964A196859F800DD8DB9 /* OEPrefLibraryController.xib in Resources */,
+				83FE965119685A6A00DD8DB9 /* Preferences.xib in Resources */,
 				8382D23513C5C5E100906221 /* OEPrefControlsController.xib in Resources */,
 				8396CC52140687EE0096F791 /* wood_textfield.png in Resources */,
 				83802E6A142F6FF900130517 /* controls_highlight.png in Resources */,
-				11DC4D4518681E56006CE75D /* core_triangle@2x.png in Resources */,
-				11DC4D4118681B04006CE75D /* about_background@2x.jpg in Resources */,
-				83A9E152144723E20051AF1D /* hud_power_glyph.png in Resources */,
+				948FCB65182C7A63001B16BE /* about_background.jpg in Resources */,
 				832D29431451ACF200BDF950 /* MainWindow.xib in Resources */,
-				83025E63146BDD9400A06EF9 /* slim_dark_pill_button.png in Resources */,
-				83025E69146BE71600A06EF9 /* install_progress_bar_track.png in Resources */,
-				83025E6A146BE71600A06EF9 /* install_progress_bar.png in Resources */,
-				83BF5292146C2F0A00B5F742 /* blank_slate_arrow.png in Resources */,
-				83BF5295146C2F4000B5F742 /* blank_slate_box.png in Resources */,
-				830EF6CC146C590D00B0C8B0 /* blank_slate_core_icon.png in Resources */,
-				830EF6CF146C5D5D00B0C8B0 /* open_weblink_arrow.png in Resources */,
 				836CFD6614709D3C00397683 /* wood_arrow_down.png in Resources */,
 				836CFD6714709D3C00397683 /* wood_arrow_up.png in Resources */,
 				836CFD6814709D3C00397683 /* wood_knob_vertical.png in Resources */,
 				836CFD6914709D3C00397683 /* wood_track_vertical_spacer.png in Resources */,
 				836CFD6A14709D3C00397683 /* wood_track_vertical.png in Resources */,
-				83D435F214718891003FE856 /* closed_weblink_arrow.png in Resources */,
-				837777BC147A8F6A0091A896 /* hud_progress_bar_track.png in Resources */,
-				8363A3CF193C8B2600F18425 /* grid_header.png in Resources */,
-				837777BD147A8F6A0091A896 /* hud_progress_bar.png in Resources */,
 				8308F0EE1862FFEC0046BD8A /* OpenEmu.icns in Resources */,
-				83E25058147BC6BF0074EE14 /* hud_textfield.png in Resources */,
 				83920CDD147E675C00D219EA /* hud_alert_window.png in Resources */,
-				83CE3DC314C84EC10036DB28 /* beta_icon.png in Resources */,
-				83C0B37414D6FC58007CAC00 /* sidebar_triangle.png in Resources */,
 				8303BC0814E318C200FCD701 /* dark_menu_body.png in Resources */,
 				8303BC0A14E318C200FCD701 /* dark_submenu_body.png in Resources */,
-				8303BC0C14E318C200FCD701 /* light_menu_body.png in Resources */,
-				8303BC0D14E318C200FCD701 /* light_submenu_body.png in Resources */,
-				8303BC0E14E318C200FCD701 /* menu_item_tick_mark.png in Resources */,
-				83753F1A14F5383F00D708A7 /* OEPrefDebugController.xib in Resources */,
-				83B1E1C914FE734E00AA652F /* menu_item_mixed_state.png in Resources */,
-				8375696915125A1F00795226 /* dark_menu_scroll_arrows.png in Resources */,
-				8363A3D0193C8B2600F18425 /* grid_header@2x.png in Resources */,
-				8375696A15125A1F00795226 /* light_menu_scroll_arrows.png in Resources */,
-				838C0BF815BFF2AD00519C08 /* debug_tab_icon.png in Resources */,
-				831C9AE21600989600038D0D /* menu_submenu_arrow.png in Resources */,
-				831C9AE4160098BB00038D0D /* dark_menu_arrows_body.png in Resources */,
-				831C9AE61600991200038D0D /* dark_menu_separator_item.png in Resources */,
-				831C9AE81600992B00038D0D /* light_menu_arrows_body.png in Resources */,
-				831C9AEA1600993B00038D0D /* light_menu_separator_item.png in Resources */,
 				838E2A231600A05C00CF7198 /* Theme.plist in Resources */,
-				83DEE49D162D62B2005D8AD7 /* game_scanner_buttons.png in Resources */,
-				83DEE49E162D62B2005D8AD7 /* game_scanner_progress_bar.png in Resources */,
-				83DEE49F162D62B2005D8AD7 /* game_scanner_progress_candy.png in Resources */,
-				83DEE4A0162D62B2005D8AD7 /* game_scanner_progress_track.png in Resources */,
 				C6F696C01648F64B00B243DB /* Controller-Database.plist in Resources */,
-				83FE965919685F6700DD8DB9 /* OEGameScanner.xib in Resources */,
-				83B867B9171D63510038988C /* retrode.png in Resources */,
-				EC350F7317401AC1005DA3B2 /* background_lighting@2x.png in Resources */,
-				EC350F7417401AC1005DA3B2 /* blank_slate_arrow@2x.png in Resources */,
-				ABAB7EDF26783A26006EB243 /* GTUv3.cgp in Resources */,
-				EC350F7517401AC1005DA3B2 /* blank_slate_box@2x.png in Resources */,
-				EC350F7617401AC1005DA3B2 /* blank_slate_core_icon@2x.png in Resources */,
-				EC350F7717401AC1005DA3B2 /* closed_weblink_arrow@2x.png in Resources */,
-				EC350F7817401AC1005DA3B2 /* collections@2x.png in Resources */,
-				EC350F7917401AC1005DA3B2 /* game_scanner_buttons@2x.png in Resources */,
-				EC350F7A17401AC1005DA3B2 /* game_scanner_progress_bar@2x.png in Resources */,
-				EC350F7B17401AC1005DA3B2 /* game_scanner_progress_candy@2x.png in Resources */,
-				EC350F7C17401AC1005DA3B2 /* game_scanner_progress_track@2x.png in Resources */,
-				948FCB65182C7A63001B16BE /* about_background.jpg in Resources */,
-				EC350F7D17401AC1005DA3B2 /* grid_rating@2x.png in Resources */,
-				EC350F7E17401AC1005DA3B2 /* grid_slider_large@2x.png in Resources */,
-				EC350F7F17401AC1005DA3B2 /* grid_slider_small@2x.png in Resources */,
-				EC350F8017401AC1005DA3B2 /* grid_slider_thumb@2x.png in Resources */,
-				EC350F8117401AC1005DA3B2 /* grid_slider_track@2x.png in Resources */,
-				EC350F8217401AC1005DA3B2 /* knob_horizontal@2x.png in Resources */,
-				EC350F8317401AC1005DA3B2 /* knob_vertical@2x.png in Resources */,
-				EC350F8417401AC1005DA3B2 /* list_indicators@2x.png in Resources */,
-				EC350F8517401AC1005DA3B2 /* list_rating@2x.png in Resources */,
-				EC350F8617401AC1005DA3B2 /* noise@2x.png in Resources */,
-				EC350F8717401AC1005DA3B2 /* open_weblink_arrow@2x.png in Resources */,
-				EC350F8817401AC1005DA3B2 /* scrollbar_corner@2x.png in Resources */,
-				EC350F8917401AC1005DA3B2 /* search_cancel@2x.png in Resources */,
-				EC350F8A17401AC1005DA3B2 /* search_field@2x.png in Resources */,
-				EC350F8B17401AC1005DA3B2 /* search_loupe@2x.png in Resources */,
-				EC350F8C17401AC1005DA3B2 /* selector_ring@2x.png in Resources */,
-				EC350F8D17401AC1005DA3B2 /* sidebar_triangle@2x.png in Resources */,
-				EC350F8E17401AC1005DA3B2 /* sort_arrow@2x.png in Resources */,
-				EC350F8F17401AC1005DA3B2 /* table_header@2x.png in Resources */,
-				EC350F9017401AC1005DA3B2 /* toolbar_add_button@2x.png in Resources */,
-				EC350F9117401AC1005DA3B2 /* toolbar_sidebar_button@2x.png in Resources */,
-				83495DDE19A3A4EB009DB6E5 /* bios_found@2x.png in Resources */,
-				EC350F9217401AC1005DA3B2 /* toolbar_view_buttons@2x.png in Resources */,
-				83495DDD19A3A4EB009DB6E5 /* bios_found.png in Resources */,
-				EC350F9317401AC1005DA3B2 /* track_horizontal_spacer@2x.png in Resources */,
-				EC350F9417401AC1005DA3B2 /* track_horizontal@2x.png in Resources */,
-				EC350F9517401AC1005DA3B2 /* track_vertical_spacer@2x.png in Resources */,
-				EC350F9617401AC1005DA3B2 /* track_vertical@2x.png in Resources */,
 				AB095E9D2676D52B00EC2CE8 /* MainMenu.xib in Resources */,
-				ABAB7ED826783A26006EB243 /* _pass3.cg in Resources */,
-				83D94FB419A4D43B007583E1 /* bios_tab_icon.png in Resources */,
-				EC350FA417401B0B005DA3B2 /* menu_item_mixed_state@2x.png in Resources */,
-				EC350FA517401B0B005DA3B2 /* menu_item_tick_mark@2x.png in Resources */,
-				EC350FA617401B0B005DA3B2 /* menu_submenu_arrow@2x.png in Resources */,
 				83B6FBFA1948E30100586A2C /* hud_quicksave_notification.png in Resources */,
-				EC350FAC17401B1F005DA3B2 /* light_menu_arrows_body@2x.png in Resources */,
-				EC350FAD17401B1F005DA3B2 /* light_menu_body@2x.png in Resources */,
-				EC350FAE17401B1F005DA3B2 /* light_menu_scroll_arrows@2x.png in Resources */,
-				EC350FAF17401B1F005DA3B2 /* light_menu_separator_item@2x.png in Resources */,
 				83B04E411968610F00CB985E /* InfoPlist.strings in Resources */,
-				EC350FB017401B1F005DA3B2 /* light_submenu_body@2x.png in Resources */,
-				EC350FB617401B2E005DA3B2 /* dark_menu_arrows_body@2x.png in Resources */,
-				EC350FB717401B2E005DA3B2 /* dark_menu_body@2x.png in Resources */,
-				EC350FB817401B2E005DA3B2 /* dark_menu_scroll_arrows@2x.png in Resources */,
-				EC350FB917401B2E005DA3B2 /* dark_menu_separator_item@2x.png in Resources */,
-				EC350FBA17401B2E005DA3B2 /* dark_submenu_body@2x.png in Resources */,
-				EC350FCA17401B44005DA3B2 /* hud_alert_window@2x.png in Resources */,
-				EC350FCB17401B44005DA3B2 /* hud_bar@2x.png in Resources */,
-				EC350FCC17401B44005DA3B2 /* hud_button@2x.png in Resources */,
-				ABAB7ED626783A26006EB243 /* _pass1.cg in Resources */,
-				EC350FCD17401B44005DA3B2 /* hud_close_button@2x.png in Resources */,
-				ABAB7ED726783A26006EB243 /* _pass2.cg in Resources */,
-				EC350FCE17401B44005DA3B2 /* hud_fullscreen_glyph@2x.png in Resources */,
-				EC350FCF17401B44005DA3B2 /* hud_glyphs@2x.png in Resources */,
-				EC350FD017401B44005DA3B2 /* hud_power_glyph@2x.png in Resources */,
-				EC350FD117401B44005DA3B2 /* hud_progress_bar_track@2x.png in Resources */,
-				EC350FD217401B44005DA3B2 /* hud_progress_bar@2x.png in Resources */,
-				EC350FD317401B44005DA3B2 /* hud_slider_level@2x.png in Resources */,
-				EC350FD417401B44005DA3B2 /* hud_slider_thumb@2x.png in Resources */,
-				EC350FD517401B44005DA3B2 /* hud_slider_track@2x.png in Resources */,
-				EC350FD617401B44005DA3B2 /* hud_textfield@2x.png in Resources */,
-				EC350FD717401B44005DA3B2 /* hud_volume@2x.png in Resources */,
-				EC350FD817401B44005DA3B2 /* hud_window@2x.png in Resources */,
-				EC350FF017401B58005DA3B2 /* beta_icon@2x.png in Resources */,
-				EC350FF117401B58005DA3B2 /* controls_highlight@2x.png in Resources */,
-				EC350FF217401B58005DA3B2 /* controls_tab_icon@2x.png in Resources */,
-				EC350FF317401B58005DA3B2 /* cores_tab_icon@2x.png in Resources */,
-				83495DD819A38F3D009DB6E5 /* OEPrefBiosController.xib in Resources */,
-				EC350FF417401B58005DA3B2 /* dark_box@2x.png in Resources */,
-				EC350FF517401B58005DA3B2 /* dark_button@2x.png in Resources */,
-				EC350FF617401B58005DA3B2 /* dark_checkbox@2x.png in Resources */,
-				EC350FF717401B58005DA3B2 /* dark_inset_box@2x.png in Resources */,
-				EC350FF917401B58005DA3B2 /* debug_tab_icon@2x.png in Resources */,
-				EC350FFA17401B58005DA3B2 /* gameplay_tab_icon@2x.png in Resources */,
-				EC350FFB17401B58005DA3B2 /* install_progress_bar_track@2x.png in Resources */,
-				EC350FFC17401B58005DA3B2 /* install_progress_bar@2x.png in Resources */,
-				EC350FFD17401B58005DA3B2 /* library_tab_icon@2x.png in Resources */,
-				EC350FFE17401B58005DA3B2 /* mark_slider_thumb@2x.png in Resources */,
-				EC350FFF17401B58005DA3B2 /* mark_slider_track@2x.png in Resources */,
-				EC35100017401B58005DA3B2 /* slim_dark_pill_button@2x.png in Resources */,
-				83B6FBFB1948E30100586A2C /* hud_quicksave_notification@2x.png in Resources */,
-				EC35100117401B58005DA3B2 /* tab_selector@2x.png in Resources */,
-				EC35100217401B58005DA3B2 /* wood_inset_box@2x.png in Resources */,
-				EC35100317401B58005DA3B2 /* wood_knob_vertical@2x.png in Resources */,
-				83D94FB519A4D43B007583E1 /* bios_tab_icon@2x.png in Resources */,
-				EC35100417401B58005DA3B2 /* wood_popup_button@2x.png in Resources */,
-				EC35100517401B58005DA3B2 /* wood_textfield@2x.png in Resources */,
-				EC35100617401B58005DA3B2 /* wood_track_vertical@2x.png in Resources */,
-				EC13823317401D4A00F951F4 /* dark_popup_button@2x.png in Resources */,
-				83B04E3C196860B800CB985E /* Credits.rtf in Resources */,
-				EC1382351740210400F951F4 /* controls_background@2x.jpg in Resources */,
-				94A4E998179FB98100AD8C7D /* media.png in Resources */,
-				83338C2217A281C7007E32E9 /* secret.mp3 in Resources */,
-				83160E2819A60FE800CACD99 /* grid_download@2x.png in Resources */,
 				830013AE17A7C5A000EB128A /* controls_triangle.png in Resources */,
-				83495DE019A3A4EB009DB6E5 /* bios_missing@2x.png in Resources */,
-				83160E2719A60FE800CACD99 /* grid_download.png in Resources */,
-				83E40BED196CAAD000E469C6 /* media_featured.png in Resources */,
+				AA000001AABB000100000001 /* OpenEmuGame.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7701,7 +7546,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Release/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Macintosh HD-1/Applications/OpenEmu.app/Contents/MacOS/OpenEmu\"\n\nchmod 755 \"/Volumes/Macintosh HD-1/Applications/OpenEmu.app/Contents/MacOS/OpenEmu\"\n\n#cp \"/Users/jonathan/Library/Developer/Xcode/DerivedData/OpenEmu-eifhmqwkepsnhwfxxfhwipcmntsl/Build/Products/Release/OpenEmu.app/Contents/MacOS/OpenEmu\" \"/Volumes/Jonathan/Desktop/OpenEmu.app/Contents/MacOS/OpenEmu\"";
+			shellScript = "# Post-build copy removed";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -7861,7 +7706,6 @@
 				83025E66146BE68E00A06EF9 /* OECoreTableProgressCell.m in Sources */,
 				83CAD4D4147BB641004C0E9B /* NSClipView+OEAnimatedScrolling.m in Sources */,
 				83691817147FE3EF00F28231 /* NSWindow+OECustomWindow.m in Sources */,
-				83CA87B41961CDD400D86D55 /* 1.2 to 1.3.xcmappingmodel in Sources */,
 				83F7DBAF18C0E2470029199C /* OEFileManager.m in Sources */,
 				EF2FDBEB14CFFE06002A64F2 /* OEControlsKeyButton.m in Sources */,
 				EF2FDBEC14CFFE11002A64F2 /* OEControlsKeyLabelCell.m in Sources */,
@@ -7888,12 +7732,10 @@
 				83B65F5715F0DEA100C742D2 /* NSArray+OEAdditions.m in Sources */,
 				8363A43A193CBAFA00F18425 /* OEGridMediaItemCell.m in Sources */,
 				83633447195D798600470AB8 /* OEDBScreenshot.m in Sources */,
-				8353EB7D15FF695D0026E326 /* 1.0 Beta to 0.2.xcmappingmodel in Sources */,
 				831C9AAD160095BA00038D0D /* OETheme.m in Sources */,
 				831C9AB0160095E500038D0D /* OEThemeObject.m in Sources */,
 				831C9AB9160095F800038D0D /* OEThemeColor.m in Sources */,
 				831C9ABA160095F800038D0D /* OEThemeGradient.m in Sources */,
-				832AB28C18649B550022DFB0 /* 1.0 Beta 4 to 1.0.xcmappingmodel in Sources */,
 				831C9ABB160095F800038D0D /* OEThemeImage.m in Sources */,
 				831C9ABC160095F800038D0D /* OEThemeTextAttributes.m in Sources */,
 				831C9AC51600967E00038D0D /* OEMenuDocumentView.m in Sources */,
@@ -7918,9 +7760,7 @@
 				83DEE498162D6218005D8AD7 /* OEHorizontalLine.m in Sources */,
 				83DEE4A4162D62E4005D8AD7 /* OEProgressIndicator.m in Sources */,
 				83200BF9162F5C1C00BCFA9D /* OESidebarBackgroundView.m in Sources */,
-				8397082F163C405000E04871 /* 0.2 to 0.3.xcmappingmodel in Sources */,
 				83955CB5165D939100572B34 /* OEBlankSlateView.m in Sources */,
-				83DBA2271906A250000815B9 /* 1.1 to 1.2.xcmappingmodel in Sources */,
 				83955CB8165DA9BC00572B34 /* OEBackgroundNoisePattern.m in Sources */,
 				14861960166076A400BDB800 /* NSDate+OESortAdditions.m in Sources */,
 				835F3F401683534700C74B97 /* OEToolTipManager.m in Sources */,
@@ -8456,10 +8296,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				820EB7511483F9D3008EC398 /* en */,
-				839A390B196AAFDB001A119A /* de */,
-				839A393D196AAFED001A119A /* ru */,
-				8352C10F197ACC5700DDAD05 /* pt */,
-				83F3E33D19B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8468,10 +8304,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				822775561489471A00B19E27 /* en */,
-				839A3904196AAFDA001A119A /* de */,
-				839A3936196AAFEC001A119A /* ru */,
-				8352C109197ACC5500DDAD05 /* pt */,
-				83F3E33719B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8480,10 +8312,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				833ADC4E196B078E00217D9A /* en */,
-				833ADC50196B079000217D9A /* de */,
-				833ADC51196B079200217D9A /* ru */,
-				8352C0F6197ACC5000DDAD05 /* pt */,
-				83F3E32419B3B383009EC4ED /* es */,
 			);
 			name = CollectionView.xib;
 			sourceTree = "<group>";
@@ -8492,10 +8320,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83B04E3B196860B800CB985E /* en */,
-				839A38EC196AAFD6001A119A /* de */,
-				839A391E196AAFE8001A119A /* ru */,
-				8352C0EF197ACC4E00DDAD05 /* pt */,
-				83F3E31D19B3B382009EC4ED /* es */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
@@ -8504,10 +8328,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83B04E3E1968610F00CB985E /* en */,
-				839A38ED196AAFD7001A119A /* de */,
-				839A391F196AAFE8001A119A /* ru */,
-				8352C0F0197ACC4E00DDAD05 /* pt */,
-				83F3E31E19B3B383009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8516,10 +8336,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83B04E401968610F00CB985E /* en */,
-				839A38EE196AAFD7001A119A /* de */,
-				839A3920196AAFE8001A119A /* ru */,
-				8352C0F1197ACC4E00DDAD05 /* pt */,
-				83F3E31F19B3B383009EC4ED /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -8528,10 +8344,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83DEF7C2196C403400C7DF57 /* en */,
-				83DEF7C4196C403700C7DF57 /* de */,
-				83DEF7C5196C403800C7DF57 /* ru */,
-				8352C0F2197ACC4E00DDAD05 /* pt */,
-				83F3E32019B3B383009EC4ED /* es */,
 			);
 			name = ControlLabels.strings;
 			sourceTree = "<group>";
@@ -8540,10 +8352,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE9643196859B100DD8DB9 /* en */,
-				839A38EF196AAFD7001A119A /* de */,
-				839A3921196AAFE8001A119A /* ru */,
-				8352C0F3197ACC4F00DDAD05 /* pt */,
-				83F3E32119B3B383009EC4ED /* es */,
 			);
 			name = OEPrefCoresController.xib;
 			sourceTree = "<group>";
@@ -8552,10 +8360,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE9647196859D300DD8DB9 /* en */,
-				839A38F0196AAFD7001A119A /* de */,
-				839A3922196AAFE8001A119A /* ru */,
-				8352C0F4197ACC4F00DDAD05 /* pt */,
-				83F3E32219B3B383009EC4ED /* es */,
 			);
 			name = OEPrefGameplayController.xib;
 			sourceTree = "<group>";
@@ -8564,10 +8368,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE964B196859F800DD8DB9 /* en */,
-				839A38F1196AAFD7001A119A /* de */,
-				839A3923196AAFE9001A119A /* ru */,
-				8352C0F5197ACC4F00DDAD05 /* pt */,
-				83F3E32319B3B383009EC4ED /* es */,
 			);
 			name = OEPrefLibraryController.xib;
 			sourceTree = "<group>";
@@ -8576,10 +8376,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE965219685A6A00DD8DB9 /* en */,
-				839A38F3196AAFD8001A119A /* de */,
-				839A3925196AAFE9001A119A /* ru */,
-				8352C0F8197ACC5000DDAD05 /* pt */,
-				83F3E32619B3B383009EC4ED /* es */,
 			);
 			name = Preferences.xib;
 			sourceTree = "<group>";
@@ -8588,10 +8384,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE965A19685F6700DD8DB9 /* en */,
-				839A38F5196AAFD8001A119A /* de */,
-				839A3927196AAFE9001A119A /* ru */,
-				8352C0FA197ACC5100DDAD05 /* pt */,
-				83F3E32819B3B384009EC4ED /* es */,
 			);
 			name = OEGameScanner.xib;
 			sourceTree = "<group>";
@@ -8600,10 +8392,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE965D19685F7000DD8DB9 /* en */,
-				839A38F6196AAFD8001A119A /* de */,
-				839A3928196AAFE9001A119A /* ru */,
-				8352C0FB197ACC5100DDAD05 /* pt */,
-				83F3E32919B3B384009EC4ED /* es */,
 			);
 			name = OESystemPicker.xib;
 			sourceTree = "<group>";
@@ -8612,10 +8400,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				83FE966119685F7D00DD8DB9 /* en */,
-				839A38F7196AAFD8001A119A /* de */,
-				839A3929196AAFEA001A119A /* ru */,
-				8352C0FC197ACC5100DDAD05 /* pt */,
-				83F3E32A19B3B384009EC4ED /* es */,
 			);
 			name = OECorePicker.xib;
 			sourceTree = "<group>";
@@ -8624,10 +8408,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				9405538A17A34C6B009B505D /* en */,
-				839A390F196AAFDB001A119A /* de */,
-				839A3941196AAFED001A119A /* ru */,
-				8352C113197ACC5900DDAD05 /* pt */,
-				83F3E34219B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8636,10 +8416,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				941F5A0717A785AE0005D7EA /* en */,
-				839A38FE196AAFD9001A119A /* de */,
-				839A3930196AAFEB001A119A /* ru */,
-				8352C103197ACC5400DDAD05 /* pt */,
-				83F3E33119B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8648,10 +8424,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				943C80181708A62F00D8D93E /* en */,
-				839A3906196AAFDA001A119A /* de */,
-				839A3938196AAFEC001A119A /* ru */,
-				8352C10B197ACC5600DDAD05 /* pt */,
-				83F3E33919B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8660,10 +8432,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				943C803B1708F23900D8D93E /* en */,
-				839A391B196AAFDB001A119A /* de */,
-				839A394D196AAFEF001A119A /* ru */,
-				8352C11E197ACC5B00DDAD05 /* pt */,
-				83F3E34E19B3B387009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8672,10 +8440,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				943F99911707D51100270E89 /* en */,
-				839A3919196AAFDB001A119A /* de */,
-				839A394B196AAFEF001A119A /* ru */,
-				8352C11C197ACC5B00DDAD05 /* pt */,
-				83F3E34C19B3B387009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8684,10 +8448,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				943F99B91707DF3700270E89 /* en */,
-				839A38FA196AAFD9001A119A /* de */,
-				839A392C196AAFEA001A119A /* ru */,
-				8352C0FF197ACC5200DDAD05 /* pt */,
-				83F3E32D19B3B384009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8696,7 +8456,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				9440475B199D4DF1002D805E /* en */,
-				83F3E34019B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8705,10 +8464,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94454EBA17860E1E006C057B /* en */,
-				839A3912196AAFDB001A119A /* de */,
-				839A3944196AAFEE001A119A /* ru */,
-				8352C0EE197ACC4D00DDAD05 /* pt */,
-				83F3E34519B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8717,10 +8472,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				945E43011517F2B500057D08 /* en */,
-				839A38FB196AAFD9001A119A /* de */,
-				839A392D196AAFEA001A119A /* ru */,
-				8352C100197ACC5200DDAD05 /* pt */,
-				83F3E32E19B3B384009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8729,10 +8480,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				946B9468178289BB00A212AC /* en */,
-				839A3914196AAFDB001A119A /* de */,
-				839A3946196AAFEE001A119A /* ru */,
-				8352C117197ACC5A00DDAD05 /* pt */,
-				83F3E34719B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8741,10 +8488,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224391707537F00098DA0 /* en */,
-				839A390E196AAFDB001A119A /* de */,
-				839A3940196AAFED001A119A /* ru */,
-				8352C112197ACC5800DDAD05 /* pt */,
-				83F3E34119B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8753,10 +8496,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224491707539D00098DA0 /* en */,
-				839A391C196AAFDB001A119A /* de */,
-				839A394E196AAFF0001A119A /* ru */,
-				8352C11F197ACC5C00DDAD05 /* pt */,
-				83F3E34F19B3B387009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8765,10 +8504,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A22459170753C800098DA0 /* en */,
-				839A3907196AAFDA001A119A /* de */,
-				839A3939196AAFEC001A119A /* ru */,
-				8352C10C197ACC5600DDAD05 /* pt */,
-				83F3E33A19B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8777,10 +8512,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A22469170753D500098DA0 /* en */,
-				839A3910196AAFDB001A119A /* de */,
-				839A3942196AAFEE001A119A /* ru */,
-				8352C114197ACC5900DDAD05 /* pt */,
-				83F3E34319B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8789,10 +8520,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A22479170753E100098DA0 /* en */,
-				839A3917196AAFDB001A119A /* de */,
-				839A3949196AAFEF001A119A /* ru */,
-				8352C11A197ACC5A00DDAD05 /* pt */,
-				83F3E34A19B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8801,10 +8528,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224891707541F00098DA0 /* en */,
-				839A391A196AAFDB001A119A /* de */,
-				839A394C196AAFEF001A119A /* ru */,
-				8352C11D197ACC5B00DDAD05 /* pt */,
-				83F3E34D19B3B387009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8813,10 +8536,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224991707542A00098DA0 /* en */,
-				839A3915196AAFDB001A119A /* de */,
-				839A3947196AAFEE001A119A /* ru */,
-				8352C118197ACC5A00DDAD05 /* pt */,
-				83F3E34819B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8825,10 +8544,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224A91707543600098DA0 /* en */,
-				839A38FC196AAFD9001A119A /* de */,
-				839A392E196AAFEA001A119A /* ru */,
-				8352C101197ACC5200DDAD05 /* pt */,
-				83F3E32F19B3B384009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8837,10 +8552,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224B91707544100098DA0 /* en */,
-				839A38FD196AAFD9001A119A /* de */,
-				839A392F196AAFEB001A119A /* ru */,
-				8352C102197ACC5300DDAD05 /* pt */,
-				83F3E33019B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8849,10 +8560,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224C91707544C00098DA0 /* en */,
-				839A390D196AAFDB001A119A /* de */,
-				839A393F196AAFED001A119A /* ru */,
-				8352C111197ACC5800DDAD05 /* pt */,
-				83F3E33F19B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8861,10 +8568,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224D91707556D00098DA0 /* en */,
-				839A3913196AAFDB001A119A /* de */,
-				839A3945196AAFEE001A119A /* ru */,
-				8352C116197ACC5900DDAD05 /* pt */,
-				83F3E34619B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8873,10 +8576,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224E91707559100098DA0 /* en */,
-				839A3900196AAFDA001A119A /* de */,
-				839A3932196AAFEB001A119A /* ru */,
-				8352C105197ACC5400DDAD05 /* pt */,
-				83F3E33319B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8885,10 +8584,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94A224FC1707596200098DA0 /* en */,
-				839A3911196AAFDB001A119A /* de */,
-				839A3943196AAFEE001A119A /* ru */,
-				8352C115197ACC5900DDAD05 /* pt */,
-				83F3E34419B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8897,10 +8592,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94BE9E56171683E000AB08E6 /* en */,
-				839A38FF196AAFD9001A119A /* de */,
-				839A3931196AAFEB001A119A /* ru */,
-				8352C104197ACC5400DDAD05 /* pt */,
-				83F3E33219B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8909,10 +8600,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94CEB27317A84809005A2107 /* en */,
-				839A3903196AAFDA001A119A /* de */,
-				839A3935196AAFEC001A119A /* ru */,
-				8352C108197ACC5500DDAD05 /* pt */,
-				83F3E33619B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8921,10 +8608,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				94D7E8CF15073BA000FBDD85 /* en */,
-				839A390A196AAFDB001A119A /* de */,
-				839A393C196AAFED001A119A /* ru */,
-				8352C10E197ACC5700DDAD05 /* pt */,
-				83F3E33C19B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8941,10 +8624,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C646574E13771F12002A4F70 /* en */,
-				839A3902196AAFDA001A119A /* de */,
-				839A3934196AAFEB001A119A /* ru */,
-				8352C107197ACC5500DDAD05 /* pt */,
-				83F3E33519B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8953,10 +8632,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C6480FC713648F670094FA33 /* en */,
-				839A3918196AAFDB001A119A /* de */,
-				839A394A196AAFEF001A119A /* ru */,
-				8352C11B197ACC5B00DDAD05 /* pt */,
-				83F3E34B19B3B387009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8965,10 +8640,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C64BB093136478E600C1AB23 /* en */,
-				839A390C196AAFDB001A119A /* de */,
-				839A393E196AAFED001A119A /* ru */,
-				8352C110197ACC5800DDAD05 /* pt */,
-				83F3E33E19B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8977,10 +8648,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C671181A136368330034379A /* en */,
-				839A3916196AAFDB001A119A /* de */,
-				839A3948196AAFEF001A119A /* ru */,
-				8352C119197ACC5A00DDAD05 /* pt */,
-				83F3E34919B3B386009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -8989,10 +8656,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C6B947B51364ECA700A425F0 /* en */,
-				839A3901196AAFDA001A119A /* de */,
-				839A3933196AAFEB001A119A /* ru */,
-				8352C106197ACC5500DDAD05 /* pt */,
-				83F3E33419B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -9001,10 +8664,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C6B947EC1365080B00A425F0 /* en */,
-				839A3905196AAFDA001A119A /* de */,
-				839A3937196AAFEC001A119A /* ru */,
-				8352C10A197ACC5600DDAD05 /* pt */,
-				83F3E33819B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -9013,10 +8672,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				FEB66262187B791800D14713 /* en */,
-				839A3908196AAFDA001A119A /* de */,
-				839A393A196AAFEC001A119A /* ru */,
-				8352C10D197ACC5700DDAD05 /* pt */,
-				83F3E33B19B3B385009EC4ED /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
