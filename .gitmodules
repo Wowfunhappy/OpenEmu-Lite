@@ -1,75 +1,18 @@
-[submodule "CrabEmu"]
-	path = CrabEmu
-	url = git@github.com:OpenEmu/CrabEmu-Core.git
-[submodule "BSNES"]
-	path = BSNES
-	url = git@github.com:OpenEmu/BSNES-Core.git
-[submodule "FCEU"]
-	path = FCEU
-	url = git@github.com:OpenEmu/FCEU-Core.git
-[submodule "Gambatte"]
-	path = Gambatte
-	url = git@github.com:OpenEmu/Gambatte-Core.git
-[submodule "GenesisPlus"]
-	path = GenesisPlus
-	url = git@github.com:OpenEmu/GenesisPlus-Core.git
-[submodule "Mednafen"]
-	path = Mednafen
-	url = git@github.com:OpenEmu/Mednafen-Core.git
-[submodule "Mupen64Plus"]
-	path = Mupen64Plus
-	url = git@github.com:OpenEmu/Mupen64Plus-Core.git
-[submodule "NeoPop"]
-	path = NeoPop
-	url = git@github.com:OpenEmu/NeoPop-Core.git
-[submodule "Nestopia"]
-	path = Nestopia
-	url = git@github.com:OpenEmu/Nestopia-Core.git
 [submodule "SNES9x"]
 	path = SNES9x
-	url = git@github.com:OpenEmu/SNES9x-Core.git
-[submodule "VisualBoyAdvance"]
-	path = VisualBoyAdvance
-	url = git@github.com:OpenEmu/VisualBoyAdvance-Core.git
-[submodule "TwoMbit"]
-	path = TwoMbit
-	url = git@github.com:OpenEmu/TwoMbit-Core.git
-[submodule "UME"]
-	path = UME
-	url = git@github.com:OpenEmu/UME-Core.git
-[submodule "picodrive"]
-	path = picodrive
-	url = git@github.com:OpenEmu/picodrive.git
-[submodule "Higan"]
-	path = Higan
-	url = git@github.com:OpenEmu/Higan-Core.git
-[submodule "PPSSPP"]
-	path = PPSSPP
-	url = git@github.com:OpenEmu/PPSSPP-Core.git
-[submodule "yabause"]
-	path = yabause
-	url = git@github.com:OpenEmu/yabause.git
-[submodule "VecXGL"]
-	path = VecXGL
-	url = git@github.com:OpenEmu/VecXGL-Core.git
-[submodule "ProSystem"]
-	path = ProSystem
-	url = git@github.com:OpenEmu/ProSystem-Core.git
-[submodule "Stella"]
-	path = Stella
-	url = git@github.com:OpenEmu/Stella-Core.git
-[submodule "Atari800"]
-	path = Atari800
-	url = git@github.com:OpenEmu/Atari800-Core.git
-[submodule "blueMSX"]
-	path = blueMSX
-	url = git@github.com:OpenEmu/blueMSX-Core.git
-[submodule "4DO"]
-	path = 4DO
-	url = git@github.com:OpenEmu/4DO-Core.git
-[submodule "VirtualJaguar"]
-	path = VirtualJaguar
-	url = git@github.com:OpenEmu/VirtualJaguar-Core.git
-[submodule "O2EM"]
-	path = O2EM
-	url = git@github.com:OpenEmu/O2EM-Core.git
+	url = https://github.com/Wowfunhappy/SNES9x-Core.git
+[submodule "mGBA"]
+	path = mGBA
+	url = https://github.com/Wowfunhappy/mGBA-Core.git
+[submodule "GenesisPlus"]
+	path = GenesisPlus
+	url = https://github.com/Wowfunhappy/GenesisPlus-Core.git
+[submodule "Gambatte"]
+	path = Gambatte
+	url = https://github.com/Wowfunhappy/Gambatte-Core.git
+[submodule "DeSmuME"]
+	path = DeSmuME
+	url = https://github.com/OpenEmu/DeSmuME-Core.git
+[submodule "Nestopia"]
+	path = Nestopia
+	url = https://github.com/Wowfunhappy/Nestopia-Core.git
