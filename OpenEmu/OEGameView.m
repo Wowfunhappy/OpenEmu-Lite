@@ -134,8 +134,8 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
 
 + (NSOpenGLPixelFormat *)defaultPixelFormat
 {
-    // choose our pixel formats
-    NSOpenGLPixelFormatAttribute attr[] =
+    // Try accelerated first, fall back to software for VMs
+    NSOpenGLPixelFormatAttribute accelAttr[] =
     {
         NSOpenGLPFAAccelerated,
         NSOpenGLPFADoubleBuffer,
@@ -143,7 +143,16 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
         0
     };
 
-    return [[NSOpenGLPixelFormat alloc] initWithAttributes:attr];
+    NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:accelAttr];
+    if(format) return format;
+
+    NSOpenGLPixelFormatAttribute softAttr[] =
+    {
+        NSOpenGLPFADoubleBuffer,
+        0
+    };
+
+    return [[NSOpenGLPixelFormat alloc] initWithAttributes:softAttr];
 }
 
 // Warning: - because we are using a superview with a CALayer for transitioning, we have prepareOpenGL called more than once.

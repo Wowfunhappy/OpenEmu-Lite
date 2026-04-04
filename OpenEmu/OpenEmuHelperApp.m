@@ -130,13 +130,20 @@
 - (void)setupOpenGLOnScreen:(NSScreen *)screen
 {
     // init our context.
-    static const CGLPixelFormatAttribute attributes[] = { kCGLPFAAccelerated, kCGLPFAAllowOfflineRenderers, 0 };
+    static const CGLPixelFormatAttribute acceleratedAttrs[] = { kCGLPFAAccelerated, kCGLPFAAllowOfflineRenderers, 0 };
+    static const CGLPixelFormatAttribute softwareAttrs[] = { 0 };
 
     CGLError err = kCGLNoError;
     GLint numPixelFormats = 0;
 
     DLog(@"choosing pixel format");
-    err = CGLChoosePixelFormat(attributes, &_glPixelFormat, &numPixelFormats);
+    err = CGLChoosePixelFormat(acceleratedAttrs, &_glPixelFormat, &numPixelFormats);
+
+    if(err != kCGLNoError || numPixelFormats == 0)
+    {
+        NSLog(@"No accelerated pixel format available, falling back to software renderer");
+        err = CGLChoosePixelFormat(softwareAttrs, &_glPixelFormat, &numPixelFormats);
+    }
 
     if(err != kCGLNoError)
     {
