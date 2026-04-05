@@ -27,7 +27,10 @@ static int16_t stubMouseY;
 static uint8_t stubMouseBtns;
 
 void oeSetInputState(uint8_t kDown, uint8_t kHeld, int16_t mouseX, int16_t mouseY, uint8_t mouseBtns) {
-    stubCurrKDown = kDown;
+    // Accumulate "just pressed" flags so presses that land on a frame where
+    // the cart doesn't call _update_buttons() (e.g. the yield frame of a
+    // 30fps cart) survive until the cart actually reads them.
+    stubCurrKDown |= kDown;
     stubCurrKHeld = kHeld;
     stubMouseX = mouseX;
     stubMouseY = mouseY;
@@ -47,7 +50,10 @@ void Host::changeStretch() { }
 void Host::forceStretch(StretchOption newStretch) { }
 
 InputState_t Host::scanInput() {
-    return InputState_t {stubCurrKDown, stubCurrKHeld, stubMouseX, stubMouseY, stubMouseBtns, stubCurrKBdown, stubCurrKBkey};
+    InputState_t state = {stubCurrKDown, stubCurrKHeld, stubMouseX, stubMouseY, stubMouseBtns, stubCurrKBdown, stubCurrKBkey};
+    // Clear "just pressed" after reading so each press is only seen once.
+    stubCurrKDown = 0;
+    return state;
 }
 
 bool Host::shouldQuit() {
