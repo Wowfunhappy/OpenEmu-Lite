@@ -1072,6 +1072,10 @@
 		F808000010000000000014 /* Keyboard-Mappings.plist in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000005; };
 		F808000010000000000015 /* Controller-Mappings.plist in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000006; };
 		F808000010000000000016 /* Controller-Preferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000007; };
+		F80800001000000000001D /* controller_pico8.png in Resources */ = {isa = PBXBuildFile; fileRef = F80800001000000000001B; };
+		F80800001000000000001E /* controller_pico8_mask.png in Resources */ = {isa = PBXBuildFile; fileRef = F80800001000000000001C; };
+		F808000010000000000021 /* controller_pico8@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F80800001000000000001F; };
+		F808000010000000000022 /* controller_pico8_mask@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000020; };
 		F80800001000000000001A /* PICO8.oesystemplugin in Copy System Plugins */ = {isa = PBXBuildFile; fileRef = F808000010000000000009; };
 /* End PBXBuildFile section */
 
@@ -2901,6 +2905,10 @@
 		F808000010000000000005 /* Keyboard-Mappings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyboard-Mappings.plist"; sourceTree = "<group>"; };
 		F808000010000000000006 /* Controller-Mappings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Mappings.plist"; sourceTree = "<group>"; };
 		F808000010000000000007 /* Controller-Preferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Preferences.plist"; sourceTree = "<group>"; };
+		F80800001000000000001B /* controller_pico8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controller_pico8.png; sourceTree = "<group>"; };
+		F80800001000000000001C /* controller_pico8_mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controller_pico8_mask.png; sourceTree = "<group>"; };
+		F80800001000000000001F /* controller_pico8@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "controller_pico8@2x.png"; sourceTree = "<group>"; };
+		F808000010000000000020 /* controller_pico8_mask@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "controller_pico8_mask@2x.png"; sourceTree = "<group>"; };
 		F808000010000000000009 /* PICO8.oesystemplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PICO8.oesystemplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -5799,6 +5807,10 @@
 				F808000010000000000005 /* Keyboard-Mappings.plist */,
 				F808000010000000000006 /* Controller-Mappings.plist */,
 				F808000010000000000007 /* Controller-Preferences.plist */,
+				F80800001000000000001B /* controller_pico8.png */,
+				F80800001000000000001C /* controller_pico8_mask.png */,
+				F80800001000000000001F /* controller_pico8@2x.png */,
+				F808000010000000000020 /* controller_pico8_mask@2x.png */,
 			);
 			path = PICO8;
 			sourceTree = "<group>";
@@ -7280,6 +7292,10 @@
 				F808000010000000000014 /* Keyboard-Mappings.plist in Resources */,
 				F808000010000000000015 /* Controller-Mappings.plist in Resources */,
 				F808000010000000000016 /* Controller-Preferences.plist in Resources */,
+				F80800001000000000001D /* controller_pico8.png in Resources */,
+				F80800001000000000001E /* controller_pico8_mask.png in Resources */,
+				F808000010000000000021 /* controller_pico8@2x.png in Resources */,
+				F808000010000000000022 /* controller_pico8_mask@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
