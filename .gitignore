@@ -20,3 +20,7 @@ profile
 icon?
 
 **/.claude/settings.local.json
+
+# FAKE08 build output
+FAKE08/build/
+FAKE08/FAKE08.oecoreplugin/

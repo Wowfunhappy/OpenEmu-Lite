@@ -13,3 +13,6 @@
 [submodule "Nestopia"]
 	path = Nestopia
 	url = https://github.com/Wowfunhappy/Nestopia-Core.git
+[submodule "FAKE08/fake-08"]
+	path = FAKE08/fake-08
+	url = https://github.com/jtothebell/fake-08.git

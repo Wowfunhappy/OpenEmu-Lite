@@ -115,6 +115,28 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>p8</string>
+				<string>p8.png</string>
+				<string>png</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenEmuGame.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>PICO-8 Game</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>NSDocumentClass</key>
+			<string>OEGameDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>nes</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>

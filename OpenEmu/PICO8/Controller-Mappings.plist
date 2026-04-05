@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>OEControllerMicrosoftXbox360</key>
+	<dict>
+		<key>OEPICO8ButtonUp</key>
+		<string>OEControllerMicrosoftXbox360DPadUp</string>
+		<key>OEPICO8ButtonDown</key>
+		<string>OEControllerMicrosoftXbox360DPadDown</string>
+		<key>OEPICO8ButtonLeft</key>
+		<string>OEControllerMicrosoftXbox360DPadLeft</string>
+		<key>OEPICO8ButtonRight</key>
+		<string>OEControllerMicrosoftXbox360DPadRight</string>
+		<key>OEPICO8ButtonO</key>
+		<string>OEControllerMicrosoftXbox360ButtonA</string>
+		<key>OEPICO8ButtonX</key>
+		<string>OEControllerMicrosoftXbox360ButtonX</string>
+		<key>OEPICO8ButtonPause</key>
+		<string>OEControllerMicrosoftXbox360ButtonStart</string>
+	</dict>
+	<key>OEControllerSonyPS3Sixaxis</key>
+	<dict>
+		<key>OEPICO8ButtonUp</key>
+		<string>OEControllerSonyPS3SixaxisDPadUp</string>
+		<key>OEPICO8ButtonDown</key>
+		<string>OEControllerSonyPS3SixaxisDPadDown</string>
+		<key>OEPICO8ButtonLeft</key>
+		<string>OEControllerSonyPS3SixaxisDPadLeft</string>
+		<key>OEPICO8ButtonRight</key>
+		<string>OEControllerSonyPS3SixaxisDPadRight</string>
+		<key>OEPICO8ButtonO</key>
+		<string>OEControllerSonyPS3SixaxisButtonCross</string>
+		<key>OEPICO8ButtonX</key>
+		<string>OEControllerSonyPS3SixaxisButtonSquare</string>
+		<key>OEPICO8ButtonPause</key>
+		<string>OEControllerSonyPS3SixaxisButtonStart</string>
+	</dict>
+	<key>OEControllerSonyPS4Dualshock4</key>
+	<dict>
+		<key>OEPICO8ButtonUp</key>
+		<string>OEControllerSonyPS4Dualshock4DPadUp</string>
+		<key>OEPICO8ButtonDown</key>
+		<string>OEControllerSonyPS4Dualshock4DPadDown</string>
+		<key>OEPICO8ButtonLeft</key>
+		<string>OEControllerSonyPS4Dualshock4DPadLeft</string>
+		<key>OEPICO8ButtonRight</key>
+		<string>OEControllerSonyPS4Dualshock4DPadRight</string>
+		<key>OEPICO8ButtonO</key>
+		<string>OEControllerSonyPS4Dualshock4ButtonCross</string>
+		<key>OEPICO8ButtonX</key>
+		<string>OEControllerSonyPS4Dualshock4ButtonSquare</string>
+		<key>OEPICO8ButtonPause</key>
+		<string>OEControllerSonyPS4Dualshock4ButtonOptions</string>
+	</dict>
+</dict>
+</plist>

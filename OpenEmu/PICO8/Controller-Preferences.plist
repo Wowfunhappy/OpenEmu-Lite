@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>OEControllerKeyPositionKey</key>
+	<dict>
+		<key>OEPICO8ButtonUp</key>
+		<string>{178, 172}</string>
+		<key>OEPICO8ButtonDown</key>
+		<string>{178, 134}</string>
+		<key>OEPICO8ButtonLeft</key>
+		<string>{156, 153}</string>
+		<key>OEPICO8ButtonRight</key>
+		<string>{197, 154}</string>
+		<key>OEPICO8ButtonO</key>
+		<string>{300, 166}</string>
+		<key>OEPICO8ButtonX</key>
+		<string>{340, 149}</string>
+		<key>OEPICO8ButtonPause</key>
+		<string>{258, 94}</string>
+	</dict>
+</dict>
+</plist>

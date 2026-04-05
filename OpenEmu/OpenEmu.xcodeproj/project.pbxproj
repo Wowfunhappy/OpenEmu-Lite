@@ -45,6 +45,7 @@
 				8227756F14894A2100B19E27 /* PBXTargetDependency */,
 				820EB7631483FBEF008EC398 /* PBXTargetDependency */,
 				83F3714F140BB17B005A7353 /* PBXTargetDependency */,
+				F808000010000000000018 /* PBXTargetDependency */,
 				83F37151140BB17C005A7353 /* PBXTargetDependency */,
 				83F37149140BB177005A7353 /* PBXTargetDependency */,
 				83F3714D140BB17A005A7353 /* PBXTargetDependency */,
@@ -1065,6 +1066,13 @@
 		BB000001CC00000100000001 /* OERom.m in Sources */ = {isa = PBXBuildFile; fileRef = BB000002CC00000200000002 /* OERom.m */; };
 		BB000003CC00000300000003 /* OESaveState.m in Sources */ = {isa = PBXBuildFile; fileRef = BB000004CC00000400000004 /* OESaveState.m */; };
 		BB000011CC00001100000011 /* OEROMQuickLook.qlgenerator in Copy Files */ = {isa = PBXBuildFile; fileRef = BB000010CC00001000000010 /* OEROMQuickLook.qlgenerator */; };
+		F808000010000000000011 /* OEPICO8SystemResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = F808000010000000000002; };
+		F808000010000000000012 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB; };
+		F808000010000000000013 /* OpenEmuSystem.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6D120C417112E1300E868A8; };
+		F808000010000000000014 /* Keyboard-Mappings.plist in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000005; };
+		F808000010000000000015 /* Controller-Mappings.plist in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000006; };
+		F808000010000000000016 /* Controller-Preferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000007; };
+		F80800001000000000001A /* PICO8.oesystemplugin in Copy System Plugins */ = {isa = PBXBuildFile; fileRef = F808000010000000000009; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1369,6 +1377,13 @@
 			remoteGlobalIDString = FEB6625A187B791800D14713;
 			remoteInfo = MSX;
 		};
+		F808000010000000000019 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA;
+			proxyType = 1;
+			remoteGlobalIDString = F80800001000000000000D;
+			remoteInfo = PICO8;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1458,6 +1473,7 @@
 				948E54111571D78D002D26E0 /* GameBoy.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E54121571D78D002D26E0 /* Genesis.oesystemplugin in Copy System Plugins to App Plugins */,
 				948E54131571D78D002D26E0 /* GameBoy Advance.oesystemplugin in Copy System Plugins to App Plugins */,
+				F80800001000000000001A /* PICO8.oesystemplugin in Copy System Plugins */,
 			);
 			name = "Copy System Plugins to App Plugins";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2878,6 +2894,14 @@
 		BB000004CC00000400000004 /* OESaveState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OESaveState.m; sourceTree = "<group>"; };
 		BB000006CC00000600000006 /* OESaveState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OESaveState.h; sourceTree = "<group>"; };
 		BB000010CC00001000000010 /* OEROMQuickLook.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper.cfbundle; path = OEROMQuickLook.qlgenerator; sourceTree = "<group>"; };
+		F808000010000000000001 /* OEPICO8SystemResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEPICO8SystemResponder.h; sourceTree = "<group>"; };
+		F808000010000000000002 /* OEPICO8SystemResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEPICO8SystemResponder.m; sourceTree = "<group>"; };
+		F808000010000000000003 /* OEPICO8SystemResponderClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEPICO8SystemResponderClient.h; sourceTree = "<group>"; };
+		F808000010000000000004 /* PICO8-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "PICO8-Info.plist"; sourceTree = "<group>"; };
+		F808000010000000000005 /* Keyboard-Mappings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyboard-Mappings.plist"; sourceTree = "<group>"; };
+		F808000010000000000006 /* Controller-Mappings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Mappings.plist"; sourceTree = "<group>"; };
+		F808000010000000000007 /* Controller-Preferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Preferences.plist"; sourceTree = "<group>"; };
+		F808000010000000000009 /* PICO8.oesystemplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PICO8.oesystemplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3275,6 +3299,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F80800001000000000000B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F808000010000000000012 /* Cocoa.framework in Frameworks */,
+				F808000010000000000013 /* OpenEmuSystem.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -3388,6 +3421,7 @@
 				82FA7A500F4B8CE700576F05 /* mGBA.oecoreplugin */,
 				C6480FC113648F670094FA33 /* SuperNES.oesystemplugin */,
 				C6B947AF1364ECA600A425F0 /* GameBoy.oesystemplugin */,
+				F808000010000000000009 /* PICO8.oesystemplugin */,
 				C6B947E61365080B00A425F0 /* Genesis.oesystemplugin */,
 				C646574813771F12002A4F70 /* GameBoy Advance.oesystemplugin */,
 				1415540F1442B3B300A01683 /* N64.oesystemplugin */,
@@ -5592,6 +5626,7 @@
 				94BE9E52171683E000AB08E6 /* ColecoVision */,
 				94A224E51707559100098DA0 /* Computer */,
 				C6B947B11364ECA700A425F0 /* GameBoy */,
+				F808000010000000000008 /* PICO8 */,
 				C646574A13771F12002A4F70 /* GameBoy Advance */,
 				94CEB26F17A84809005A2107 /* GameCube */,
 				822775521489471A00B19E27 /* GameGear */,
@@ -5752,6 +5787,20 @@
 				FEB66278187B812800D14713 /* Controller-Preferences.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F808000010000000000008 /* PICO8 */ = {
+			isa = PBXGroup;
+			children = (
+				F808000010000000000001 /* OEPICO8SystemResponder.h */,
+				F808000010000000000002 /* OEPICO8SystemResponder.m */,
+				F808000010000000000003 /* OEPICO8SystemResponderClient.h */,
+				F808000010000000000004 /* PICO8-Info.plist */,
+				F808000010000000000005 /* Keyboard-Mappings.plist */,
+				F808000010000000000006 /* Controller-Mappings.plist */,
+				F808000010000000000007 /* Controller-Preferences.plist */,
+			);
+			path = PICO8;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -6459,6 +6508,23 @@
 			productReference = FEB6625B187B791800D14713 /* MSX.oesystemplugin */;
 			productType = "com.apple.product-type.bundle";
 		};
+		F80800001000000000000D /* PICO8 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F80800001000000000000E;
+			buildPhases = (
+				F80800001000000000000A /* Sources */,
+				F80800001000000000000B /* Frameworks */,
+				F80800001000000000000C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PICO8;
+			productName = PICO8;
+			productReference = F808000010000000000009;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -6490,6 +6556,7 @@
 			);
 			projectRoot = "";
 			targets = (
+				F80800001000000000000D /* PICO8 */,
 				8D15AC270486D014006FF6A4 /* OpenEmu */,
 				1BEF2A9311682A530090F72B /* OpenEmuHelperApp */,
 				3887A7F51024D1F9000FC4CF /* OESaveStateQLPlugin */,
@@ -7206,6 +7273,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F80800001000000000000C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F808000010000000000014 /* Keyboard-Mappings.plist in Resources */,
+				F808000010000000000015 /* Controller-Mappings.plist in Resources */,
+				F808000010000000000016 /* Controller-Preferences.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -7745,6 +7822,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F80800001000000000000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F808000010000000000011 /* OEPICO8SystemResponder.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -7947,6 +8032,11 @@
 			isa = PBXTargetDependency;
 			target = FEB6625A187B791800D14713 /* MSX */;
 			targetProxy = FE6DEA64187E88DD00EFA21E /* PBXContainerItemProxy */;
+		};
+		F808000010000000000018 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F80800001000000000000D;
+			targetProxy = F808000010000000000019;
 		};
 /* End PBXTargetDependency section */
 
@@ -10302,6 +10392,49 @@
 			};
 			name = Release;
 		};
+		F80800001000000000000F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				INFOPLIST_FILE = "PICO8/PICO8-Info.plist";
+				INSTALL_PATH = "\"$$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems\"";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
+				WRAPPER_EXTENSION = oesystemplugin;
+			};
+			name = Debug;
+		};
+		F808000010000000000010 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				INFOPLIST_FILE = "PICO8/PICO8-Info.plist";
+				INSTALL_PATH = "\"$$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems\"";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
+				WRAPPER_EXTENSION = oesystemplugin;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -10724,6 +10857,15 @@
 			buildConfigurations = (
 				FEB66266187B791800D14713 /* Debug */,
 				FEB66267187B791800D14713 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F80800001000000000000E /* Build configuration list for PBXNativeTarget "PICO8" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F80800001000000000000F /* Debug */,
+				F808000010000000000010 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1217,7 +1217,9 @@ typedef enum : NSUInteger
          }];
     };
 
-    if([[[_gameCoreManager plugin] bundleIdentifier] isEqualToString:[state coreIdentifier]])
+    NSString *currentCore = [[_gameCoreManager plugin] bundleIdentifier];
+    NSString *stateCore = [state coreIdentifier];
+    if([currentCore isEqualToString:stateCore])
     {
         loadState();
         return;

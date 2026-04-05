@@ -15,12 +15,41 @@
     {
         rom->_url = [url URLByStandardizingPath];
         rom->_name = [[url lastPathComponent] stringByDeletingPathExtension];
+        // Strip additional extension for compound types like .p8.png
+        if([[rom->_name pathExtension] length] > 0 && [[rom->_name pathExtension] length] <= 4)
+        {
+            NSString *possibleCompound = [NSString stringWithFormat:@"%@.%@",
+                [rom->_name pathExtension], [[url pathExtension] lowercaseString]];
+            // Only strip if this looks like a known compound extension
+            if([possibleCompound isEqualToString:@"p8.png"])
+                rom->_name = [rom->_name stringByDeletingPathExtension];
+        }
 
         // Identify system by file extension
+        // Check compound extensions first (e.g. "p8.png"), then simple extension
+        NSString *filename = [[url lastPathComponent] lowercaseString];
         NSString *ext = [[url pathExtension] lowercaseString];
         for(OESystemPlugin *plugin in [OESystemPlugin allPlugins])
         {
-            if([[plugin supportedTypeExtensions] containsObject:ext])
+            BOOL matched = NO;
+            for(NSString *suffix in [plugin supportedTypeExtensions])
+            {
+                if([suffix rangeOfString:@"."].location != NSNotFound)
+                {
+                    // Compound extension: check if filename ends with it
+                    if([filename hasSuffix:suffix])
+                    {
+                        matched = YES;
+                        break;
+                    }
+                }
+                else if([ext isEqualToString:suffix])
+                {
+                    matched = YES;
+                    break;
+                }
+            }
+            if(matched)
             {
                 rom->_systemPlugin = plugin;
                 break;
