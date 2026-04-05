@@ -138,6 +138,40 @@ static const int PicoScreenHeight = 128;
     return YES;
 }
 
+// Lua hook: periodically checks if a reset was requested.
+// This allows "Reset Console" to break out of infinite loops caused by
+// corrupt save states or buggy carts.
+static volatile BOOL *s_resetFlag = NULL;
+static void luaResetHook(lua_State *L, lua_Debug *ar) {
+    if (s_resetFlag && *s_resetFlag) {
+        luaL_error(L, "reset requested");
+    }
+}
+
+// SIGSEGV/SIGBUS recovery for corrupt save states.
+// If Step() dereferences corrupt Lua data, we catch the signal and
+// recover via longjmp instead of crashing.
+#include <signal.h>
+#include <setjmp.h>
+static sigjmp_buf s_crashRecovery;
+static volatile sig_atomic_t s_crashProtectionActive = 0;
+static struct sigaction s_oldSIGSEGV, s_oldSIGBUS;
+
+static void crashHandler(int sig) {
+    if (s_crashProtectionActive) {
+        s_crashProtectionActive = 0;
+        siglongjmp(s_crashRecovery, sig);
+    }
+    // Not our crash — forward to previous handler
+    struct sigaction *old = (sig == SIGSEGV) ? &s_oldSIGSEGV : &s_oldSIGBUS;
+    if (old->sa_handler != SIG_DFL && old->sa_handler != SIG_IGN) {
+        old->sa_handler(sig);
+    } else {
+        signal(sig, SIG_DFL);
+        raise(sig);
+    }
+}
+
 - (void)executeFrame
 {
     // Process deferred reset on the emulation thread
@@ -146,10 +180,42 @@ static const int PicoScreenHeight = 128;
         _vm->HardReset(_romPath);
     }
 
-    // Feed input state to the host before stepping
+    // Install reset hook so corrupt states can't freeze permanently
+    s_resetFlag = &_resetQueued;
+    lua_State *L = _vm->getLuaState();
+    if (L) lua_sethook(L, luaResetHook, LUA_MASKCOUNT, 10000);
+
+    // Feed input state to the host before stepping.
     oeSetInputState(_kDown, _kHeld, 0, 0, 0);
 
-    _vm->Step();
+    // Protect Step() against SIGSEGV/SIGBUS from corrupt Lua state.
+    // If a crash occurs, recover by doing a hard reset.
+    struct sigaction sa = {};
+    sa.sa_handler = crashHandler;
+    sa.sa_flags = 0;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGSEGV, &sa, &s_oldSIGSEGV);
+    sigaction(SIGBUS, &sa, &s_oldSIGBUS);
+
+    s_crashProtectionActive = 1;
+    int crashed = sigsetjmp(s_crashRecovery, 1);
+    if (crashed) {
+        // Crashed inside Step() — recover with a hard reset
+        NSLog(@"PICO-8: Caught signal %d in Step(), performing hard reset", crashed);
+        _vm->HardReset(_romPath);
+        // Restore default signal handlers
+        sigaction(SIGSEGV, &s_oldSIGSEGV, NULL);
+        sigaction(SIGBUS, &s_oldSIGBUS, NULL);
+    } else {
+        _vm->Step();
+        s_crashProtectionActive = 0;
+        sigaction(SIGSEGV, &s_oldSIGSEGV, NULL);
+        sigaction(SIGBUS, &s_oldSIGBUS, NULL);
+    }
+
+    // Remove hook after normal execution
+    L = _vm->getLuaState();
+    if (L) lua_sethook(L, NULL, 0, 0);
 
     // Check for pending save state load (deferred from loadStateFromFileAtPath)
     // This runs on the emulation thread, after Step() has loaded the cart on the first frame.
@@ -380,16 +446,22 @@ static const int PicoScreenHeight = 128;
 
     NSData *stateData = [NSData dataWithContentsOfFile:fileName];
     if (!stateData || [stateData length] < 8) {
+        NSLog(@"PICO-8: Save state too small or unreadable, ignoring");
+        return;
     }
 
     const char *data = (const char *)[stateData bytes];
     size_t total = [stateData length];
 
     if (data[0] != 'f' || data[1] != '8') {
+        NSLog(@"PICO-8: Save state has bad magic, ignoring");
+        return;
     }
 
     uint8_t version = data[3];
     if (version != 11) {
+        NSLog(@"PICO-8: Save state version %d != 11, ignoring", version);
+        return;
     }
 
     size_t offset = 4;
@@ -403,6 +475,8 @@ static const int PicoScreenHeight = 128;
     offset += sizeof(void *);
 
     if (savedBase != lua_arena_base()) {
+        NSLog(@"PICO-8: Save state arena base mismatch, ignoring");
+        return;
     }
 
     // Read pointer offset table
@@ -422,30 +496,43 @@ static const int PicoScreenHeight = 128;
     size_t expectedSize = lua_arena_size() + sizeof(PicoRam) + sizeof(ptrdiff_t) + sizeof(audioState_t);
 
     if (payloadSize != expectedSize) {
+        NSLog(@"PICO-8: Save state payload size %zu != expected %zu, ignoring", payloadSize, expectedSize);
+        return;
     }
 
     char *payload = (char *)malloc(payloadSize);
     uLongf destLen = payloadSize;
     int zret = uncompress((Bytef *)payload, &destLen, (const Bytef *)(data + offset), compSize);
     if (zret != Z_OK || destLen != payloadSize) {
+        NSLog(@"PICO-8: Save state decompression failed (zret=%d), ignoring", zret);
         free(payload);
+        return;
     }
 
     size_t arenaSize = lua_arena_size();
-    // Stop GC before overwriting the arena
-    lua_gc(_vm->getLuaState(), LUA_GCSTOP, 0);
-    // Restore arena — this overwrites EVERYTHING including the allocator's
-    // free list, which is correct because the saved free list matches the
-    // saved arena contents exactly.
-    memcpy(lua_arena_base(), payload, arenaSize);
 
-    // Restore PicoRam (before Lua fixup since setLuaState needs _memory valid)
-    memcpy(_memory->data, payload + arenaSize, sizeof(PicoRam));
-
-    // Restore lua_State pointer
+    // Validate lua_State offset before touching the arena
     ptrdiff_t luaStateOffset;
     memcpy(&luaStateOffset, payload + arenaSize + sizeof(PicoRam), sizeof(ptrdiff_t));
+    if (luaStateOffset < 0 || (size_t)luaStateOffset >= arenaSize) {
+        NSLog(@"PICO-8: Save state lua_State offset %td out of arena bounds, ignoring", luaStateOffset);
+        free(payload);
+        return;
+    }
+
+    // Stop GC before overwriting the arena
+    lua_gc(_vm->getLuaState(), LUA_GCSTOP, 0);
+
+    // Restore arena
+    memcpy(lua_arena_base(), payload, arenaSize);
+
+    // Restore PicoRam
+    memcpy(_memory->data, payload + arenaSize, sizeof(PicoRam));
+
+    // Compute restored lua_State pointer
     lua_State *restoredL = (lua_State *)((char *)lua_arena_base() + luaStateOffset);
+
+    // Apply pointer fixup
     ptrdiff_t delta = (char *)lua_arena_alloc - (char *)savedRef;
     if (delta != 0 && ptrOffsets && numOffsets > 0) {
         // Apply precise offset-based fixup (only at struct-walk-identified locations)
@@ -470,6 +557,25 @@ static const int PicoScreenHeight = 128;
 
     // Restart GC
     lua_gc(_vm->getLuaState(), LUA_GCRESTART, 0);
+
+    // Dismiss the in-game pause menu if it was active when the state was saved,
+    // so it can't get out of sync with the Pause Emulation menu item.
+    if (_vm->IsPaused()) {
+        _kDown |= P8_KEY_PAUSE;
+        _kHeld |= P8_KEY_PAUSE;
+    }
+}
+
+#pragma mark - Pause
+
+- (void)setPauseEmulation:(BOOL)flag
+{
+    // Toggle PICO-8's in-game pause menu instead of freezing emulation.
+    // The VM must keep running so the pause menu can render.
+    [self didPushPICO8Button:OEPICO8ButtonPause];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self didReleasePICO8Button:OEPICO8ButtonPause];
+    });
 }
 
 #pragma mark - Input
