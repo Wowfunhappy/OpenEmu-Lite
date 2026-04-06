@@ -792,7 +792,11 @@ typedef enum : NSUInteger
     {
         [_gameCoreManager resetEmulationWithCompletionHandler:
          ^{
-             [self setEmulationPaused:NO];
+             // Force status to playing without going through setPauseEmulation:,
+             // which would send a pause button press to the freshly reset core.
+             [self disableOSSleep];
+             _lastPlayStartDate = [NSDate date];
+             _emulationStatus = OEEmulationStatusPlaying;
          }];
     }
 }
@@ -1046,8 +1050,6 @@ typedef enum : NSUInteger
     if(![self supportsSaveStates])
         return;
     
-    BOOL didPauseEmulation = [self OE_pauseEmulationIfNeeded];
-
     NSInteger   saveGameNo    = 1;
     // TODO: properly format date
     NSDate *date = [NSDate date];
@@ -1061,12 +1063,8 @@ typedef enum : NSUInteger
      {
          if(result == NSAlertDefaultReturn)
          {
-             [self OE_saveStateWithName:[alert stringValue] completionHandler:
-              ^{
-                  if(didPauseEmulation) [self setEmulationPaused:NO];
-              }];
+             [self OE_saveStateWithName:[alert stringValue] completionHandler:nil];
          }
-         else if(didPauseEmulation) [self setEmulationPaused:NO];
      }];
 
     [alert runModal];
@@ -1081,11 +1079,9 @@ typedef enum : NSUInteger
         slot = [sender tag];
 
     NSString *name = [OESaveState nameOfQuickSaveInSlot:slot];
-    BOOL didPauseEmulation = [self OE_pauseEmulationIfNeeded];
 
     [self OE_saveStateWithName:name completionHandler:
      ^{
-         if(didPauseEmulation) [self setEmulationPaused:NO];
          [[[self gameViewController] gameView] showQuickSaveNotification];
     }];
 }
@@ -1159,9 +1155,6 @@ typedef enum : NSUInteger
 
 - (void)loadState:(id)sender;
 {
-    // calling pauseGame here because it might need some time to execute
-    [self OE_pauseEmulationIfNeeded];
-
     OESaveState *state = nil;
     if([sender isKindOfClass:[OESaveState class]])
         state = sender;
@@ -1212,8 +1205,6 @@ typedef enum : NSUInteger
                      [_gameSystemResponder releaseEmulatorKey:sysKey];
                  }
              }
-
-             [self setEmulationPaused:NO];
          }];
     };
 

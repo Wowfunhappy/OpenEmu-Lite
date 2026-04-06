@@ -26,6 +26,8 @@
 	<string>Copyright © 2024 OpenEmu Team. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string>OESystemController</string>
+	<key>OESystemIcon</key>
+	<string>pico8_library</string>
 	<key>OESystemName</key>
 	<string>PICO-8</string>
 	<key>OESystemIdentifier</key>
@@ -79,14 +81,6 @@
 				<string>X</string>
 				<key>OEControlListKeyNameKey</key>
 				<string>OEPICO8ButtonX</string>
-			</dict>
-		</array>
-		<array>
-			<dict>
-				<key>OEControlListKeyLabelKey</key>
-				<string>Pause</string>
-				<key>OEControlListKeyNameKey</key>
-				<string>OEPICO8ButtonPause</string>
 			</dict>
 		</array>
 	</array>

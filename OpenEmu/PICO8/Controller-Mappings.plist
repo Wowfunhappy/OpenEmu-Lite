@@ -16,8 +16,6 @@
 		<string>OEControllerMicrosoftXbox360ButtonA</string>
 		<key>OEPICO8ButtonX</key>
 		<string>OEControllerMicrosoftXbox360ButtonX</string>
-		<key>OEPICO8ButtonPause</key>
-		<string>OEControllerMicrosoftXbox360ButtonStart</string>
 	</dict>
 	<key>OEControllerSonyPS3Sixaxis</key>
 	<dict>
@@ -33,8 +31,6 @@
 		<string>OEControllerSonyPS3SixaxisButtonCross</string>
 		<key>OEPICO8ButtonX</key>
 		<string>OEControllerSonyPS3SixaxisButtonSquare</string>
-		<key>OEPICO8ButtonPause</key>
-		<string>OEControllerSonyPS3SixaxisButtonStart</string>
 	</dict>
 	<key>OEControllerSonyPS4Dualshock4</key>
 	<dict>
@@ -50,8 +46,6 @@
 		<string>OEControllerSonyPS4Dualshock4ButtonCross</string>
 		<key>OEPICO8ButtonX</key>
 		<string>OEControllerSonyPS4Dualshock4ButtonSquare</string>
-		<key>OEPICO8ButtonPause</key>
-		<string>OEControllerSonyPS4Dualshock4ButtonOptions</string>
 	</dict>
 </dict>
 </plist>

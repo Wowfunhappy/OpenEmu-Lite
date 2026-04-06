@@ -9,19 +9,17 @@
 	<key>OEControllerKeyPositionKey</key>
 	<dict>
 		<key>OEPICO8ButtonUp</key>
-		<string>{117, 260}</string>
+		<string>{117, 332}</string>
 		<key>OEPICO8ButtonDown</key>
-		<string>{118, 197}</string>
+		<string>{118, 269}</string>
 		<key>OEPICO8ButtonLeft</key>
-		<string>{85, 228}</string>
+		<string>{85, 300}</string>
 		<key>OEPICO8ButtonRight</key>
-		<string>{149, 228}</string>
+		<string>{149, 300}</string>
 		<key>OEPICO8ButtonO</key>
-		<string>{349, 206}</string>
+		<string>{349, 278}</string>
 		<key>OEPICO8ButtonX</key>
-		<string>{407, 240}</string>
-		<key>OEPICO8ButtonPause</key>
-		<string>{250, 130}</string>
+		<string>{407, 312}</string>
 	</dict>
 </dict>
 </plist>

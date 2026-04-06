@@ -1076,6 +1076,7 @@
 		F80800001000000000001E /* controller_pico8_mask.png in Resources */ = {isa = PBXBuildFile; fileRef = F80800001000000000001C; };
 		F808000010000000000021 /* controller_pico8@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F80800001000000000001F; };
 		F808000010000000000022 /* controller_pico8_mask@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000020; };
+		F808000010000000000023 /* pico8_library.png in Resources */ = {isa = PBXBuildFile; fileRef = F808000010000000000024; };
 		F80800001000000000001A /* PICO8.oesystemplugin in Copy System Plugins */ = {isa = PBXBuildFile; fileRef = F808000010000000000009; };
 /* End PBXBuildFile section */
 
@@ -2909,6 +2910,7 @@
 		F80800001000000000001C /* controller_pico8_mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controller_pico8_mask.png; sourceTree = "<group>"; };
 		F80800001000000000001F /* controller_pico8@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "controller_pico8@2x.png"; sourceTree = "<group>"; };
 		F808000010000000000020 /* controller_pico8_mask@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "controller_pico8_mask@2x.png"; sourceTree = "<group>"; };
+		F808000010000000000024 /* pico8_library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pico8_library.png; sourceTree = "<group>"; };
 		F808000010000000000009 /* PICO8.oesystemplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PICO8.oesystemplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -5811,6 +5813,7 @@
 				F80800001000000000001C /* controller_pico8_mask.png */,
 				F80800001000000000001F /* controller_pico8@2x.png */,
 				F808000010000000000020 /* controller_pico8_mask@2x.png */,
+				F808000010000000000024 /* pico8_library.png */,
 			);
 			path = PICO8;
 			sourceTree = "<group>";
@@ -7296,6 +7299,7 @@
 				F80800001000000000001E /* controller_pico8_mask.png in Resources */,
 				F808000010000000000021 /* controller_pico8@2x.png in Resources */,
 				F808000010000000000022 /* controller_pico8_mask@2x.png in Resources */,
+				F808000010000000000023 /* pico8_library.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

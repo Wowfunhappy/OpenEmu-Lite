@@ -37,11 +37,18 @@
 
 - (void)pressEmulatorKey:(OESystemKey *)aKey
 {
+    if ([aKey key] == OEPICO8ButtonPause) {
+        // Route through the emulation pause toggle so the menu item stays in sync
+        [[self globalEventsHandler] toggleEmulationPaused:self];
+        return;
+    }
     [[self client] didPushPICO8Button:(OEPICO8Button)[aKey key]];
 }
 
 - (void)releaseEmulatorKey:(OESystemKey *)aKey
 {
+    if ([aKey key] == OEPICO8ButtonPause)
+        return;
     [[self client] didReleasePICO8Button:(OEPICO8Button)[aKey key]];
 }
 
