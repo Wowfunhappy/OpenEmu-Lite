@@ -39,6 +39,7 @@
 #include "OEHostHelpers.h"
 #include "LuaArena.h"
 #include "LuaFixup.h"
+#include <dlfcn.h>
 #include <zlib.h>
 
 #define SAMPLERATE 22050
@@ -149,29 +150,6 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
 }
 
 // SIGSEGV/SIGBUS recovery for corrupt save states.
-// If Step() dereferences corrupt Lua data, we catch the signal and
-// recover via longjmp instead of crashing.
-#include <signal.h>
-#include <setjmp.h>
-static sigjmp_buf s_crashRecovery;
-static volatile sig_atomic_t s_crashProtectionActive = 0;
-static struct sigaction s_oldSIGSEGV, s_oldSIGBUS;
-
-static void crashHandler(int sig) {
-    if (s_crashProtectionActive) {
-        s_crashProtectionActive = 0;
-        siglongjmp(s_crashRecovery, sig);
-    }
-    // Not our crash — forward to previous handler
-    struct sigaction *old = (sig == SIGSEGV) ? &s_oldSIGSEGV : &s_oldSIGBUS;
-    if (old->sa_handler != SIG_DFL && old->sa_handler != SIG_IGN) {
-        old->sa_handler(sig);
-    } else {
-        signal(sig, SIG_DFL);
-        raise(sig);
-    }
-}
-
 - (void)executeFrame
 {
     // Process deferred reset on the emulation thread
@@ -180,7 +158,8 @@ static void crashHandler(int sig) {
         _vm->HardReset(_romPath);
     }
 
-    // Install reset hook so corrupt states can't freeze permanently
+    // Install reset hook so corrupt states / infinite loops can't freeze permanently.
+    // The hook checks the reset flag every 10k Lua instructions.
     s_resetFlag = &_resetQueued;
     lua_State *L = _vm->getLuaState();
     if (L) lua_sethook(L, luaResetHook, LUA_MASKCOUNT, 10000);
@@ -188,32 +167,9 @@ static void crashHandler(int sig) {
     // Feed input state to the host before stepping.
     oeSetInputState(_kDown, _kHeld, 0, 0, 0);
 
-    // Protect Step() against SIGSEGV/SIGBUS from corrupt Lua state.
-    // If a crash occurs, recover by doing a hard reset.
-    struct sigaction sa = {};
-    sa.sa_handler = crashHandler;
-    sa.sa_flags = 0;
-    sigemptyset(&sa.sa_mask);
-    sigaction(SIGSEGV, &sa, &s_oldSIGSEGV);
-    sigaction(SIGBUS, &sa, &s_oldSIGBUS);
+    _vm->Step();
 
-    s_crashProtectionActive = 1;
-    int crashed = sigsetjmp(s_crashRecovery, 1);
-    if (crashed) {
-        // Crashed inside Step() — recover with a hard reset
-        NSLog(@"PICO-8: Caught signal %d in Step(), performing hard reset", crashed);
-        _vm->HardReset(_romPath);
-        // Restore default signal handlers
-        sigaction(SIGSEGV, &s_oldSIGSEGV, NULL);
-        sigaction(SIGBUS, &s_oldSIGBUS, NULL);
-    } else {
-        _vm->Step();
-        s_crashProtectionActive = 0;
-        sigaction(SIGSEGV, &s_oldSIGSEGV, NULL);
-        sigaction(SIGBUS, &s_oldSIGBUS, NULL);
-    }
-
-    // Remove hook after normal execution
+    // Remove hook after normal execution (avoid overhead)
     L = _vm->getLuaState();
     if (L) lua_sethook(L, NULL, 0, 0);
 
@@ -355,6 +311,7 @@ static void crashHandler(int sig) {
 
 - (void)saveStateToFileAtPath:(NSString *)fileName completionHandler:(void (^)(BOOL, NSError *))block
 {
+
     // Capture locals to avoid race with stopEmulation on another thread
     Vm *vm = _vm;
     PicoRam *memory = _memory;
@@ -371,8 +328,10 @@ static void crashHandler(int sig) {
         return;
     }
 
-    // Force full GC collection to ensure consistent state
-    lua_gc(L, LUA_GCCOLLECT, 0);
+    // Stop the GC so it doesn't run concurrently while we snapshot the arena.
+    // (A full LUA_GCCOLLECT traverses the entire heap and can crash if called
+    // during shutdown when objects may be in an inconsistent state.)
+    lua_gc(L, LUA_GCSTOP, 0);
 
     size_t arenaSize = lua_arena_size();
     ptrdiff_t luaStateOffset = (char *)L - (char *)arena;
@@ -405,33 +364,36 @@ static void crashHandler(int sig) {
         return;
     }
 
-    // Collect exact offsets of all C function/data pointers in the arena
-    uint32_t *ptrOffsets = (uint32_t *)malloc(65536 * sizeof(uint32_t));
-    size_t numOffsets = lua_collect_ptr_offsets(vm->getLuaState(), ptrOffsets, 65536);
-
+    // The load path uses a brute-force scan to fix ALL code pointers in the
+    // arena, so we don't need the struct-walk offset table. Write an empty
+    // table to keep the file format compatible. (The old lua_collect_ptr_offsets
+    // traversed GC lists and could crash during shutdown.)
     NSMutableData *stateData = [NSMutableData data];
-    char header[4] = {'f', '8', 0, 11}; // version 11 = arena + offset-based fixup
+    char header[4] = {'f', '8', 0, 11}; // version 11
     [stateData appendBytes:header length:4];
     void *base = arena;
     [stateData appendBytes:&base length:sizeof(void *)];
     void *ref = (void *)lua_arena_alloc;
     [stateData appendBytes:&ref length:sizeof(void *)];
-    // Pointer offset table
+    size_t numOffsets = 0;
     [stateData appendBytes:&numOffsets length:sizeof(size_t)];
-    if (numOffsets > 0)
-        [stateData appendBytes:ptrOffsets length:numOffsets * sizeof(uint32_t)];
-    free(ptrOffsets);
     // Compressed payload
     [stateData appendBytes:&payloadSize length:sizeof(size_t)];
     [stateData appendBytes:compressed length:compSize];
     free(compressed);
 
     BOOL success = [stateData writeToFile:fileName atomically:YES];
+
+    // Restart the GC (we stopped it to snapshot the arena)
+    if (vm->getLuaState())
+        lua_gc(vm->getLuaState(), LUA_GCRESTART, 0);
+
     if (block) block(success, nil);
 }
 
 - (void)loadStateFromFileAtPath:(NSString *)fileName completionHandler:(void (^)(BOOL, NSError *))block
 {
+
     // Defer the actual load to the next executeFrame so it happens
     // BEFORE Step() processes the cart, not after.
     _pendingSaveStatePath = [fileName copy];
@@ -532,20 +494,26 @@ static void crashHandler(int sig) {
     // Compute restored lua_State pointer
     lua_State *restoredL = (lua_State *)((char *)lua_arena_base() + luaStateOffset);
 
-    // Apply pointer fixup
+    // Apply pointer fixup: brute-force scan the arena for any pointer-sized
+    // value pointing into the OLD plugin image and shift it by delta.
+    // This fixes ALL stale pointers: C functions, hook functions, dummynode
+    // references, coroutine state, etc. — no struct-walk needed.
     ptrdiff_t delta = (char *)lua_arena_alloc - (char *)savedRef;
-    if (delta != 0 && ptrOffsets && numOffsets > 0) {
-        // Apply precise offset-based fixup (only at struct-walk-identified locations)
-        lua_apply_offset_fixup(ptrOffsets, numOffsets, delta);
+    if (delta != 0) {
+        Dl_info info;
+        if (dladdr((void *)lua_arena_alloc, &info)) {
+            uintptr_t newBase = (uintptr_t)info.dli_fbase;
+            uintptr_t oldBase = newBase - delta;
+            uintptr_t pluginSize = 16 * 1024 * 1024;
 
-        // Also fix dummynode references (single value, safe to brute scan)
-        extern const void *luaT_getdummynode(void);
-        uintptr_t newDummy = (uintptr_t)luaT_getdummynode();
-        uintptr_t oldDummy = newDummy - delta;
-        uintptr_t *scan = (uintptr_t *)lua_arena_base();
-        size_t count = lua_arena_size() / sizeof(uintptr_t);
-        for (size_t i = 0; i < count; i++) {
-            if (scan[i] == oldDummy) scan[i] = newDummy;
+            uintptr_t *scan = (uintptr_t *)lua_arena_base();
+            size_t count = lua_arena_size() / sizeof(uintptr_t);
+            for (size_t i = 0; i < count; i++) {
+                uintptr_t val = scan[i];
+                if (val >= oldBase && val < oldBase + pluginSize) {
+                    scan[i] = val + delta;
+                }
+            }
         }
     }
     _vm->setLuaState(restoredL, 0);
@@ -558,12 +526,11 @@ static void crashHandler(int sig) {
     // Restart GC
     lua_gc(_vm->getLuaState(), LUA_GCRESTART, 0);
 
-    // Dismiss the in-game pause menu if it was active when the state was saved,
-    // so it can't get out of sync with the Pause Emulation menu item.
-    if (_vm->IsPaused()) {
-        _kDown |= P8_KEY_PAUSE;
-        _kHeld |= P8_KEY_PAUSE;
-    }
+    // Clear the pause menu flag so it can't get out of sync with the
+    // Pause Emulation menu item. _pauseMenu is C++ state not included
+    // in the save data, so it can be stale after a restore.
+    _vm->clearPauseMenu();
+
 }
 
 #pragma mark - Pause

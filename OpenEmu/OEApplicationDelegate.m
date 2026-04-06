@@ -26,6 +26,7 @@
 
 #import "OEApplicationDelegate.h"
 
+#import <OpenEmuXPCCommunicator/OEXPCCAgentConfiguration.h>
 #import "OEPlugin.h"
 #import "OECorePlugin.h"
 
@@ -148,6 +149,20 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     [self OE_ensureInitialized];
+
+    // Pre-initialize the XPC agent singleton before any documents open.
+    // Its dispatch_once calls waitUntilExit (which pumps the main run loop),
+    // so opening two documents simultaneously would re-enter dispatch_once
+    // from the same thread and deadlock. Run the init on a background thread
+    // and block here with a semaphore (which does NOT pump the run loop).
+    {
+        dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            [OEXPCCAgentConfiguration defaultConfiguration];
+            dispatch_semaphore_signal(sem);
+        });
+        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    }
 
     DLog();
     //mainWindowController  = [[OEMainWindowController alloc]  initWithWindowNibName:@"MainWindow"];
