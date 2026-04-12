@@ -842,6 +842,14 @@ typedef enum : NSUInteger
 
     [self OE_saveStateWithName:OESaveStateAutosaveName completionHandler:
      ^{
+         // Bump the ROM file's modification date so QuickLook regenerates its thumbnail
+         // from the freshly-written save-state screenshot.
+         NSURL *romURL = [self romFileURL];
+         if(romURL)
+             [[NSFileManager defaultManager] setAttributes:@{NSFileModificationDate: [NSDate date]}
+                                              ofItemAtPath:[romURL path]
+                                                     error:NULL];
+
          _emulationStatus = OEEmulationStatusTerminating;
          // TODO: #567 and #568 need to be fixed first
          //[self OE_removeDeviceNotificationObservers];

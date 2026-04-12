@@ -6,7 +6,6 @@
 
 static NSString *OE_md5ForFileAtURL(NSURL *url);
 static NSImage *OE_screenshotForROMAtURL(NSURL *romURL);
-static NSImage *OE_consoleImageForExtension(NSString *ext);
 static void OE_drawThumbnailWithScreenshot(NSImage *screenshot, NSImage *consoleImage, CGContextRef cgContext, CGSize size);
 
 void CancelThumbnailGeneration(void *thisInterface, QLThumbnailRequestRef thumbnail);
@@ -154,51 +153,6 @@ static NSImage *OE_screenshotForROMAtURL(NSURL *romURL)
     return nil;
 }
 
-#pragma mark - Console Image Lookup
-
-static NSImage *OE_consoleImageForExtension(NSString *ext)
-{
-    // Map file extensions to system plugin names
-    NSDictionary *extToSystem = @{
-        @"smc": @"SuperNES", @"sfc": @"SuperNES",
-        @"nes": @"NES",
-        @"gb": @"GameBoy", @"gbc": @"GameBoy", @"sgb": @"GameBoy",
-        @"gba": @"GameBoy Advance",
-        @"smd": @"Genesis", @"md": @"Genesis", @"gen": @"Genesis",
-        @"nds": @"NDS",
-    };
-
-    NSString *systemName = [extToSystem objectForKey:[ext lowercaseString]];
-    if(!systemName) return nil;
-
-    // Find the app bundle by looking for OpenEmu.app in common locations
-    NSArray *searchPaths = @[
-        @"/Applications/OpenEmu.app",
-        [@"~/Applications/OpenEmu.app" stringByExpandingTildeInPath],
-        [@"~/Desktop/OpenEmu.app" stringByExpandingTildeInPath],
-    ];
-
-    // Also check running app via Launch Services
-    NSString *appPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"org.openemu.OpenEmu"];
-    if(appPath) searchPaths = [@[appPath] arrayByAddingObjectsFromArray:searchPaths];
-
-    NSFileManager *fm = [NSFileManager defaultManager];
-    for(NSString *path in searchPaths) {
-        NSString *pluginPath = [NSString stringWithFormat:@"%@/Contents/PlugIns/Systems/%@.oesystemplugin/Contents/Resources",
-                                path, systemName];
-
-        NSArray *contents = [fm contentsOfDirectoryAtPath:pluginPath error:nil];
-        for(NSString *file in contents) {
-            if([file rangeOfString:@"_library"].location != NSNotFound) {
-                NSImage *img = [[NSImage alloc] initWithContentsOfFile:[pluginPath stringByAppendingPathComponent:file]];
-                if(img) return img;
-            }
-        }
-    }
-
-    return nil;
-}
-
 #pragma mark - Drawing
 
 static void OE_drawThumbnailWithScreenshot(NSImage *screenshot, NSImage *consoleImage, CGContextRef cgContext, CGSize size)
@@ -335,19 +289,18 @@ OSStatus GenerateThumbnailForURL(void *thisInterface, QLThumbnailRequestRef thum
         NSURL *romURL = (__bridge NSURL *)url;
         NSString *ext = [[romURL pathExtension] lowercaseString];
 
-        // For NDS ROMs, always use the game's embedded icon instead of a screenshot
+        // For NDS ROMs, always use the game's embedded icon instead of a screenshot.
+        // For everything else, use a save-state screenshot or fall through to the
+        // system default icon.
         NSImage *screenshot = nil;
         NSImage *consoleImage = nil;
         if([ext isEqualToString:@"nds"]) {
             consoleImage = OE_iconFromNDSROM(romURL);
+            if(!consoleImage) return noErr;
         } else {
             screenshot = OE_screenshotForROMAtURL(romURL);
-            if(!screenshot)
-                consoleImage = OE_consoleImageForExtension(ext);
+            if(!screenshot) return noErr;
         }
-
-        // If we have neither a screenshot nor a console image, let Finder use default icon
-        if(!screenshot && !consoleImage) return noErr;
 
         CGFloat dim = fmin(maxSize.width, maxSize.height);
         CGSize size = CGSizeMake(dim, dim);

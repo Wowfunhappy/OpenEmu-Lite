@@ -42,11 +42,12 @@ should_build() {
 # Clean a single Xcode target from the workspace's DerivedData
 clean_xcode_target() {
     local project="$1" target="$2"
-    local workspace_dd
+    local workspace_dd build_dir
     workspace_dd=$(find "$DERIVED_DATA" -maxdepth 1 -name "OpenEmu-*" -type d -print -quit)
     if [ -n "$workspace_dd" ]; then
+        build_dir="$workspace_dd/Build/Products"
         xcodebuild -project "$project" -target "$target" -configuration Release \
-            -derivedDataPath "$workspace_dd" clean
+            BUILD_DIR="$build_dir" clean
     else
         xcodebuild -project "$project" -target "$target" -configuration Release clean
     fi
