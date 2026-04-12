@@ -1,3 +1,2 @@
 Note to self next time I'm working on this:
-- The GTU filter in the built app bundle is not the same as the one in the repo, MAKE SURE to update the one in the repo.
 - There is some evidence I may have messed up years ago, and the built copy of OpenEmuXPCCommunicator.framework is not the same as the code at https://github.com/Wowfunhappy/OpenEmuXPCCommunicator. If you rebuild this framework, make sure to stress test opening/closing lots of documents.

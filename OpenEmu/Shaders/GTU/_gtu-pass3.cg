@@ -59,7 +59,8 @@ float normalGaussIntegral(float x)
 }
 
 float3 scanlines( float x , float3 c, float2 video_size, float2 output_size){
-   float temp=sqrt(2*pi)*(tvVerticalResolution/video_size.y);
+   float scaleFactor = min(1.0, video_size.y / 240.0);
+   float temp=sqrt(2*pi)*((tvVerticalResolution*scaleFactor)/video_size.y);
 
    float rrr=0.5*(video_size.y/output_size.y);
    float x1=(x+rrr)*temp;
@@ -100,6 +101,8 @@ float4 pass_3(float2 texture_size, float2 video_size, float2 output_size, float2
 
    float range=ceil(0.5+video_size.y/tvVerticalResolution);
    
+   range = FIXNUM;
+
    float i;
 
    if (noScanlines)

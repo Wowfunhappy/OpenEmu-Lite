@@ -72,6 +72,8 @@ float4 pass_2(float2 texture_size, float2 video_size, float2 texCoord, COMPAT_Te
    else
       range=ceil(0.5+video_size.x/signalResolution);
 	  
+	  range = FIXNUM;
+
    float i;
    if(compositeConnection){
       for (i=-range;i<range+2.0;i++){
