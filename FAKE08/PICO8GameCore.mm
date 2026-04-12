@@ -139,13 +139,20 @@ static const int PicoScreenHeight = 128;
     return YES;
 }
 
-// Lua hook: periodically checks if a reset was requested.
-// This allows "Reset Console" to break out of infinite loops caused by
-// corrupt save states or buggy carts.
+// Lua hook: periodically checks if a reset was requested AND enforces a
+// per-frame instruction budget so that infinite loops (e.g. `repeat until
+// false` in carts whose load() fails) cannot hang the emulator.
 static volatile BOOL *s_resetFlag = NULL;
+static int s_instrCount = 0;
+static const int kMaxInstrsPerFrame = 5000000; // ~5M instructions ≈ generous budget
+
 static void luaResetHook(lua_State *L, lua_Debug *ar) {
     if (s_resetFlag && *s_resetFlag) {
         luaL_error(L, "reset requested");
+    }
+    s_instrCount += 10000; // hook fires every 10k instructions
+    if (s_instrCount > kMaxInstrsPerFrame) {
+        luaL_error(L, "frame budget exceeded (infinite loop?)");
     }
 }
 
@@ -159,19 +166,28 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     }
 
     // Install reset hook so corrupt states / infinite loops can't freeze permanently.
-    // The hook checks the reset flag every 10k Lua instructions.
+    // The hook checks the reset flag every 10k Lua instructions and enforces a
+    // per-frame instruction budget.
     s_resetFlag = &_resetQueued;
+    s_instrCount = 0;
     lua_State *L = _vm->getLuaState();
     if (L) lua_sethook(L, luaResetHook, LUA_MASKCOUNT, 10000);
 
     // Feed input state to the host before stepping.
     oeSetInputState(_kDown, _kHeld, 0, 0, 0);
 
-    _vm->Step();
+    bool stepOK = _vm->Step();
 
     // Remove hook after normal execution (avoid overhead)
     L = _vm->getLuaState();
     if (L) lua_sethook(L, NULL, 0, 0);
+
+    if (!stepOK) {
+        lua_getglobal(L, "__z8_last_error");
+        const char *luaErr = lua_isstring(L, -1) ? lua_tostring(L, -1) : "(unknown)";
+        NSLog(@"PICO-8: cart error — %s", luaErr);
+        lua_pop(L, 1);
+    }
 
     // Check for pending save state load (deferred from loadStateFromFileAtPath)
     // This runs on the emulation thread, after Step() has loaded the cart on the first frame.
@@ -198,10 +214,42 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     // Render framebuffer
     uint8_t *picoFb = _vm->GetPicoInteralFb();
     uint8_t *screenPaletteMap = _vm->GetScreenPaletteMap();
+    uint8_t drawMode = _memory->drawState.drawMode;
+
+    // drawMode (poke 0x5f2c) selects which sub-region of the 128x128 framebuffer
+    // is active.  Modes 1-3 use a half/quarter region that must be stretched to
+    // fill the full display; modes 129-135 apply mirror/rotation.
+    int srcW = PicoScreenWidth;
+    int srcH = PicoScreenHeight;
+    bool flipX = false, flipY = false, rotate = false;
+
+    switch (drawMode) {
+        case 1:   srcW = 64; break;
+        case 2:   srcH = 64; break;
+        case 3:   srcW = 64; srcH = 64; break;
+        case 129: flipX = true; break;
+        case 130: flipY = true; break;
+        case 131: flipX = true; flipY = true; break;
+        case 133: rotate = true; break;                    // 90°
+        case 134: flipX = true; flipY = true; break;      // 180° same as double-flip
+        case 135: rotate = true; flipX = true; flipY = true; break; // 270°
+        default:  break;
+    }
 
     for (int y = 0; y < PicoScreenHeight; y++) {
         for (int x = 0; x < PicoScreenWidth; x++) {
-            uint8_t colorIdx = screenPaletteMap[getPixelNibble(x, y, picoFb)] & 0x8f;
+            int sx = x * srcW / PicoScreenWidth;
+            int sy = y * srcH / PicoScreenHeight;
+
+            if (flipX) sx = srcW - 1 - sx;
+            if (flipY) sy = srcH - 1 - sy;
+            if (rotate) {
+                int tmp = sx;
+                sx = sy;
+                sy = srcW - 1 - tmp;
+            }
+
+            uint8_t colorIdx = screenPaletteMap[getPixelNibble(sx, sy, picoFb)] & 0x8f;
             _videoBuffer[y * PicoScreenWidth + x] = _rgbaColors[colorIdx];
         }
     }
@@ -277,7 +325,7 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
 
 - (OEIntSize)aspectSize
 {
-    return OEIntSizeMake(1, 1);
+    return OEIntSizeMake(PicoScreenWidth, PicoScreenHeight);
 }
 
 - (GLenum)pixelFormat
@@ -369,7 +417,7 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     // table to keep the file format compatible. (The old lua_collect_ptr_offsets
     // traversed GC lists and could crash during shutdown.)
     NSMutableData *stateData = [NSMutableData data];
-    char header[4] = {'f', '8', 0, 11}; // version 11
+    char header[4] = {'f', '8', 0, 12}; // version 12
     [stateData appendBytes:header length:4];
     void *base = arena;
     [stateData appendBytes:&base length:sizeof(void *)];
@@ -421,8 +469,8 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     }
 
     uint8_t version = data[3];
-    if (version != 11) {
-        NSLog(@"PICO-8: Save state version %d != 11, ignoring", version);
+    if (version != 12) {
+        NSLog(@"PICO-8: Save state version %d != 12, ignoring", version);
         return;
     }
 
