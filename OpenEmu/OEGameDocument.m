@@ -638,6 +638,7 @@ typedef enum : NSUInteger
     }
 
     [_gameCoreManager setPauseEmulation:pauseEmulation];
+    [self OE_updateGameViewColorTint];
 }
 
 // switchCore:: expects sender or [sender representedObject] to be an OECorePlugin object and prompts the user for confirmation
@@ -803,6 +804,14 @@ typedef enum : NSUInteger
 {
     _isFastForwarding = !_isFastForwarding;
     [_gameCoreManager fastForward:_isFastForwarding];
+    [self OE_updateGameViewColorTint];
+}
+
+- (void)OE_updateGameViewColorTint
+{
+    OEGameView *gameView = [[self gameViewController] gameView];
+    [gameView setFastForwarding:_isFastForwarding];
+    [gameView setShowsPausedTint:(_emulationStatus == OEEmulationStatusPaused)];
 }
 
 - (void)resetEmulation:(id)sender;
@@ -816,6 +825,7 @@ typedef enum : NSUInteger
              [self disableOSSleep];
              _lastPlayStartDate = [NSDate date];
              _emulationStatus = OEEmulationStatusPlaying;
+             [self OE_updateGameViewColorTint];
          }];
     }
 }

@@ -559,6 +559,36 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
             }
         }
 
+        if(_fastForwarding || _showsPausedTint)
+        {
+            glDisable(GL_TEXTURE_RECTANGLE_EXT);
+            glDisable(GL_TEXTURE_2D);
+
+            glEnable(GL_BLEND);
+
+            if(_fastForwarding)
+            {
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glColor4f(0.35f, 0.90f, 0.85f, 0.30f);
+            }
+            else
+            {
+                glBlendFunc(GL_DST_COLOR, GL_ZERO);
+                glColor4f(0.85f, 0.75f, 0.30f, 1.0f);
+            }
+
+            glBegin(GL_QUADS);
+            glVertex2f(-1.0f, -1.0f);
+            glVertex2f(-1.0f,  1.0f);
+            glVertex2f( 1.0f,  1.0f);
+            glVertex2f( 1.0f, -1.0f);
+            glEnd();
+
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            glDisable(GL_BLEND);
+            glEnable(GL_TEXTURE_RECTANGLE_EXT);
+        }
+
         if([_gameServer hasClients])
             [_gameServer publishFrameTexture:_gameTexture textureTarget:GL_TEXTURE_RECTANGLE_ARB imageRegion:textureRect textureDimensions:textureRect.size flipped:NO];
 

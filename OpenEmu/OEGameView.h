@@ -46,6 +46,9 @@ extern NSString * const OEScreenshotAspectRationCorrectionDisabled;
 @property(nonatomic, copy) NSString *filterName;
 @property(nonatomic, copy) NSString *gameTitle;
 @property(nonatomic, copy) NSColor  *backgroundColor;
+
+@property(nonatomic) BOOL fastForwarding;
+@property(nonatomic) BOOL showsPausedTint;
 // Screenshots
 /* Returns a screenshot containing the game viewport with its current size in the window and filters */
 - (NSImage *)screenshot;
