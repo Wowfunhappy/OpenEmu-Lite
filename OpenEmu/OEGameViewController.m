@@ -55,6 +55,7 @@
 #import "OECompositionPlugin.h"
 #import "OEShaderPlugin.h"
 #import "OEGameIntegralScalingDelegate.h"
+#import "OEPopoutGameWindowController.h"
 #import "OECheats.h"
 BOOL extraMenuItemsSetupDone; //Warning! Global for app! (Sorry!)
 
@@ -347,32 +348,22 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [item setSubmenu:filterMenu];
     
     // Setup integral scaling
-    id<OEGameIntegralScalingDelegate> integralScalingDelegate = [self integralScalingDelegate];
-    const BOOL hasSubmenu = [integralScalingDelegate shouldAllowIntegralScaling] && [integralScalingDelegate respondsToSelector:@selector(maximumIntegralScale)];
-    
+    // The scale items themselves are built on demand by OEIntegralScaleMenuDelegate
+    // so that the submenu always reflects the current front document (available
+    // scales) and the window's current size (checkmark), rather than the single
+    // document that happened to be frontmost when this menu was first created.
     NSMenu *scaleMenu = [NSMenu new];
     [scaleMenu setTitle:OELocalizedString(@"Select Scale", @"")];
+    [scaleMenu setDelegate:[OEIntegralScaleMenuDelegate sharedDelegate]];
     item = [NSMenuItem new];
     [item setTitle:[scaleMenu title]];
+    // The action lets the front game window controller enable/disable this parent
+    // item through responder-chain validation (disabled in full screen, or when
+    // nothing above 1x fits). Clicking it just opens the submenu.
+    [item setAction:@selector(OE_selectScaleParentMenuItem:)];
     [viewMenu addItem:item];
     [item setSubmenu:scaleMenu];
-    
-    if(hasSubmenu)
-    {
-        unsigned int maxScale = [integralScalingDelegate maximumIntegralScale];
-        unsigned int currentScale = [integralScalingDelegate currentIntegralScale];
-        
-        for(unsigned int scale = 1; scale <= maxScale; scale++)
-        {
-            NSString *scaleTitle  = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
-            NSMenuItem *scaleItem = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
-            [scaleItem setRepresentedObject:@(scale)];
-            [scaleMenu addItem:scaleItem];
-        }
-    }
-    else
-        [item setEnabled:NO];
-    
+
     extraMenuItemsSetupDone = true;
 }
 

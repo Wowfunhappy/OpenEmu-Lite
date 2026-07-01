@@ -65,6 +65,13 @@ typedef enum
 @end
 
 
+@interface OEPopoutGameWindowController ()
+// Whether the "Select Scale" menu has any meaningful choice to offer for this
+// window. Used both to validate the parent menu item and to populate its submenu.
+- (BOOL)OE_canOfferIntegralScaleChoices;
+@end
+
+
 
 @implementation OEPopoutGameWindowController
 {
@@ -207,6 +214,51 @@ typedef enum
     return ![[self window] isFullScreen];
 }
 
+- (unsigned int)currentExactIntegralScale
+{
+    // Unlike -currentIntegralScale (which returns the last scale that was
+    // explicitly selected and goes stale after a manual resize), this walks the
+    // available scales and reports one only when the window is sized to it
+    // exactly. Returns _OEFitToWindowScale (0) otherwise.
+    if([[self window] isFullScreen])
+        return _OEFitToWindowScale;
+
+    const NSSize       currentSize = [[self window] frame].size;
+    const unsigned int maxScale    = [self maximumIntegralScale];
+
+    for(unsigned int scale = 1; scale <= maxScale; scale++)
+    {
+        const NSSize scaleSize = [self OE_windowSizeForGameViewIntegralScale:scale];
+        if(fabs(scaleSize.width - currentSize.width) < 0.5 && fabs(scaleSize.height - currentSize.height) < 0.5)
+            return scale;
+    }
+
+    return _OEFitToWindowScale;
+}
+
+- (BOOL)OE_canOfferIntegralScaleChoices
+{
+    // There is nothing to choose between when integral scaling is disallowed
+    // (i.e. in full screen) or when the screen is too small to fit anything above
+    // 1x anyway.
+    return [self shouldAllowIntegralScaling] && [self maximumIntegralScale] > 1;
+}
+
+// The "Select Scale" parent item carries this action purely so it participates in
+// responder-chain menu validation (see -validateMenuItem:); it opens its submenu
+// rather than performing anything when clicked.
+- (IBAction)OE_selectScaleParentMenuItem:(id)sender
+{
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    if([menuItem action] == @selector(OE_selectScaleParentMenuItem:))
+        return [self OE_canOfferIntegralScaleChoices];
+
+    return YES;
+}
+
 #pragma mark - Private methods
 
 - (NSSize)OE_windowContentSizeForGameViewIntegralScale:(unsigned int)gameViewIntegralScale
@@ -269,26 +321,12 @@ typedef enum
 
 
 //Wowfunhappy
-//Disabled because it doesn't work properly - Stays checked on manual window resize.
-/*
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-    SEL action = [menuItem action];
-    
-    if(action == @selector(changeIntegralScale:))
-    {
-        NSLog(@"Wowfunhappy Testing: %d", [self currentIntegralScale]);
-        NSLog(@"Wowfunhappy Testing: %d", [[menuItem title] substringFromIndex:1].intValue);
-        if ([[menuItem representedObject] unsignedIntValue] == [self currentIntegralScale]) {
-            [menuItem setState:NSOnState];
-        } else {
-            [menuItem setState:NSOffState];
-        }
-    }
-    
-    return YES;
-}
- */
+// The "Select Scale" checkmark is no longer driven by -validateMenuItem:. That
+// approach stayed checked after a manual window resize because it compared
+// against -currentIntegralScale (the last explicitly-selected scale) rather than
+// the window's actual size. The submenu is now rebuilt on demand by
+// OEIntegralScaleMenuDelegate (see below), which checkmarks a scale only when the
+// window is sized to it exactly via -currentExactIntegralScale.
 
 
 
@@ -471,6 +509,59 @@ typedef enum
 - (void)setScreenshot:(NSImage *)screenshot
 {
     [[self screenshotView] setImage:screenshot];
+}
+
+@end
+
+
+
+@implementation OEIntegralScaleMenuDelegate
+
++ (instancetype)sharedDelegate
+{
+    static OEIntegralScaleMenuDelegate *sharedDelegate = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedDelegate = [[self alloc] init];
+    });
+    return sharedDelegate;
+}
+
+// The frontmost window drives the menu, so switching between documents (which may
+// belong to different systems with different maximum scales) automatically shows
+// the correct set of scales.
+- (OEPopoutGameWindowController *)OE_frontGameWindowController
+{
+    NSWindow *window   = ([NSApp mainWindow] ? : [NSApp keyWindow]);
+    id windowController = [window windowController];
+
+    if([windowController isKindOfClass:[OEPopoutGameWindowController class]])
+        return windowController;
+
+    return nil;
+}
+
+- (void)menuNeedsUpdate:(NSMenu *)menu
+{
+    // Rebuilt every time the submenu opens, so both the available scales and the
+    // checkmark always reflect the current front document and window size.
+    [menu removeAllItems];
+
+    OEPopoutGameWindowController *controller = [self OE_frontGameWindowController];
+    if(controller == nil || ![controller OE_canOfferIntegralScaleChoices])
+        return;
+
+    const unsigned int maxScale     = [controller maximumIntegralScale];
+    const unsigned int currentScale = [controller currentExactIntegralScale];
+
+    for(unsigned int scale = 1; scale <= maxScale; scale++)
+    {
+        NSString   *scaleTitle = [NSString stringWithFormat:OELocalizedString(@"%ux", @"Integral scale menu item title"), scale];
+        NSMenuItem *scaleItem  = [[NSMenuItem alloc] initWithTitle:scaleTitle action:@selector(changeIntegralScale:) keyEquivalent:@""];
+        [scaleItem setRepresentedObject:@(scale)];
+        [scaleItem setState:(scale == currentScale ? NSOnState : NSOffState)];
+        [menu addItem:scaleItem];
+    }
 }
 
 @end

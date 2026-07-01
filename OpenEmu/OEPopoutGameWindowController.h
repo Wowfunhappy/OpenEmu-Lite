@@ -37,4 +37,23 @@
 
 - (IBAction)changeIntegralScale:(id)sender;
 
+// Placeholder action for the "Select Scale" parent menu item so it can be enabled
+// or disabled through responder-chain validation.
+- (IBAction)OE_selectScaleParentMenuItem:(id)sender;
+
+#pragma mark - Integral Scaling
+
+// Returns the exact integer scale the window is currently displayed at, or 0
+// (fit-to-window) if the window is not sized to any exact integer scale.
+- (unsigned int)currentExactIntegralScale;
+
+@end
+
+
+// Menu delegate that keeps the "Select Scale" submenu in sync with the frontmost
+// game window: it populates the scales available for the current front document
+// (which may differ from other open documents) and checkmarks the scale the
+// window is currently displayed at, if any.
+@interface OEIntegralScaleMenuDelegate : NSObject <NSMenuDelegate>
++ (instancetype)sharedDelegate;
 @end
