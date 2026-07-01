@@ -40,6 +40,7 @@
 #include "LuaArena.h"
 #include "LuaFixup.h"
 #include <dlfcn.h>
+#include <mach-o/loader.h>
 #include <zlib.h>
 
 #define SAMPLERATE 22050
@@ -47,6 +48,30 @@
 
 static const int PicoScreenWidth = 128;
 static const int PicoScreenHeight = 128;
+
+// A save state is a raw image of this plugin's Lua heap; restoring it only
+// corrects for ASLR, NOT for changes in the compiled code layout. A state
+// written by a different build of the core therefore cannot be safely restored
+// (its C-function pointers would resolve to the wrong functions and crash). We
+// stamp each state with this build's Mach-O LC_UUID — the linker regenerates it
+// on every relink — and refuse to load a state whose UUID differs.
+static BOOL OEPICO8BuildUUID(uint8_t out[16])
+{
+    memset(out, 0, 16);
+    Dl_info info;
+    if (!dladdr((const void *)lua_arena_alloc, &info) || !info.dli_fbase) return NO;
+    const struct mach_header_64 *mh = (const struct mach_header_64 *)info.dli_fbase;
+    const uint8_t *p = (const uint8_t *)mh + sizeof(struct mach_header_64);
+    for (uint32_t i = 0; i < mh->ncmds; i++) {
+        const struct load_command *lc = (const struct load_command *)p;
+        if (lc->cmd == LC_UUID) {
+            memcpy(out, ((const struct uuid_command *)lc)->uuid, 16);
+            return YES;
+        }
+        p += lc->cmdsize;
+    }
+    return NO;
+}
 
 @interface PICO8GameCore () <OEPICO8SystemResponderClient>
 {
@@ -412,13 +437,16 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
         return;
     }
 
-    // The load path uses a brute-force scan to fix ALL code pointers in the
-    // arena, so we don't need the struct-walk offset table. Write an empty
-    // table to keep the file format compatible. (The old lua_collect_ptr_offsets
-    // traversed GC lists and could crash during shutdown.)
+    // The load path fixes up C pointers by walking the restored object graph
+    // (lua_fixup_arena_pointers), so no offset table is stored here.
+    // Version 14 stores this build's 16-byte Mach-O UUID right after the header
+    // so states from a different core build are rejected on load.
     NSMutableData *stateData = [NSMutableData data];
-    char header[4] = {'f', '8', 0, 12}; // version 12
+    char header[4] = {'f', '8', 0, 14}; // version 14
     [stateData appendBytes:header length:4];
+    uint8_t buildUUID[16];
+    OEPICO8BuildUUID(buildUUID);
+    [stateData appendBytes:buildUUID length:16];
     void *base = arena;
     [stateData appendBytes:&base length:sizeof(void *)];
     void *ref = (void *)lua_arena_alloc;
@@ -469,12 +497,27 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     }
 
     uint8_t version = data[3];
-    if (version != 12) {
-        NSLog(@"PICO-8: Save state version %d != 12, ignoring", version);
+    if (version != 14) {
+        NSLog(@"PICO-8: Save state version %d != 14, ignoring", version);
         return;
     }
 
     size_t offset = 4;
+
+    // Build-id guard: a state written by a different build of the core has a
+    // different code layout, so its captured C pointers cannot be relocated by
+    // an ASLR shift alone. Reject it rather than crash.
+    if (total < offset + 16) {
+        NSLog(@"PICO-8: Save state truncated, ignoring");
+        return;
+    }
+    uint8_t curUUID[16];
+    OEPICO8BuildUUID(curUUID);
+    if (memcmp(data + offset, curUUID, 16) != 0) {
+        NSLog(@"PICO-8: Save state is from a different core build, ignoring");
+        return;
+    }
+    offset += 16;
 
     void *savedBase;
     memcpy(&savedBase, data + offset, sizeof(void *));
@@ -542,26 +585,25 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     // Compute restored lua_State pointer
     lua_State *restoredL = (lua_State *)((char *)lua_arena_base() + luaStateOffset);
 
-    // Apply pointer fixup: brute-force scan the arena for any pointer-sized
-    // value pointing into the OLD plugin image and shift it by delta.
-    // This fixes ALL stale pointers: C functions, hook functions, dummynode
-    // references, coroutine state, etc. — no struct-walk needed.
+    // Apply pointer fixup for ASLR. The plugin is loaded at a different address
+    // each launch, so every C pointer captured in the arena points into the OLD
+    // plugin image and must be shifted by delta. We walk the Lua object graph and
+    // shift only genuine C-pointer fields (never number values), so restoring
+    // cannot corrupt game state. See LuaFixup.c for why a blind memory scan is
+    // unsafe (z8lua numbers can masquerade as in-window pointers).
+    //
+    // NOTE: this only corrects for the ASLR base shift; it assumes the plugin
+    // code LAYOUT is identical to the one that wrote the state. A save from a
+    // different build of the core is rejected earlier via the build-id check, so
+    // we never reach here with a mismatched layout.
     ptrdiff_t delta = (char *)lua_arena_alloc - (char *)savedRef;
     if (delta != 0) {
         Dl_info info;
         if (dladdr((void *)lua_arena_alloc, &info)) {
             uintptr_t newBase = (uintptr_t)info.dli_fbase;
             uintptr_t oldBase = newBase - delta;
-            uintptr_t pluginSize = 16 * 1024 * 1024;
-
-            uintptr_t *scan = (uintptr_t *)lua_arena_base();
-            size_t count = lua_arena_size() / sizeof(uintptr_t);
-            for (size_t i = 0; i < count; i++) {
-                uintptr_t val = scan[i];
-                if (val >= oldBase && val < oldBase + pluginSize) {
-                    scan[i] = val + delta;
-                }
-            }
+            uintptr_t winLo = oldBase, winHi = oldBase + 16 * 1024 * 1024;
+            lua_fixup_arena_pointers(restoredL, delta, winLo, winHi);
         }
     }
     _vm->setLuaState(restoredL, 0);

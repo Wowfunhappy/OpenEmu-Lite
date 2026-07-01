@@ -8,11 +8,13 @@ struct lua_State;
 extern "C" {
 #endif
 
-// Collect offsets within the arena where C function/data pointers are stored.
-size_t lua_collect_ptr_offsets(lua_State *L, uint32_t *out, size_t max_out);
-
-// Apply delta to the pointer at each recorded offset.
-void lua_apply_offset_fixup(const uint32_t *offsets, size_t count, ptrdiff_t delta);
+// Walk the restored Lua object graph and shift every C pointer captured in the
+// arena (light C functions, C-closure functions, dummynode links, allocator/
+// panic hooks) by `delta`. Only genuine pointer fields whose value falls inside
+// the old plugin image range [plugin_lo, plugin_hi) are touched, so number
+// values are never corrupted. Safe to call on a freshly restored arena.
+void lua_fixup_arena_pointers(lua_State *L, ptrdiff_t delta,
+                              uintptr_t plugin_lo, uintptr_t plugin_hi);
 
 #ifdef __cplusplus
 }
