@@ -17,6 +17,7 @@
 				<string>org.openemu.rom.gb</string>
 				<string>org.openemu.rom.gba</string>
 				<string>com.bluezbox.nds</string>
+				<string>org.openemu.rom.pico8</string>
 			</array>
 		</dict>
 	</array>
@@ -84,7 +85,6 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>smd</string>
-					<string>md</string>
 					<string>gen</string>
 				</array>
 			</dict>
@@ -148,6 +148,21 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>nds</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>org.openemu.rom.pico8</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>p8</string>
 				</array>
 			</dict>
 		</dict>
