@@ -2604,6 +2604,11 @@
 		A6F3061018AF3BB7007CF986 /* INWindowButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = INWindowButton.h; sourceTree = "<group>"; };
 		A6F3061118AF3BB7007CF986 /* INWindowButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = INWindowButton.m; sourceTree = "<group>"; };
 		AB095E9C2676D52B00EC2CE8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		FADE000000000000000000A1 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		FADE000000000000000000A2 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		FADE000000000000000000A3 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = pt.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		FADE000000000000000000A4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		FADE000000000000000000A5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		ABAB7EC826780E90006EB243 /* cheats-database.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "cheats-database.xml"; sourceTree = "<group>"; };
 		ABAB7ECB26783A26006EB243 /* _gtu-pass1.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass1.cg; sourceTree = "<group>"; };
 		ABAB7ECC26783A26006EB243 /* _gtu-pass2.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass2.cg; sourceTree = "<group>"; };
@@ -6560,6 +6565,7 @@
 				pt,
 				en,
 				es,
+				fr,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* OpenEmu */;
 			projectDirPath = "";
@@ -8385,6 +8391,11 @@
 			isa = PBXVariantGroup;
 			children = (
 				AB095E9C2676D52B00EC2CE8 /* en */,
+				FADE000000000000000000A1 /* de */,
+				FADE000000000000000000A2 /* es */,
+				FADE000000000000000000A3 /* pt */,
+				FADE000000000000000000A4 /* ru */,
+				FADE000000000000000000A5 /* fr */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
