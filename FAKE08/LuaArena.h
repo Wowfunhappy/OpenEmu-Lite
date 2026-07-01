@@ -8,8 +8,11 @@
 // at a fixed virtual address. This allows save states by simply dumping
 // the entire region to disk and restoring it at the same address.
 
-// Arena size: 4MB (PICO-8 Lua limit is 2MB, plus overhead for allocator metadata)
-#define LUA_ARENA_SIZE (4 * 1024 * 1024)
+// Arena size: 32MB. PICO-8's own Lua limit is 2MB, but eris save-state restore
+// transiently needs the freshly-loaded cart state, the serialized blob, and the
+// unpersisted duplicate live at once, so we give it generous headroom. The arena
+// is MAP_ANON, so unused pages cost no physical memory.
+#define LUA_ARENA_SIZE (32 * 1024 * 1024)
 
 // Fixed virtual address for the arena. Chosen to be in an unused region
 // of the 64-bit address space, far from typical heap/stack/library regions.

@@ -38,9 +38,6 @@
 #include "filehelpers.h"
 #include "OEHostHelpers.h"
 #include "LuaArena.h"
-#include "LuaFixup.h"
-#include <dlfcn.h>
-#include <mach-o/loader.h>
 #include <zlib.h>
 
 #define SAMPLERATE 22050
@@ -48,30 +45,6 @@
 
 static const int PicoScreenWidth = 128;
 static const int PicoScreenHeight = 128;
-
-// A save state is a raw image of this plugin's Lua heap; restoring it only
-// corrects for ASLR, NOT for changes in the compiled code layout. A state
-// written by a different build of the core therefore cannot be safely restored
-// (its C-function pointers would resolve to the wrong functions and crash). We
-// stamp each state with this build's Mach-O LC_UUID — the linker regenerates it
-// on every relink — and refuse to load a state whose UUID differs.
-static BOOL OEPICO8BuildUUID(uint8_t out[16])
-{
-    memset(out, 0, 16);
-    Dl_info info;
-    if (!dladdr((const void *)lua_arena_alloc, &info) || !info.dli_fbase) return NO;
-    const struct mach_header_64 *mh = (const struct mach_header_64 *)info.dli_fbase;
-    const uint8_t *p = (const uint8_t *)mh + sizeof(struct mach_header_64);
-    for (uint32_t i = 0; i < mh->ncmds; i++) {
-        const struct load_command *lc = (const struct load_command *)p;
-        if (lc->cmd == LC_UUID) {
-            memcpy(out, ((const struct uuid_command *)lc)->uuid, 16);
-            return YES;
-        }
-        p += lc->cmdsize;
-    }
-    return NO;
-}
 
 @interface PICO8GameCore () <OEPICO8SystemResponderClient>
 {
@@ -401,22 +374,54 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
         return;
     }
 
-    // Stop the GC so it doesn't run concurrently while we snapshot the arena.
-    // (A full LUA_GCCOLLECT traverses the entire heap and can crash if called
-    // during shutdown when objects may be in an inconsistent state.)
+    // Serialize the full Lua state with eris. Unlike a raw heap image, an eris
+    // blob is a portable object graph: C functions are mapped to stable indices
+    // via the permanents table, so restoring needs NO pointer fixup and works
+    // across ASLR and core rebuilds. The pico-8 RAM and audio-engine state are
+    // plain C structs, saved raw alongside the blob.
+    lua_getglobal(L, "eris");
+    if (lua_type(L, -1) != LUA_TTABLE) {
+        NSLog(@"PICO-8: eris library not available, cannot save state");
+        lua_pop(L, 1);
+        if (block) block(NO, nil);
+        return;
+    }
+    lua_getfield(L, -1, "persist_all");
+    if (lua_type(L, -1) != LUA_TFUNCTION) {
+        lua_pop(L, 2);
+        if (block) block(NO, nil);
+        return;
+    }
+    // Stop the GC across persist for the same reason as unpersist (and to avoid
+    // a collection walking the graph while we serialize it). The resulting blob
+    // string stays referenced on the Lua stack, so restarting the GC before we
+    // read it is safe.
     lua_gc(L, LUA_GCSTOP, 0);
+    int persistRc = lua_pcall(L, 0, 1, 0);
+    lua_gc(L, LUA_GCRESTART, 0);
+    if (persistRc != 0) {
+        NSLog(@"PICO-8: eris persist failed: %s", lua_tostring(L, -1));
+        lua_pop(L, 2);
+        if (block) block(NO, nil);
+        return;
+    }
+    size_t blobLen = 0;
+    const char *blob = lua_tolstring(L, -1, &blobLen);
+    if (!blob || blobLen == 0) {
+        lua_pop(L, 2);
+        if (block) block(NO, nil);
+        return;
+    }
 
-    size_t arenaSize = lua_arena_size();
-    ptrdiff_t luaStateOffset = (char *)L - (char *)arena;
-
-    // Build uncompressed payload: arena + PicoRam + luaStateOffset + audioState
-    size_t payloadSize = arenaSize + sizeof(PicoRam) + sizeof(ptrdiff_t) + sizeof(audioState_t);
+    // Build uncompressed payload: [blobLen][eris blob][PicoRam][audioState]
+    size_t payloadSize = sizeof(size_t) + blobLen + sizeof(PicoRam) + sizeof(audioState_t);
     char *payload = (char *)malloc(payloadSize);
     size_t off = 0;
-    memcpy(payload + off, arena, arenaSize); off += arenaSize;
+    memcpy(payload + off, &blobLen, sizeof(size_t)); off += sizeof(size_t);
+    memcpy(payload + off, blob, blobLen); off += blobLen;
     memcpy(payload + off, memory->data, sizeof(PicoRam)); off += sizeof(PicoRam);
-    memcpy(payload + off, &luaStateOffset, sizeof(ptrdiff_t)); off += sizeof(ptrdiff_t);
     memcpy(payload + off, _audio->getAudioState(), sizeof(audioState_t));
+    lua_pop(L, 2); // eris blob string + eris table
 
     // Compress with zlib
     uLongf compSize = compressBound(payloadSize);
@@ -430,39 +435,15 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
         return;
     }
 
-    // Re-check lua state (might have been destroyed during GC or by quit)
-    if (!vm->getLuaState()) {
-        free(compressed);
-        if (block) block(NO, nil);
-        return;
-    }
-
-    // The load path fixes up C pointers by walking the restored object graph
-    // (lua_fixup_arena_pointers), so no offset table is stored here.
-    // Version 14 stores this build's 16-byte Mach-O UUID right after the header
-    // so states from a different core build are rejected on load.
+    // Header (version 15 = eris) + uncompressed size + compressed payload.
     NSMutableData *stateData = [NSMutableData data];
-    char header[4] = {'f', '8', 0, 14}; // version 14
+    char header[4] = {'f', '8', 0, 15}; // version 15 (eris)
     [stateData appendBytes:header length:4];
-    uint8_t buildUUID[16];
-    OEPICO8BuildUUID(buildUUID);
-    [stateData appendBytes:buildUUID length:16];
-    void *base = arena;
-    [stateData appendBytes:&base length:sizeof(void *)];
-    void *ref = (void *)lua_arena_alloc;
-    [stateData appendBytes:&ref length:sizeof(void *)];
-    size_t numOffsets = 0;
-    [stateData appendBytes:&numOffsets length:sizeof(size_t)];
-    // Compressed payload
     [stateData appendBytes:&payloadSize length:sizeof(size_t)];
     [stateData appendBytes:compressed length:compSize];
     free(compressed);
 
     BOOL success = [stateData writeToFile:fileName atomically:YES];
-
-    // Restart the GC (we stopped it to snapshot the arena)
-    if (vm->getLuaState())
-        lua_gc(vm->getLuaState(), LUA_GCRESTART, 0);
 
     if (block) block(success, nil);
 }
@@ -497,59 +478,24 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     }
 
     uint8_t version = data[3];
-    if (version != 14) {
-        NSLog(@"PICO-8: Save state version %d != 14, ignoring", version);
+    if (version != 15) {
+        NSLog(@"PICO-8: Save state version %d != 15, ignoring", version);
         return;
     }
 
     size_t offset = 4;
-
-    // Build-id guard: a state written by a different build of the core has a
-    // different code layout, so its captured C pointers cannot be relocated by
-    // an ASLR shift alone. Reject it rather than crash.
-    if (total < offset + 16) {
+    if (total < offset + sizeof(size_t)) {
         NSLog(@"PICO-8: Save state truncated, ignoring");
         return;
     }
-    uint8_t curUUID[16];
-    OEPICO8BuildUUID(curUUID);
-    if (memcmp(data + offset, curUUID, 16) != 0) {
-        NSLog(@"PICO-8: Save state is from a different core build, ignoring");
-        return;
-    }
-    offset += 16;
-
-    void *savedBase;
-    memcpy(&savedBase, data + offset, sizeof(void *));
-    offset += sizeof(void *);
-
-    void *savedRef;
-    memcpy(&savedRef, data + offset, sizeof(void *));
-    offset += sizeof(void *);
-
-    if (savedBase != lua_arena_base()) {
-        NSLog(@"PICO-8: Save state arena base mismatch, ignoring");
-        return;
-    }
-
-    // Read pointer offset table
-    size_t numOffsets;
-    memcpy(&numOffsets, data + offset, sizeof(size_t));
-    offset += sizeof(size_t);
-    const uint32_t *ptrOffsets = NULL;
-    if (numOffsets > 0 && numOffsets < 65536) {
-        ptrOffsets = (const uint32_t *)(data + offset);
-        offset += numOffsets * sizeof(uint32_t);
-    }
-
     size_t payloadSize;
     memcpy(&payloadSize, data + offset, sizeof(size_t));
     offset += sizeof(size_t);
     size_t compSize = total - offset;
-    size_t expectedSize = lua_arena_size() + sizeof(PicoRam) + sizeof(ptrdiff_t) + sizeof(audioState_t);
 
-    if (payloadSize != expectedSize) {
-        NSLog(@"PICO-8: Save state payload size %zu != expected %zu, ignoring", payloadSize, expectedSize);
+    if (payloadSize < sizeof(size_t) + sizeof(PicoRam) + sizeof(audioState_t) ||
+        payloadSize > 64u * 1024 * 1024) {
+        NSLog(@"PICO-8: Save state payload size %zu implausible, ignoring", payloadSize);
         return;
     }
 
@@ -562,65 +508,63 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
         return;
     }
 
-    size_t arenaSize = lua_arena_size();
-
-    // Validate lua_State offset before touching the arena
-    ptrdiff_t luaStateOffset;
-    memcpy(&luaStateOffset, payload + arenaSize + sizeof(PicoRam), sizeof(ptrdiff_t));
-    if (luaStateOffset < 0 || (size_t)luaStateOffset >= arenaSize) {
-        NSLog(@"PICO-8: Save state lua_State offset %td out of arena bounds, ignoring", luaStateOffset);
+    // Parse payload: [blobLen][eris blob][PicoRam][audioState]
+    size_t poff = 0;
+    size_t blobLen;
+    memcpy(&blobLen, payload + poff, sizeof(size_t)); poff += sizeof(size_t);
+    if (blobLen == 0 ||
+        poff + blobLen + sizeof(PicoRam) + sizeof(audioState_t) != payloadSize) {
+        NSLog(@"PICO-8: Save state payload malformed, ignoring");
         free(payload);
         return;
     }
+    const char *blob = payload + poff; poff += blobLen;
+    const char *picoRamData = payload + poff; poff += sizeof(PicoRam);
+    const char *audioData = payload + poff;
 
-    // Stop GC before overwriting the arena
-    lua_gc(_vm->getLuaState(), LUA_GCSTOP, 0);
-
-    // Restore arena
-    memcpy(lua_arena_base(), payload, arenaSize);
-
-    // Restore PicoRam
-    memcpy(_memory->data, payload + arenaSize, sizeof(PicoRam));
-
-    // Compute restored lua_State pointer
-    lua_State *restoredL = (lua_State *)((char *)lua_arena_base() + luaStateOffset);
-
-    // Apply pointer fixup for ASLR. The plugin is loaded at a different address
-    // each launch, so every C pointer captured in the arena points into the OLD
-    // plugin image and must be shifted by delta. We walk the Lua object graph and
-    // shift only genuine C-pointer fields (never number values), so restoring
-    // cannot corrupt game state. See LuaFixup.c for why a blind memory scan is
-    // unsafe (z8lua numbers can masquerade as in-window pointers).
-    //
-    // NOTE: this only corrects for the ASLR base shift; it assumes the plugin
-    // code LAYOUT is identical to the one that wrote the state. A save from a
-    // different build of the core is rejected earlier via the build-id check, so
-    // we never reach here with a mismatched layout.
-    ptrdiff_t delta = (char *)lua_arena_alloc - (char *)savedRef;
-    if (delta != 0) {
-        Dl_info info;
-        if (dladdr((void *)lua_arena_alloc, &info)) {
-            uintptr_t newBase = (uintptr_t)info.dli_fbase;
-            uintptr_t oldBase = newBase - delta;
-            uintptr_t winLo = oldBase, winHi = oldBase + 16 * 1024 * 1024;
-            lua_fixup_arena_pointers(restoredL, delta, winLo, winHi);
-        }
+    // Deserialize the Lua state with eris. The cart has already been loaded on
+    // this frame (Step ran first), so the permanents table is built and _G holds
+    // fresh C functions; eris.restore_all rebuilds the persisted object graph and
+    // copies it back into _G — no pointer fixup, no arena-base dependency.
+    lua_State *L = _vm->getLuaState();
+    lua_getglobal(L, "eris");
+    if (lua_type(L, -1) != LUA_TTABLE) {
+        NSLog(@"PICO-8: eris library not available, cannot load state");
+        lua_pop(L, 1);
+        free(payload);
+        return;
     }
-    _vm->setLuaState(restoredL, 0);
+    lua_getfield(L, -1, "restore_all");
+    if (lua_type(L, -1) != LUA_TFUNCTION) {
+        lua_pop(L, 2);
+        free(payload);
+        return;
+    }
+    lua_pushlstring(L, blob, blobLen);
+    // Stop the GC across unpersist: eris builds the object graph incrementally,
+    // and a collection triggered by an allocation mid-build would mark a
+    // half-constructed object and crash (luaC_forcestep -> propagatemark).
+    lua_gc(L, LUA_GCSTOP, 0);
+    int restoreRc = lua_pcall(L, 1, 0, 0);
+    lua_gc(L, LUA_GCRESTART, 0);
+    if (restoreRc != 0) {
+        NSLog(@"PICO-8: eris restore failed: %s", lua_tostring(L, -1));
+        lua_pop(L, 2); // error message + eris table
+        free(payload);
+        return;
+    }
+    lua_pop(L, 1); // eris table
+    NSLog(@"PICO-8: eris restore OK (%zu byte blob)", blobLen);
 
-    // Restore audio state
-    memcpy(_audio->getAudioState(), payload + arenaSize + sizeof(PicoRam) + sizeof(ptrdiff_t), sizeof(audioState_t));
+    // Restore pico-8 RAM and audio-engine state (plain C structs).
+    memcpy(_memory->data, picoRamData, sizeof(PicoRam));
+    memcpy(_audio->getAudioState(), audioData, sizeof(audioState_t));
 
     free(payload);
 
-    // Restart GC
-    lua_gc(_vm->getLuaState(), LUA_GCRESTART, 0);
-
     // Clear the pause menu flag so it can't get out of sync with the
-    // Pause Emulation menu item. _pauseMenu is C++ state not included
-    // in the save data, so it can be stale after a restore.
+    // Pause Emulation menu item.
     _vm->clearPauseMenu();
-
 }
 
 #pragma mark - Pause
