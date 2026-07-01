@@ -32,6 +32,7 @@ typedef struct
     TPCircularBuffer *buffer;
     int channelCount;
     int bytesPerSample;
+    double speed;
 } OEGameAudioContext;
 
 ExtAudioFileRef recordingFile;
@@ -74,24 +75,45 @@ static OSStatus RenderCallback(void                       *in,
     OEGameAudioContext *context = (OEGameAudioContext *)in;
     int availableBytes = 0;
     void *head = TPCircularBufferTail(context->buffer, &availableBytes);
-    int bytesRequested = inNumberFrames * context->bytesPerSample * context->channelCount;
+    int bytesPerFrame = context->bytesPerSample * context->channelCount;
+    char *outBuffer = ioData->mBuffers[0].mData;
+
+    double speed = context->speed;
+
+    if(speed > 1.0 && context->bytesPerSample == 2)
+    {
+        int framesRequested = inNumberFrames;
+        int framesWanted     = (int)(framesRequested * speed);
+        int bytesWanted      = framesWanted * bytesPerFrame;
+        int useBytes         = MIN(availableBytes, bytesWanted);
+        int framesAvailable  = useBytes / bytesPerFrame;
+
+        if(framesAvailable > 0)
+            StretchSamples((int16_t *)outBuffer, head, framesRequested, framesAvailable, context->channelCount);
+        else
+            memset(outBuffer, 0, framesRequested * bytesPerFrame);
+
+        TPCircularBufferConsume(context->buffer, useBytes);
+        return noErr;
+    }
+
+    int bytesRequested = inNumberFrames * bytesPerFrame;
     availableBytes = MIN(availableBytes, bytesRequested);
     int leftover = bytesRequested - availableBytes;
-    char *outBuffer = ioData->mBuffers[0].mData;
 
     if(leftover > 0 && context->bytesPerSample == 2)
     {
         // time stretch
         // FIXME this works a lot better with a larger buffer
         int framesRequested = inNumberFrames;
-        int framesAvailable = availableBytes / (context->bytesPerSample * context->channelCount);
+        int framesAvailable = availableBytes / bytesPerFrame;
         StretchSamples((int16_t *)outBuffer, head, framesRequested, framesAvailable, context->channelCount);
     }
     else if(availableBytes)
         memcpy(outBuffer, head, availableBytes);
     else
         memset(outBuffer, 0, bytesRequested);
-    
+
     TPCircularBufferConsume(context->buffer, availableBytes);
     return noErr;
 }
@@ -100,6 +122,7 @@ static OSStatus RenderCallback(void                       *in,
 {
     __weak OEGameCore  *_gameCore;
     OEGameAudioContext *_contexts;
+    double              _speedMultiplier;
     NSNumber           *_outputDeviceID; // nil if no output device has been set (use default)
 
     AUGraph   _graph;
@@ -120,6 +143,7 @@ static OSStatus RenderCallback(void                       *in,
     if(self != nil)
     {
         _gameCore = core;
+        _speedMultiplier = 1.0;
     }
 
     return self;
@@ -221,7 +245,7 @@ static OSStatus RenderCallback(void                       *in,
     _contexts = realloc(_contexts, sizeof(OEGameAudioContext) * bufferCount);
     for(UInt32 i = 0; i < bufferCount; ++i)
     {
-        _contexts[i] = (OEGameAudioContext){ &([_gameCore ringBufferAtIndex:i]->buffer), (UInt32)[_gameCore channelCountForBuffer:i], (UInt32)[_gameCore audioBitDepth] / 8};
+        _contexts[i] = (OEGameAudioContext){ &([_gameCore ringBufferAtIndex:i]->buffer), (UInt32)[_gameCore channelCountForBuffer:i], (UInt32)[_gameCore audioBitDepth] / 8, _speedMultiplier};
         
         //Create the converter node
         err = AUGraphAddNode(_graph, (const AudioComponentDescription *)&desc, &_converterNode);
@@ -280,6 +304,18 @@ static OSStatus RenderCallback(void                       *in,
 	
     //CFShow(_graph);
     [self setVolume:[self volume]];
+}
+
+- (void)setFastForwardMultiplier:(double)multiplier
+{
+    _speedMultiplier = (multiplier > 0.0) ? multiplier : 1.0;
+
+    if(_contexts != NULL)
+    {
+        NSUInteger bufferCount = [_gameCore audioBufferCount];
+        for(NSUInteger i = 0; i < bufferCount; ++i)
+            _contexts[i].speed = _speedMultiplier;
+    }
 }
 
 - (AudioDeviceID)outputDeviceID

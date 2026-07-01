@@ -81,6 +81,7 @@ typedef enum : NSUInteger
     OESaveState        *_saveStateForGameStart;
     NSDate             *_lastPlayStartDate;
     BOOL                _isMuted;
+    BOOL                _isFastForwarding;
     //BOOL                _pausedByGoingToBackground;
     BOOL                _isTerminatingEmulation;
 }
@@ -500,16 +501,28 @@ typedef enum : NSUInteger
     
     if(action == @selector(toggleEmulationPaused:))
     {
+        if(_isFastForwarding)
+        {
+            [menuItem setState:NSOffState];
+            return NO;
+        }
+
         if(_emulationStatus == OEEmulationStatusPaused)
         {
             [menuItem setState:NSOnState];
             return YES;
         }
-        
+
         [menuItem setState:NSOffState];
         return _emulationStatus == OEEmulationStatusPlaying;
     }
     
+    if(action == @selector(toggleFastForward:))
+    {
+        [menuItem setState:_isFastForwarding ? NSOnState : NSOffState];
+        return _emulationStatus == OEEmulationStatusPlaying;
+    }
+
     if(action == @selector(toggleAudioMute:))
     {
         if(_isMuted)
@@ -784,6 +797,12 @@ typedef enum : NSUInteger
 - (void)toggleEmulationPaused:(id)sender;
 {
     [self setEmulationPaused:![self isEmulationPaused]];
+}
+
+- (IBAction)toggleFastForward:(id)sender;
+{
+    _isFastForwarding = !_isFastForwarding;
+    [_gameCoreManager fastForward:_isFastForwarding];
 }
 
 - (void)resetEmulation:(id)sender;

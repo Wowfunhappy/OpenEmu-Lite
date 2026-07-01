@@ -195,6 +195,11 @@
     [_rootProxy setPauseEmulation:pauseEmulation];
 }
 
+- (void)fastForward:(BOOL)flag;
+{
+    [_rootProxy fastForward:flag];
+}
+
 - (void)setAudioOutputDeviceID:(AudioDeviceID)deviceID;
 {
     [_rootProxy setAudioOutputDeviceID:deviceID];

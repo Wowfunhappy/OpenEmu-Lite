@@ -391,7 +391,7 @@ static NSTimeInterval defaultTimeInterval = 60.0;
     if(flag)
     {
         isFastForwarding = YES;
-        frameRateModifier = 5; // 5x speed
+        frameRateModifier = OEGameCoreFastForwardRate;
     }
     else
     {

@@ -74,6 +74,11 @@
     [[self gameCoreHelper] setPauseEmulation:pauseEmulation];
 }
 
+- (void)fastForward:(BOOL)flag;
+{
+    [[self gameCoreHelper] fastForward:flag];
+}
+
 - (void)setAudioOutputDeviceID:(AudioDeviceID)deviceID;
 {
     [[self gameCoreHelper] setAudioOutputDeviceID:deviceID];

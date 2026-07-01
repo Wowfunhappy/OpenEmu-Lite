@@ -38,6 +38,7 @@
 
 - (oneway void)setVolume:(CGFloat)value;
 - (oneway void)setPauseEmulation:(BOOL)pauseEmulation;
+- (oneway void)fastForward:(BOOL)flag;
 - (oneway void)setAudioOutputDeviceID:(AudioDeviceID)deviceID;
 - (oneway void)setDrawSquarePixels:(BOOL)drawSquarePixels;
 

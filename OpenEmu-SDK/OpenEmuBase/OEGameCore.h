@@ -84,6 +84,8 @@ enum _OEGameCoreErrorCodes {
 
 @class OEHIDEvent, OERingBuffer;
 
+#define OEGameCoreFastForwardRate 2.0
+
 #pragma mark -
 
 @interface OEGameCore : NSResponder <OESystemResponderClient>

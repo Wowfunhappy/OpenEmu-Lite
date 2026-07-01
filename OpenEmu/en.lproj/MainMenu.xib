@@ -9848,6 +9848,15 @@ zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W
 									<reference key="NSOnImage" ref="364983442"/>
 									<reference key="NSMixedImage" ref="771956725"/>
 								</object>
+								<object class="NSMenuItem" id="672819001">
+									<reference key="NSMenu" ref="1039504524"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<string key="NSTitle">Double Speed</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="364983442"/>
+									<reference key="NSMixedImage" ref="771956725"/>
+								</object>
 								<object class="NSMenuItem" id="226986987">
 									<reference key="NSMenu" ref="1039504524"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -10093,6 +10102,14 @@ zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleFastForward:</string>
+						<reference key="source" ref="38857222"/>
+						<reference key="destination" ref="672819001"/>
+					</object>
+					<string key="id">FF1-Fw-Rd1</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">resetEmulation:</string>
 						<reference key="source" ref="38857222"/>
 						<reference key="destination" ref="176373940"/>
@@ -10289,6 +10306,7 @@ zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W
 						<reference key="object" ref="1039504524"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="105128930"/>
+							<reference ref="672819001"/>
 							<reference ref="176373940"/>
 							<reference ref="550590928"/>
 							<reference ref="789515824"/>
@@ -10473,6 +10491,11 @@ zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W
 					<object class="IBObjectRecord">
 						<string key="id">1044</string>
 						<reference key="object" ref="105128930"/>
+						<reference key="parent" ref="1039504524"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">672819002</string>
+						<reference key="object" ref="672819001"/>
 						<reference key="parent" ref="1039504524"/>
 					</object>
 					<object class="IBObjectRecord">

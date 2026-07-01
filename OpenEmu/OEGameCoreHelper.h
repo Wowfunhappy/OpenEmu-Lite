@@ -32,6 +32,7 @@
 
 - (void)setVolume:(CGFloat)value;
 - (void)setPauseEmulation:(BOOL)pauseEmulation;
+- (void)fastForward:(BOOL)flag;
 - (void)setAudioOutputDeviceID:(AudioDeviceID)deviceID;
 - (void)setDrawSquarePixels:(BOOL)drawSquarePixels;
 

@@ -711,6 +711,12 @@
     [[self gameCoreProxy] setPauseEmulation:paused];
 }
 
+- (void)fastForward:(BOOL)flag
+{
+    [[self gameCoreProxy] fastForward:flag];
+    [_gameAudio setFastForwardMultiplier:(flag ? OEGameCoreFastForwardRate : 1.0)];
+}
+
 - (void)setDrawSquarePixels:(BOOL)value
 {
     if(_drawSquarePixels == value) return;

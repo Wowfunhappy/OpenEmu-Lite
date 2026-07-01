@@ -42,4 +42,6 @@
 - (void)stopAudio;
 - (void)pauseAudio;
 
+- (void)setFastForwardMultiplier:(double)multiplier;
+
 @end
