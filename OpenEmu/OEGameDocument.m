@@ -850,23 +850,39 @@ typedef enum : NSUInteger
 
 - (void)resetEmulation:(id)sender;
 {
-    if([[OEHUDAlert resetSystemAlert] runModal] == NSAlertDefaultReturn)
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    // Honor a previously-set "Do not ask me again": reset without confirming.
+    if(![defaults boolForKey:OEResetSystemAlertSuppressionKey])
     {
-        // Enabled cheats stay applied across a reset: a Game Genie ROM patch
-        // persists in the loaded ROM through system_reset, mirroring how a real
-        // Game Genie stays plugged in. (A game that verifies its ROM checksum at
-        // boot, e.g. Sonic 2, will therefore need a companion checksum-disable
-        // code to survive a reset with a code active — same as on hardware.)
-        [_gameCoreManager resetEmulationWithCompletionHandler:
-         ^{
-             // Force status to playing without going through setPauseEmulation:,
-             // which would send a pause button press to the freshly reset core.
-             [self disableOSSleep];
-             _lastPlayStartDate = [NSDate date];
-             _emulationStatus = OEEmulationStatusPlaying;
-             [self OE_updateGameViewColorTint];
-         }];
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:OELocalizedString(@"Are you sure you want to reset the console?", @"")];
+        [alert addButtonWithTitle:OELocalizedString(@"Restart", @"")];
+        [alert addButtonWithTitle:OELocalizedString(@"Cancel", @"")];
+        [alert setShowsSuppressionButton:YES];
+
+        if([alert runModal] != NSAlertFirstButtonReturn)
+            return;
+
+        // Only remember the choice when the user actually confirmed the reset.
+        if([[alert suppressionButton] state] == NSOnState)
+            [defaults setBool:YES forKey:OEResetSystemAlertSuppressionKey];
     }
+
+    // Enabled cheats stay applied across a reset: a Game Genie ROM patch
+    // persists in the loaded ROM through system_reset, mirroring how a real
+    // Game Genie stays plugged in. (A game that verifies its ROM checksum at
+    // boot, e.g. Sonic 2, will therefore need a companion checksum-disable
+    // code to survive a reset with a code active — same as on hardware.)
+    [_gameCoreManager resetEmulationWithCompletionHandler:
+     ^{
+         // Force status to playing without going through setPauseEmulation:,
+         // which would send a pause button press to the freshly reset core.
+         [self disableOSSleep];
+         _lastPlayStartDate = [NSDate date];
+         _emulationStatus = OEEmulationStatusPlaying;
+         [self OE_updateGameViewColorTint];
+     }];
 }
 
 - (BOOL)shouldTerminateEmulation

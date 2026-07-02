@@ -528,16 +528,16 @@ static CFHashCode _OEHIDEventHashSetCallback(OEHIDEvent *value)
 {
     [self OE_updateInputPopupButtonSelection];
 
-    OEHUDAlert *alert = [[OEHUDAlert alloc] init];
-    
+    NSAlert *alert = [[NSAlert alloc] init];
+
     if([[OEDeviceManager sharedDeviceManager] isBluetoothEnabled])
     {
-        [alert setMessageText:OELocalizedString(@"If there is a red button on the back battery cover, press it.\nIf not, hold down buttons ①+②.", @"")];
-        [alert setDefaultButtonTitle:OELocalizedString(@"Start Scanning", @"")];
-        [alert setAlternateButtonTitle:OELocalizedString(@"Cancel", @"")];
-        [alert setHeadlineText:OELocalizedString(@"Make your Wiimote discoverable", @"")];
+        [alert setMessageText:OELocalizedString(@"Make your Wiimote discoverable", @"")];
+        [alert setInformativeText:OELocalizedString(@"If there is a red button on the back battery cover, press it.\nIf not, hold down buttons ①+②.", @"")];
+        [alert addButtonWithTitle:OELocalizedString(@"Start Scanning", @"")];
+        [alert addButtonWithTitle:OELocalizedString(@"Cancel", @"")];
 
-        if([alert runModal])
+        if([alert runModal] == NSAlertFirstButtonReturn)
         {
             // Start WiiRemote support
             if([[NSUserDefaults standardUserDefaults] boolForKey:OEWiimoteSupportEnabled])
@@ -546,9 +546,9 @@ static CFHashCode _OEHIDEventHashSetCallback(OEHIDEvent *value)
     }
     else
     {
-        [alert setMessageText:OELocalizedString(@"Bluetooth must be enabled to pair a Wii controller.", @"")];
-        [alert setDefaultButtonTitle:OELocalizedString(@"OK", @"")];
-        [alert setHeadlineText:OELocalizedString(@"Bluetooth Not Enabled", @"")];
+        [alert setMessageText:OELocalizedString(@"Bluetooth Not Enabled", @"")];
+        [alert setInformativeText:OELocalizedString(@"Bluetooth must be enabled to pair a Wii controller.", @"")];
+        [alert addButtonWithTitle:OELocalizedString(@"OK", @"")];
         [alert runModal];
     }
 }
