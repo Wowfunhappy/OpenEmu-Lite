@@ -642,12 +642,3 @@
 /*s|OECheatsWindowController.m|Cheats table empty-area tooltip*/ "Double-click to add a cheat" = "Double-click to add a cheat";
 /*s|OEGameDocument.m|Default title for a newly added cheat / menu title for a cheat with no title*/ "Untitled Cheat" = "Untitled Cheat";
 
-/* Edit menu (present only while the Manage Cheats panel is key) */
-/*s|OECheatsWindowController.m|Edit menu title*/ "Edit" = "Edit";
-/*s|OECheatsWindowController.m|Edit menu item*/ "Undo" = "Undo";
-/*s|OECheatsWindowController.m|Edit menu item*/ "Redo" = "Redo";
-/*s|OECheatsWindowController.m|Edit menu item*/ "Cut" = "Cut";
-/*s|OECheatsWindowController.m|Edit menu item*/ "Copy" = "Copy";
-/*s|OECheatsWindowController.m|Edit menu item*/ "Paste" = "Paste";
-/*s|OECheatsWindowController.m|Edit menu item*/ "Delete" = "Delete";
-

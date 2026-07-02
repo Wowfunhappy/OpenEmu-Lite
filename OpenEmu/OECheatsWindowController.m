@@ -129,15 +129,10 @@ static NSString *const OECheatCodeColumn        = @"code";
 
 @end
 
-@interface OECheatsWindowController () <NSTableViewDataSource, OECheatsTableViewDelegate, NSWindowDelegate>
+@interface OECheatsWindowController () <NSTableViewDataSource, OECheatsTableViewDelegate>
 @property(nonatomic, weak) OEGameDocument *gameDocument;
 @property(nonatomic, strong) NSTableView *tableView;
 @property(nonatomic, strong) NSButton *removeButton;
-// While this panel is key, the menu bar is reduced to just the app menu and a
-// standard Edit menu; every other top-level menu is removed and restored when
-// the panel isn't key, so the rest of the (text-field-free) app is unaffected.
-@property(nonatomic, strong) NSMenuItem *editMenuItem;
-@property(nonatomic, strong) NSArray *savedMenuItems;
 @end
 
 @implementation OECheatsWindowController
@@ -170,7 +165,6 @@ static NSString *const OECheatCodeColumn        = @"code";
     [window setReleasedWhenClosed:NO];
     [window setMinSize:NSMakeSize(600, 200)];
     [window setTitle:OELocalizedString(@"Manage Cheats", @"Cheats window title")];
-    [window setDelegate:self];
 
     NSView *content = [window contentView];
 
@@ -378,90 +372,6 @@ static NSString *const OECheatCodeColumn        = @"code";
         [document setCheat:[cheat objectForKey:@"code"] withType:[cheat objectForKey:@"type"] enabled:YES];
 
     [document saveCheats];
-}
-
-#pragma mark - Contextual Edit menu
-
-// A standard Edit menu, present only while this panel is key so the user can
-// cut/copy/paste (and use ⌘X/C/V/A) in the Title and Code fields. The items
-// target the first responder, so AppKit enables/disables them automatically
-// based on the field editor's selection.
-- (NSMenu *)OE_makeEditMenu
-{
-    NSMenu *menu = [[NSMenu alloc] initWithTitle:OELocalizedString(@"Edit", @"")];
-
-    [menu addItemWithTitle:OELocalizedString(@"Undo", @"") action:@selector(undo:) keyEquivalent:@"z"];
-
-    NSMenuItem *redo = [menu addItemWithTitle:OELocalizedString(@"Redo", @"") action:@selector(redo:) keyEquivalent:@"z"];
-    [redo setKeyEquivalentModifierMask:NSCommandKeyMask | NSShiftKeyMask];
-
-    [menu addItem:[NSMenuItem separatorItem]];
-
-    [menu addItemWithTitle:OELocalizedString(@"Cut", @"")   action:@selector(cut:)   keyEquivalent:@"x"];
-    [menu addItemWithTitle:OELocalizedString(@"Copy", @"")  action:@selector(copy:)  keyEquivalent:@"c"];
-    [menu addItemWithTitle:OELocalizedString(@"Paste", @"") action:@selector(paste:) keyEquivalent:@"v"];
-    [menu addItemWithTitle:OELocalizedString(@"Delete", @"") action:@selector(delete:) keyEquivalent:@""];
-
-    [menu addItem:[NSMenuItem separatorItem]];
-
-    [menu addItemWithTitle:OELocalizedString(@"Select All", @"") action:@selector(selectAll:) keyEquivalent:@"a"];
-
-    return menu;
-}
-
-// Reduces the menu bar to just the app menu (index 0, left untouched) and Edit:
-// every other top-level item (File, Emulation, View, Window, Help, …) is pulled
-// out and stashed so it can be put back exactly as it was.
-- (void)OE_installEditMenu
-{
-    if(_editMenuItem != nil) return;
-
-    NSMenu *mainMenu = [NSApp mainMenu];
-
-    NSMutableArray *saved = [NSMutableArray array];
-    while([mainMenu numberOfItems] > 1)
-    {
-        NSMenuItem *item = [mainMenu itemAtIndex:1];
-        [saved addObject:item];
-        [mainMenu removeItemAtIndex:1];
-    }
-    _savedMenuItems = saved;
-
-    NSMenuItem *editItem = [[NSMenuItem alloc] init];
-    [editItem setTitle:OELocalizedString(@"Edit", @"")];
-    [editItem setSubmenu:[self OE_makeEditMenu]];
-    [mainMenu addItem:editItem];
-    _editMenuItem = editItem;
-}
-
-- (void)OE_removeEditMenu
-{
-    if(_editMenuItem == nil) return;
-
-    NSMenu *mainMenu = [NSApp mainMenu];
-    [mainMenu removeItem:_editMenuItem];
-    _editMenuItem = nil;
-
-    for(NSMenuItem *item in _savedMenuItems)
-        [mainMenu addItem:item];
-    _savedMenuItems = nil;
-}
-
-#pragma mark - NSWindowDelegate
-
-- (void)windowDidBecomeKey:(NSNotification *)notification
-{
-    [self OE_installEditMenu];
-}
-
-- (void)windowDidResignKey:(NSNotification *)notification
-{
-    [self OE_removeEditMenu];
-}
-
-- (void)windowWillClose:(NSNotification *)notification
-{
-    [self OE_removeEditMenu];
 }
 
 @end
