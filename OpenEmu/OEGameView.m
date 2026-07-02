@@ -107,7 +107,6 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
     OEIntSize          _gameScreenSize;
     OEIntSize          _gameAspectSize;
     CVDisplayLinkRef   _gameDisplayLinkRef;
-    SyphonServer      *_gameServer;
 
     // QC based filters
     CIImage           *_gameCIImage;
@@ -257,7 +256,6 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
     _frameCount = 0;
 
     _filters = [self OE_shadersForContext:cgl_ctx];
-    _gameServer = [[SyphonServer alloc] initWithName:self.gameTitle context:cgl_ctx options:nil];
 
     // filters
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -303,7 +301,6 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
     if(_gameTitle != title)
     {
         _gameTitle = [title copy];
-        [_gameServer setName:title];
     }
 }
 
@@ -457,10 +454,6 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
     DLog(@"OEGameView dealloc");
     [self tearDownDisplayLink];
 
-    [_gameServer setName:@""];
-    [_gameServer stop];
-    _gameServer = nil;
-
     _gameCIImage = nil;
 
     // filters
@@ -574,9 +567,6 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
             // Remap the paused frame to a sepia tone.
             [self OE_drawTonedFrameInCGLContext:cgl_ctx blueTone:NO];
         }
-
-        if([_gameServer hasClients])
-            [_gameServer publishFrameTexture:_gameTexture textureTarget:GL_TEXTURE_RECTANGLE_ARB imageRegion:textureRect textureDimensions:textureRect.size flipped:NO];
 
 
         // Draw quick save notification if appropriate

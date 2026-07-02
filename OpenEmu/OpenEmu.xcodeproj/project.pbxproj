@@ -128,15 +128,11 @@
 		11E0C9CA175ADD0700CDAB86 /* controller_vb@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11E0C9C8175ADD0700CDAB86 /* controller_vb@2x.png */; };
 		141554101442B3B300A01683 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6711810136368330034379A /* Cocoa.framework */; };
 		141554211442B7B100A01683 /* OEN64SystemResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 141554201442B7B100A01683 /* OEN64SystemResponder.m */; };
-		143F299A164DE0CC00544CCF /* MagicKit.framework in Copy Frameworks to App Frameworks */ = {isa = PBXBuildFile; fileRef = 143F2995164DE0B300544CCF /* MagicKit.framework */; };
-		143F299D164DE18100544CCF /* MagicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 143F2995164DE0B300544CCF /* MagicKit.framework */; };
 		14861960166076A400BDB800 /* NSDate+OESortAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1486195F166076A400BDB800 /* NSDate+OESortAdditions.m */; };
 		14AE945116FDEE57009DD56D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D32E3213B95E2800A6ACE0 /* CoreAudio.framework */; };
 		14CB5DAA16FE1F8300342817 /* OEAudioDeviceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 14CB5DA916FE1F8300342817 /* OEAudioDeviceManager.m */; };
 		14E4A7FA1616EF8B00082311 /* NSWindow+OEFullScreenAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E4A7F91616EF8B00082311 /* NSWindow+OEFullScreenAdditions.m */; };
 		14F6A926168180D00071386D /* OEPopoutGameWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14F6A925168180CF0071386D /* OEPopoutGameWindowController.m */; };
-		1B42C66D1429510A004691D7 /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B42C66C1429510A004691D7 /* Syphon.framework */; };
-		1B42C66F14295130004691D7 /* Syphon.framework in Copy Frameworks to App Frameworks */ = {isa = PBXBuildFile; fileRef = 1B42C66C1429510A004691D7 /* Syphon.framework */; };
 		1BEF2A9C11682A5E0090F72B /* OpenEmuHelperApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF2A7411682A330090F72B /* OpenEmuHelperApp.m */; };
 		1BEF2AC411682AEB0090F72B /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BEF2AC311682A9D0090F72B /* IOSurface.framework */; };
 		1BEF2CA011684E7E0090F72B /* OEGameAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 829779330E743F2A00631240 /* OEGameAudio.m */; };
@@ -1049,34 +1045,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		143F2994164DE0B300544CCF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 143F298A164DE0B300544CCF /* MagicKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = MagicKit;
-		};
-		143F2996164DE0B300544CCF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 143F298A164DE0B300544CCF /* MagicKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DDC92A8412618AE90012DE28;
-			remoteInfo = "MagicKit-iOS";
-		};
-		143F2998164DE0B300544CCF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 143F298A164DE0B300544CCF /* MagicKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DDC92C0512619C1E0012DE28;
-			remoteInfo = MagicKitTest;
-		};
-		143F299B164DE0EC00544CCF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 143F298A164DE0B300544CCF /* MagicKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = MagicKit;
-		};
 		1B6A25011430F8FB009F1CE1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -1404,8 +1372,6 @@
 				82DE4B8010265600007184EB /* UniversalDetector.framework in Copy Frameworks to App Frameworks */,
 				82DE4B7F102655FC007184EB /* XADMaster.framework in Copy Frameworks to App Frameworks */,
 				8CAD37CF16A18C3000AE25F5 /* Cg.framework in Copy Frameworks to App Frameworks */,
-				1B42C66F14295130004691D7 /* Syphon.framework in Copy Frameworks to App Frameworks */,
-				143F299A164DE0CC00544CCF /* MagicKit.framework in Copy Frameworks to App Frameworks */,
 				C6D120C717112E3800E868A8 /* OpenEmuBase.framework in Copy Frameworks to App Frameworks */,
 				C6D120C817112E3800E868A8 /* OpenEmuSystem.framework in Copy Frameworks to App Frameworks */,
 			);
@@ -1519,7 +1485,6 @@
 		141554201442B7B100A01683 /* OEN64SystemResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEN64SystemResponder.m; sourceTree = "<group>"; };
 		141554221442B85000A01683 /* OEN64SystemResponderClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEN64SystemResponderClient.h; sourceTree = "<group>"; };
 		142689BD16585F0E00AD0B63 /* OEDatabase 0.4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "OEDatabase 0.4.xcdatamodel"; sourceTree = "<group>"; };
-		143F298A164DE0B300544CCF /* MagicKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MagicKit.xcodeproj; path = ../MagicKit/MagicKit.xcodeproj; sourceTree = "<group>"; };
 		1486195E166076A400BDB800 /* NSDate+OESortAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+OESortAdditions.h"; sourceTree = "<group>"; };
 		1486195F166076A400BDB800 /* NSDate+OESortAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+OESortAdditions.m"; sourceTree = "<group>"; };
 		14A9073916FAA0AE005E2635 /* FeedbackReporter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FeedbackReporter.framework; sourceTree = "<group>"; };
@@ -1540,7 +1505,6 @@
 		1B224267100D170F00F42067 /* CRTMaskStraightScanlineOnly.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = CRTMaskStraightScanlineOnly.tiff; sourceTree = "<group>"; };
 		1B224268100D170F00F42067 /* CRTMaskStaggeredScanlineOnly.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = CRTMaskStaggeredScanlineOnly.tiff; sourceTree = "<group>"; };
 		1B2243AE100E92E700F42067 /* CRTMaskShadow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = CRTMaskShadow.tiff; sourceTree = "<group>"; };
-		1B42C66C1429510A004691D7 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Syphon.framework; sourceTree = "<group>"; };
 		1B48F21716671473004E8ABA /* FeedbackReporter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FeedbackReporter.framework; sourceTree = "<group>"; };
 		1B5B5FF7100986400043536B /* CRTMaskStaggered.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = CRTMaskStaggered.tiff; sourceTree = "<group>"; };
 		1B96BA55166BDD52005064C8 /* FRFeedbackReporter.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = FRFeedbackReporter.sh; sourceTree = "<group>"; };
@@ -2890,12 +2854,10 @@
 				839213F4164338D60006CEE0 /* IOKit.framework in Frameworks */,
 				1BFC26D9116C1CB800B95689 /* IOSurface.framework in Frameworks */,
 				0A9F272316635A55008B1FB8 /* libz.dylib in Frameworks */,
-				143F299D164DE18100544CCF /* MagicKit.framework in Frameworks */,
 				53D32E4913B95F3C00A6ACE0 /* OpenGL.framework in Frameworks */,
 				53D32E4D13B95F6200A6ACE0 /* QTKit.framework in Frameworks */,
 				53D32E4A13B95F4000A6ACE0 /* Quartz.framework in Frameworks */,
 				8305267513FBC999006179C6 /* Security.framework in Frameworks */,
-				1B42C66D1429510A004691D7 /* Syphon.framework in Frameworks */,
 				82DE4B63102655DA007184EB /* UniversalDetector.framework in Frameworks */,
 				82DE4B62102655D5007184EB /* XADMaster.framework in Frameworks */,
 			);
@@ -3219,7 +3181,6 @@
 				8CCBC0C8169B323100141631 /* Cg.framework */,
 				3D1D8D811650C22900DBC37D /* Accelerate.framework */,
 				8322D746156A973400FC0E81 /* IOBluetooth.framework */,
-				1B42C66C1429510A004691D7 /* Syphon.framework */,
 				8305267413FBC999006179C6 /* Security.framework */,
 				53D32E3113B95E2800A6ACE0 /* AudioUnit.framework */,
 				53D32E3B13B95EAB00A6ACE0 /* AudioToolbox.framework */,
@@ -3269,16 +3230,6 @@
 				C6252DB114E7566600350A13 /* Controller-Preferences.plist */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		143F298B164DE0B300544CCF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				143F2995164DE0B300544CCF /* MagicKit.framework */,
-				143F2997164DE0B300544CCF /* libMagicKit-iOS.a */,
-				143F2999164DE0B300544CCF /* MagicKitTest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		14CB5DA516FE1F6600342817 /* Audio Devices */ = {
@@ -3544,7 +3495,6 @@
 				C67B0CB51363370B00F18A5D /* OpenEmuSystem */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
-				143F298A164DE0B300544CCF /* MagicKit.xcodeproj */,
 			);
 			name = OpenEmu;
 			sourceTree = "<group>";
@@ -5786,7 +5736,6 @@
 			);
 			dependencies = (
 				8309A781166CE6360013AD4A /* PBXTargetDependency */,
-				143F299C164DE0EC00544CCF /* PBXTargetDependency */,
 				9479665515EDE6B3004316AB /* PBXTargetDependency */,
 				3DAA589A14464890001C09A8 /* PBXTargetDependency */,
 				1B6A25021430F8FB009F1CE1 /* PBXTargetDependency */,
@@ -6399,12 +6348,6 @@
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* OpenEmu */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 143F298B164DE0B300544CCF /* Products */;
-					ProjectRef = 143F298A164DE0B300544CCF /* MagicKit.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				F80800001000000000000D /* PICO8 */,
@@ -6459,27 +6402,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		143F2995164DE0B300544CCF /* MagicKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = MagicKit.framework;
-			remoteRef = 143F2994164DE0B300544CCF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		143F2997164DE0B300544CCF /* libMagicKit-iOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libMagicKit-iOS.a";
-			remoteRef = 143F2996164DE0B300544CCF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		143F2999164DE0B300544CCF /* MagicKitTest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = MagicKitTest;
-			remoteRef = 143F2998164DE0B300544CCF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -7665,11 +7587,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		143F299C164DE0EC00544CCF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = MagicKit;
-			targetProxy = 143F299B164DE0EC00544CCF /* PBXContainerItemProxy */;
-		};
 		1B6A25021430F8FB009F1CE1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 83F37141140BB166005A7353 /* Build SystemPlugins */;
