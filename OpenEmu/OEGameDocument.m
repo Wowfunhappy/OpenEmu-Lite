@@ -505,12 +505,6 @@ typedef enum : NSUInteger
     
     if(action == @selector(toggleEmulationPaused:))
     {
-        if(_isFastForwarding)
-        {
-            [menuItem setState:NSOffState];
-            return NO;
-        }
-
         if(_emulationStatus == OEEmulationStatusPaused)
         {
             [menuItem setState:NSOnState];
@@ -520,11 +514,11 @@ typedef enum : NSUInteger
         [menuItem setState:NSOffState];
         return _emulationStatus == OEEmulationStatusPlaying;
     }
-    
+
     if(action == @selector(toggleFastForward:))
     {
         [menuItem setState:_isFastForwarding ? NSOnState : NSOffState];
-        return _emulationStatus == OEEmulationStatusPlaying;
+        return _emulationStatus == OEEmulationStatusPlaying || _emulationStatus == OEEmulationStatusPaused;
     }
 
     if(action == @selector(toggleAudioMute:))
@@ -650,6 +644,13 @@ typedef enum : NSUInteger
     {
         if(!pauseEmulation) [self OE_startEmulation];
         return;
+    }
+
+    if(pauseEmulation && _isFastForwarding)
+    {
+        // Pausing automatically exits double speed.
+        _isFastForwarding = NO;
+        [_gameCoreManager fastForward:NO];
     }
 
     if(pauseEmulation)
@@ -832,6 +833,11 @@ typedef enum : NSUInteger
 {
     _isFastForwarding = !_isFastForwarding;
     [_gameCoreManager fastForward:_isFastForwarding];
+
+    // Enabling double speed automatically exits pause.
+    if(_isFastForwarding && _emulationStatus == OEEmulationStatusPaused)
+        [self setEmulationPaused:NO];
+
     [self OE_updateGameViewColorTint];
 }
 
