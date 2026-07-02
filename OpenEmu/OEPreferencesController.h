@@ -26,7 +26,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString *const OEDebugModeKey;
 extern NSString *const OEPreferencesOpenPaneNotificationName;
 extern NSString *const OEPreferencesSetupPaneNotificationName;
 extern NSString *const OEPreferencesUserInfoPanelNameKey;
@@ -34,12 +33,8 @@ extern NSString *const OEPreferencesUserInfoSystemIdentifierKey;
 
 @protocol OEPreferencePane;
 @class OEBackgroundGradientView;
-@class OEToolbarView;
 
 @interface OEPreferencesController : NSWindowController
-
-- (void)switchView:(id)sender;
-- (void)switchView:(id)sender animate:(BOOL)animateFlag;
 
 @property NSArray *preferencePanes;
 @property(nonatomic) NSInteger visibleItemIndex;

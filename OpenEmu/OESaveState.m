@@ -2,7 +2,6 @@
 #import "OERom.h"
 #import "OECorePlugin.h"
 
-NSString *const OESaveStateUseQuickSaveSlotsKey = @"UseQuickSaveSlots";
 
 NSString *const OESaveStateSuffix         = @"oesavestate";
 NSString *const OESaveStateDataFile       = @"State";

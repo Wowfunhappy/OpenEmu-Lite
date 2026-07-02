@@ -85,7 +85,6 @@ enum _OEGameDocumentErrorCodes
 - (IBAction)unmute:(id)sender;
 
 #pragma mark - Controlling Emulation
-- (void)switchCore:(id)sender;
 - (IBAction)stopEmulation:(id)sender;
 
 #pragma mark - Cheats
@@ -107,9 +106,6 @@ enum _OEGameDocumentErrorCodes
 
 #pragma mark - Saving States
 - (BOOL)supportsSaveStates;
-
-#pragma mark - Deleting States
-- (IBAction)deleteSaveState:(id)sender;
 
 #pragma mark - OEGameViewController Methods
 

@@ -87,8 +87,6 @@ NSString *const OEControllerImageKey         = @"OEControllerImageKey";
 NSString *const OEControllerImageMaskKey     = @"OEControllerImageMaskKey";
 NSString *const OEControllerKeyPositionKey   = @"OEControllerKeyPositionKey";
 
-NSString *const OEPrefControlsShowAllGlobalKeys = @"OEShowAllGlobalKeys";
-
 @implementation OESystemController
 @synthesize controllerImage = _controllerImage, controllerImageMask = _controllerImageMask;
 
@@ -205,51 +203,6 @@ NSString *const OEPrefControlsShowAllGlobalKeys = @"OEShowAllGlobalKeys";
     if(fileName != nil) fileName = [_bundle pathForResource:fileName ofType:@"plist"];
 
     return (fileName == nil ? nil : [NSPropertyListSerialization propertyListFromData:[NSData dataWithContentsOfFile:fileName] mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL]);
-}
-
-- (NSArray *)OE_globalButtonsControlList
-{
-#define Button(_LABEL_, _DESCRIPTION_, _NAME_) @{                          \
-      OEControlListKeyLabelKey : NSLocalizedString(_LABEL_, _DESCRIPTION_),\
-      OEControlListKeyNameKey : _NAME_,                                    \
-      }
-    static NSArray *globalKeys;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        globalKeys = @[[[NSUserDefaults standardUserDefaults] boolForKey:OEPrefControlsShowAllGlobalKeys] ?
-        // All available 'global' buttons
-        @[Button(@"Save", @"Name of the global button to save a state", OEGlobalButtonSaveState),
-          Button(@"Load", @"Name of the global button to load a state", OEGlobalButtonLoadState),
-          Button(@"Quick Save Button", @"Name of the global button to do a quick save", OEGlobalButtonQuickSave),
-          Button(@"Quick Load Button", @"Name of the global button to load a quick save", OEGlobalButtonQuickLoad),
-          Button(@"Fullscreen", @"Name of the global button to toggle fullscreen mode", OEGlobalButtonFullScreen),
-          Button(@"Mute", @"Name of the global button to toggle sound mute", OEGlobalButtonMute),
-          Button(@"Volume Down", @"Name of the global button to decrease the volume", OEGlobalButtonVolumeDown),
-          Button(@"Volume Up", @"Name of the global button to increase the volume", OEGlobalButtonVolumeUp),
-          Button(@"Reset", @"Name of the global button to reset the emulation", OEGlobalButtonReset),
-          Button(@"Pause", @"Name of the global button to pause the emulation", OEGlobalButtonPause),
-          //Button(@"Rewind", @"Name of the global button to rewind the emulation", OEGlobalButtonRewind),
-          Button(@"Fast Forward", @"Name of the global button to fast foward the emulation", OEGlobalButtonFastForward),
-          //Button(@"Slow Motion", @"Name of the global button to run the emulation in slow motion", OEGlobalButtonSlowMotion),
-          //Button(@"Step Backward", @"Name of the global button to step the emulation backward by one frame", OEGlobalButtonStepFrameBackward),
-          //Button(@"Step Forward", @"Name of the global button to step the emulation forward by one frame", OEGlobalButtonStepFrameForward),
-          Button(@"Display Mode", @"Name of the global button to switch display modes", OEGlobalButtonDisplayMode),
-          Button(@"Screenshot", @"Name of the global button to take screenshot", OEGlobalButtonScreenshot),
-          ]
-        : // Limited selection of global buttons
-        @[Button(@"Quick Save", @"Name of the global button to do a quick save", OEGlobalButtonQuickSave),
-          Button(@"Quick Load", @"Name of the global button to load a quick save", OEGlobalButtonQuickLoad),
-          Button(@"Mute", @"Name of the global button to toggle sound mute", OEGlobalButtonMute),
-          Button(@"Pause", @"Name of the global button to pause the emulation", OEGlobalButtonPause),
-          //Button(@"Rewind", @"Name of the global button to rewind the emulation", OEGlobalButtonRewind),
-          Button(@"Fast Forward", @"Name of the global button to fast foward the emulation", OEGlobalButtonFastForward),
-          Button(@"Display Mode", @"Name of the global button to switch display modes", OEGlobalButtonDisplayMode),
-          Button(@"Screenshot", @"Name of the global button to take screenshot", OEGlobalButtonScreenshot),
-          ]];
-    });
-
-    return globalKeys;
-#undef Button
 }
 
 - (void)OE_setUpControllerPreferencesKeys;

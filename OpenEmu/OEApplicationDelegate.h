@@ -27,23 +27,17 @@
 #import "NSDocumentController+OEAdditions.h"
 
 @class OEDeviceManager;
-@class OEMainWindowController;
 @class OEPreferencesController;
 @interface OEApplicationDelegate : NSDocumentController <NSApplicationDelegate, NSMenuDelegate>
 
 - (IBAction)showAboutWindow:(id)sender;
-- (IBAction)showPreferencesWindow:(id)sender;
-- (IBAction)showOpenEmuWindow:(id)sender;
 
 - (IBAction)openWeblink:(id)sender;
 
 - (void)updateInfoPlist;
 
-- (void)loadDatabase;
-
 @property(unsafe_unretained) IBOutlet NSWindow               *aboutWindow;
 @property(unsafe_unretained) IBOutlet NSMenu                 *fileMenu;
-@property(strong) IBOutlet OEMainWindowController  *mainWindowController;
 @property(strong) IBOutlet OEPreferencesController *preferencesController;
 
 @property(readonly) NSString           *aboutCreditsPath;

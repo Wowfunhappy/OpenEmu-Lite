@@ -38,7 +38,6 @@
 #import "NSImage+OEDrawingAdditions.h"
 #import "NSWindow+OEFullScreenAdditions.h"
 
-#import "OEHUDAlert+DefaultAlertsAdditions.h"
 #import "OEGameDocument.h"
 
 #import "OERom.h"
@@ -84,7 +83,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 @end
 
 @implementation OEApplicationDelegate
-@synthesize mainWindowController, preferencesController;
+@synthesize preferencesController;
 @synthesize aboutWindow, aboutCreditsPath, cachedLastPlayedInfo;
 
 + (void)load
@@ -265,11 +264,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
         return;
     }
 
-    //if([[OEHUDAlert quitApplicationAlert] runModal] == NSAlertDefaultReturn)
-    if (true)
-        [self closeAllDocumentsWithDelegate:delegate didCloseAllSelector:didReviewAllSelector contextInfo:contextInfo];
-    else
-        SEND_CALLBACK(delegate, didReviewAllSelector, self, NO, contextInfo);
+    [self closeAllDocumentsWithDelegate:delegate didCloseAllSelector:didReviewAllSelector contextInfo:contextInfo];
 }
 
 - (void)closeAllDocumentsWithDelegate:(id)delegate didCloseAllSelector:(SEL)didCloseAllSelector contextInfo:(void *)contextInfo
@@ -412,12 +407,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [OEBindingsController class];
     [OEDeviceManager sharedDeviceManager];
 }
-#pragma mark - Preferences Window
-
-- (IBAction)showPreferencesWindow:(id)sender
-{
-}
-
 #pragma mark - Help Menu
 - (IBAction)showOEHelp:(id)sender
 {

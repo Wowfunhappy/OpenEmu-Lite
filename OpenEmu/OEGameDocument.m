@@ -28,10 +28,8 @@
 
 #import "OEApplicationDelegate.h"
 #import "OEAudioDeviceManager.h"
-#import "OEBackgroundColorView.h"
 #import "OECheats.h"
 #import "OECheatsWindowController.h"
-#import "OECorePickerController.h"
 #import "OECorePlugin.h"
 #import "OERom.h"
 #import "OESaveState.h"
@@ -39,7 +37,6 @@
 #import "OEGameCoreManager.h"
 #import "OEGameView.h"
 #import "OEGameViewController.h"
-#import "OEHUDAlert+DefaultAlertsAdditions.h"
 #import "OEHUDWindow.h"
 #import "OEPopoutGameWindowController.h"
 #import "OEPreferencesController.h"
@@ -54,6 +51,12 @@
 
 NSString *const OEGameCoreManagerModePreferenceKey = @"OEGameCoreManagerModePreference";
 NSString *const OEGameDocumentErrorDomain = @"OEGameDocumentErrorDomain";
+
+// Suppression-button UserDefaults key for the Reset Console confirmation. It
+// used to live in OEHUDAlert+DefaultAlertsAdditions; it's kept here (with its
+// original string value) now that the alert is a plain NSAlert, so a user who
+// already ticked "Do not ask me again" stays suppressed.
+NSString *const OEResetSystemAlertSuppressionKey  = @"resetSystemWithoutConfirmation";
 
 #define UDDefaultCoreMappingKeyPrefix   @"defaultCore"
 #define UDSystemCoreMappingKeyForSystemIdentifier(_SYSTEM_IDENTIFIER_) [NSString stringWithFormat:@"%@.%@", UDDefaultCoreMappingKeyPrefix, _SYSTEM_IDENTIFIER_]
@@ -175,28 +178,6 @@ typedef enum : NSUInteger
     _gameCoreManager = [self _newGameCoreManagerWithCorePlugin:_corePlugin];
 
     return _gameCoreManager != nil;
-}
-
-- (void)OE_setupGameCoreManagerUsingCorePlugin:(OECorePlugin *)core completionHandler:(void(^)(void))completionHandler
-{
-    NSAssert(core != [_gameCoreManager plugin], @"Do not attempt to run a new core using the same plug-in as the current one.");
-
-    _emulationStatus = OEEmulationStatusNotSetup;
-    [_gameCoreManager stopEmulationWithCompletionHandler:
-     ^{
-         _gameCoreManager = [self _newGameCoreManagerWithCorePlugin:core];
-         [self setupGameWithCompletionHandler:
-          ^(BOOL success, NSError *error)
-          {
-              if(!success)
-              {
-                  [self presentError:error];
-                  return;
-              }
-
-              completionHandler();
-          }];
-     }];
 }
 
 - (OEGameCoreManager *)_newGameCoreManagerWithCorePlugin:(OECorePlugin *)corePlugin
@@ -327,53 +308,6 @@ typedef enum : NSUInteger
         [self setEmulationPaused:NO];
         _pausedByGoingToBackground = NO;
     }*/
-}
-
-#pragma mark - Device Notifications
-- (void)OE_addDeviceNotificationObservers
-{
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self selector:@selector(OE_didReceiveLowBatteryWarningNotification:) name:OEDeviceHandlerDidReceiveLowBatteryWarningNotification object:nil];
-    [nc addObserver:self selector:@selector(OE_deviceDidDisconnectNotification:) name:OEDeviceManagerDidRemoveDeviceHandlerNotification object:nil];
-}
-
-- (void)OE_removeDeviceNotificationObservers
-{
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self name:OEDeviceHandlerDidReceiveLowBatteryWarningNotification object:nil];
-    [nc removeObserver:self name:OEDeviceManagerDidRemoveDeviceHandlerNotification object:nil];
-}
-
-- (void)OE_didReceiveLowBatteryWarningNotification:(NSNotification *)notification
-{
-    BOOL isRunning = ![self isEmulationPaused];
-    [self setEmulationPaused:YES];
-
-    OEDeviceHandler *devHandler = [notification object];
-    NSString *lowBatteryString = [NSString stringWithFormat:OELocalizedString(@"The battery in device number %lu, %@, is low. Please charge or replace the battery.", @"Low battery alert detail message."), [devHandler deviceNumber], [[devHandler deviceDescription] name]];
-    OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:lowBatteryString
-                                           defaultButton:OELocalizedString(@"Resume", nil)
-                                         alternateButton:nil];
-    [alert setHeadlineText:[NSString stringWithFormat:OELocalizedString(@"Low Controller Battery", @"Device battery level is low.")]];
-    [alert runModal];
-
-    if(isRunning) [self setEmulationPaused:NO];
-}
-
-- (void)OE_deviceDidDisconnectNotification:(NSNotification *)notification
-{
-    BOOL isRunning = ![self isEmulationPaused];
-    [self setEmulationPaused:YES];
-
-    OEDeviceHandler *devHandler = [[notification userInfo] objectForKey:OEDeviceManagerDeviceHandlerUserInfoKey];
-    NSString *lowBatteryString = [NSString stringWithFormat:OELocalizedString(@"Device number %lu, %@, has disconnected.", @"Device disconnection detail message."), [devHandler deviceNumber], [[devHandler deviceDescription] name]];
-    OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:lowBatteryString
-                                           defaultButton:OELocalizedString(@"Resume", @"Resume game after battery warning button label")
-                                         alternateButton:nil];
-    [alert setHeadlineText:[NSString stringWithFormat:OELocalizedString(@"Device Disconnected", @"A controller device has disconnected.")]];
-    [alert runModal];
-
-    if(isRunning) [self setEmulationPaused:NO];
 }
 
 - (void)showInSeparateWindowInFullScreen:(BOOL)fullScreen;
@@ -554,10 +488,6 @@ typedef enum : NSUInteger
 
 - (void)setupGameWithCompletionHandler:(void(^)(BOOL success, NSError *error))handler;
 {
-    if([self OE_checkRequiredFiles]) return;
-    
-    [self OE_checkGlitches];
-    
     if(_emulationStatus != OEEmulationStatusNotSetup) return;
 
     [_gameCoreManager loadROMWithCompletionHandler:
@@ -570,9 +500,6 @@ typedef enum : NSUInteger
               [_gameViewController setScreenSize:screenSize aspectSize:aspectSize withIOSurfaceID:surfaceID];
 
               _emulationStatus = OEEmulationStatusSetup;
-
-              // TODO: #567 and #568 need to be fixed first
-              //[self OE_addDeviceNotificationObservers];
 
               _gameSystemResponder = [_gameSystemController newGameSystemResponder];
               [_gameSystemResponder setClient:systemClient];
@@ -668,45 +595,6 @@ typedef enum : NSUInteger
 
     [_gameCoreManager setPauseEmulation:pauseEmulation];
     [self OE_updateGameViewColorTint];
-}
-
-// switchCore:: expects sender or [sender representedObject] to be an OECorePlugin object and prompts the user for confirmation
-- (void)switchCore:(id)sender;
-{
-    OECorePlugin *plugin;
-    if([sender isKindOfClass:[OECorePlugin class]])
-        plugin = sender;
-    else if([sender respondsToSelector:@selector(representedObject)] && [[sender representedObject] isKindOfClass:[OECorePlugin class]])
-        plugin = [sender representedObject];
-    else
-    {
-        DLog(@"Invalid argument passed: %@", sender);
-        return;
-    }
-
-    if([[plugin bundleIdentifier] isEqual:[[_gameCoreManager plugin] bundleIdentifier]]) return;
-
-    OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:OELocalizedString(@"If you change the core you current progress will be lost and save states will not work anymore.", @"")
-                                           defaultButton:OELocalizedString(@"Change Core", @"")
-                                         alternateButton:OELocalizedString(@"Cancel", @"")];
-    [alert showSuppressionButtonForUDKey:OEAutoSwitchCoreAlertSuppressionKey];
-
-    [alert setCallbackHandler:
-     ^(OEHUDAlert *alert, NSUInteger result)
-     {
-         if(result != NSAlertDefaultReturn)
-             return;
-
-         NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
-         [standardUserDefaults setValue:[self coreIdentifier] forKey:UDSystemCoreMappingKeyForSystemIdentifier([self systemIdentifier])];
-
-         [self OE_setupGameCoreManagerUsingCorePlugin:plugin completionHandler:
-          ^{
-              [self OE_startEmulation];
-          }];
-     }];
-
-    [alert runModal];
 }
 
 - (IBAction)editControls:(id)sender
@@ -895,16 +783,6 @@ typedef enum : NSUInteger
     // yellow "paused" tint so it doesn't briefly flash on quit.
     [[[self gameViewController] gameView] setShowsPausedTint:NO];
 
-    //[[self controlsWindow] setCanShow:NO];
-
-    /*if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
-    {
-        //[[self controlsWindow] setCanShow:YES];
-        [self disableOSSleep];
-        [self setEmulationPaused:NO];
-        return NO;
-    }*/
-
     return YES;
 }
 
@@ -940,8 +818,6 @@ typedef enum : NSUInteger
                                                      error:NULL];
 
          _emulationStatus = OEEmulationStatusTerminating;
-         // TODO: #567 and #568 need to be fixed first
-         //[self OE_removeDeviceNotificationObservers];
 
          [_gameCoreManager stopEmulationWithCompletionHandler:
           ^{
@@ -958,88 +834,6 @@ typedef enum : NSUInteger
          
          [super canCloseDocumentWithDelegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
      }];
-}
-
-- (BOOL)OE_checkRequiredFiles
-{
-    // Check current system plugin for OERequiredFiles and core plugin for OEGameCoreRequiresFiles opt-in
-    if ([[[_gameCoreManager plugin] controller] requiredFilesForSystemIdentifier:[_gameSystemController systemIdentifier]] != nil && [[[_gameCoreManager plugin] controller] requiresFilesForSystemIdentifier:[_gameSystemController systemIdentifier]]) {
-        BOOL missingFileStatus = NO;
-        NSSortDescriptor *sortedRequiredFiles = [NSSortDescriptor sortDescriptorWithKey:@"Name" ascending:YES selector:@selector(caseInsensitiveCompare:)];
-        NSArray *validRequiredFiles = [[[[_gameCoreManager plugin] controller] requiredFilesForSystemIdentifier:[_gameSystemController systemIdentifier]] sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortedRequiredFiles]];
-        NSMutableString *missingFilesMessage = [[NSMutableString alloc] init];
-        NSMutableString *missingFilesList = [[NSMutableString alloc] init];
-        
-        for(NSDictionary *validRequiredFile in validRequiredFiles)
-        {
-            NSString *biosFilename = [validRequiredFile objectForKey:@"Name"];
-            NSString *biosDescription = [validRequiredFile objectForKey:@"Description"];
-            BOOL biosOptional = [[validRequiredFile objectForKey:@"Optional"] boolValue];
-            NSString *biosPath = [NSString pathWithComponents:@[
-                                                                [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) lastObject],
-                                                                @"OpenEmu", @"BIOS"]];
-            NSString *destFilePath = [biosPath stringByAppendingPathComponent:biosFilename];
-            
-            // Check if the required files exist and are optional
-            if (![[NSFileManager defaultManager] fileExistsAtPath:destFilePath] && !biosOptional)
-            {
-                missingFileStatus = YES;
-                [missingFilesList appendString:[NSString stringWithFormat:@"%@\n\t\"%@\"\n\n", biosDescription, biosFilename]];
-            }
-            
-        }
-        // Alert the user of missing BIOS/system files that are required for the core
-        if (missingFileStatus)
-        {
-            [missingFilesMessage appendString:[NSString stringWithFormat:OELocalizedString(@"To run this core you need the following:\n\n%@Drag and drop the required file(s) onto the game library window and try again.", @"Missing files dialog text"), missingFilesList]];
-            
-            OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:OELocalizedString(missingFilesMessage, @"")
-                                                   defaultButton:OELocalizedString(@"OK", @"")
-                                                 alternateButton:nil];
-            [alert setHeadlineText:OELocalizedString(@"Required files are missing.", @"")];
-            [alert runModal];
-            
-            return YES;
-        }
-    }
-    return NO;
-}
-
-- (BOOL)OE_checkGlitches
-{
-    NSString *OEGameCoreGlitchesKey       = OEGameCoreGlitchesSuppressionKey;
-    NSString *OEGameCoreGlitchesKeyFormat = @"%@.%@";
-    NSString *coreName                    = [[[_gameCoreManager plugin] controller] pluginName];
-    NSString *systemIdentifier            = [_gameSystemController systemIdentifier];
-    NSString *systemKey                   = [NSString stringWithFormat:OEGameCoreGlitchesKeyFormat, coreName, systemIdentifier];
-    NSUserDefaults *userDefaults          = [NSUserDefaults standardUserDefaults];
-    
-    NSDictionary *glitchInfo              = [userDefaults objectForKey:OEGameCoreGlitchesKey];
-    BOOL showAlert                        = ![[glitchInfo valueForKey:systemKey] boolValue];
-    
-    if([[[_gameCoreManager plugin] controller] hasGlitchesForSystemIdentifier:[_gameSystemController systemIdentifier]] && showAlert)
-    {
-        NSString *message = [NSString stringWithFormat:OELocalizedString(@"The %@ core has compatibility issues and some games may contain glitches or not play at all.\n\nPlease do not report problems as we are not responsible for the development of %@.", @""), coreName, coreName];
-        OEHUDAlert *alert = [OEHUDAlert alertWithMessageText:message
-                                               defaultButton:OELocalizedString(@"OK", @"")
-                                             alternateButton:nil];
-        [alert setHeadlineText:OELocalizedString(@"Warning", @"")];
-        [alert setShowsSuppressionButton:YES];
-        [alert setSuppressionLabelText:OELocalizedString(@"Do not show me again", @"Alert suppression label")];
-        
-        if([alert runModal] && [[alert suppressionButton] state] == NSOnState)
-        {
-            NSMutableDictionary *systemKeyGlitchInfo = [NSMutableDictionary dictionary];
-            [systemKeyGlitchInfo addEntriesFromDictionary:glitchInfo];
-            [systemKeyGlitchInfo setValue:@YES forKey:systemKey];
-            
-            [userDefaults setObject:systemKeyGlitchInfo forKey:OEGameCoreGlitchesKey];
-            [userDefaults synchronize];
-        }
-        
-        return YES;
-    }
-    return NO;
 }
 
 #pragma mark - Cheats
@@ -1152,29 +946,17 @@ typedef enum : NSUInteger
     return pauseNeeded;
 }
 
+// Required by the OEGlobalEventsHandler protocol. OpenEmu Lite exposes no UI for
+// manually naming save states (only the automatic save-on-close is used), so
+// this saves directly with a generated name instead of prompting.
 - (void)saveState:(id)sender;
 {
     if(![self supportsSaveStates])
         return;
-    
-    NSInteger   saveGameNo    = 1;
-    // TODO: properly format date
-    NSDate *date = [NSDate date];
+
     NSString *format = OELocalizedString(@"Save-Game-%ld %@", @"default save game name");
-    NSString    *proposedName = [NSString stringWithFormat:format, saveGameNo, date];
-    OEHUDAlert  *alert        = [OEHUDAlert saveGameAlertWithProposedName:proposedName];
-
-    [alert setWindow:[[[self gameViewController] view] window]];
-    [alert setCallbackHandler:
-     ^(OEHUDAlert *alert, NSUInteger result)
-     {
-         if(result == NSAlertDefaultReturn)
-         {
-             [self OE_saveStateWithName:[alert stringValue] completionHandler:nil];
-         }
-     }];
-
-    [alert runModal];
+    NSString *proposedName = [NSString stringWithFormat:format, (long)1, [NSDate date]];
+    [self OE_saveStateWithName:proposedName completionHandler:nil];
 }
 
 - (void)quickSave:(id)sender;
@@ -1327,27 +1109,6 @@ typedef enum : NSUInteger
 }
 
 
-#pragma mark - Deleting States
-
-// delete save state expects sender or [sender representedObject] to be an OEDBSaveState object and prompts the user for confirmation
-- (IBAction)deleteSaveState:(id)sender;
-{
-    OESaveState *state;
-    if([sender isKindOfClass:[OESaveState class]])
-        state = sender;
-    else if([sender respondsToSelector:@selector(representedObject)] && [[sender representedObject] isKindOfClass:[OESaveState class]])
-        state = [sender representedObject];
-    else
-    {
-        DLog(@"Invalid argument passed: %@", sender);
-        return;
-    }
-
-    NSString *stateName = [state name];
-    OEHUDAlert *alert = [OEHUDAlert deleteStateAlertWithStateName:stateName];
-
-    if([alert runModal]) [state deleteFromDisk];
-}
 
 #pragma mark - OEGameViewControllerDelegate methods
 

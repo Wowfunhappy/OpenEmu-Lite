@@ -16,7 +16,6 @@ extern NSString *const OESaveStateSpecialNamePrefix;
 extern NSString *const OESaveStateAutosaveName;
 extern NSString *const OESaveStateQuicksaveName;
 
-extern NSString *const OESaveStateUseQuickSaveSlotsKey;
 
 @class OERom, OECorePlugin;
 

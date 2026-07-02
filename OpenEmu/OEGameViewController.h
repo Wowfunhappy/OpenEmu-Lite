@@ -32,13 +32,6 @@
 extern NSString *const OEGameVolumeKey;
 extern NSString *const OEGameDefaultVideoFilterKey;
 extern NSString *const OEGameSystemVideoFilterKeyFormat;
-extern NSString *const OEGameCoresInBackgroundKey;
-extern NSString *const OEDontShowGameTitleInWindowKey;
-extern NSString *const OEAutoSwitchCoreAlertSuppressionKey;
-extern NSString *const OEForceCorePicker;
-extern NSString *const OEGameViewControllerEmulationWillFinishNotification;
-extern NSString *const OEGameViewControllerEmulationDidFinishNotification;
-extern NSString *const OEGameViewControllerROMKey;
 extern NSString *const OEBackgroundPauseKey;
 extern NSString *const OEGameViewBackgroundColorKey;
 extern NSString *const OETakeNativeScreenshots;
@@ -80,9 +73,7 @@ extern NSString *const OEScreenshotPropertiesKey;
 - (NSImage *)takeNativeScreenshot;
 
 #pragma mark - HUD Bar Actions
-// switchCore:: expects sender or [sender representedObject] to be an OECorePlugin object and prompts the user for confirmation
 - (void)selectFilter:(id)sender;
-- (void)toggleControlsVisibility:(id)sender;
 
 #pragma mark - Taking Screenshots
 - (IBAction)takeScreenshot:(id)sender;

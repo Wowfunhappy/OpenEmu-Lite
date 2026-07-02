@@ -33,19 +33,17 @@
 #import "OEBackgroundImageView.h"
 
 #import "OEPlugin.h"
-#import "OESystemPlugin.h"\n#import "OESystemPlugin.h"
+#import "OESystemPlugin.h"
 
 #import "OEControllerImageView.h"
 #import "OEControlsButtonSetupView.h"
 
-#import "OEHUDAlert+DefaultAlertsAdditions.h"
 
 #import "OEPreferencesController.h"
 #import <OpenEmuSystem/OpenEmuSystem.h>
 
 NSString *const OELastControlsPluginIdentifierKey = @"lastControlsPlugin";
 NSString *const OELastControlsPlayerKey           = @"lastControlsPlayer";
-NSString *const OELastControlsDeviceTypeKey       = @"lastControlsDevice";
 NSString *const OEKeyboardBindingsIsSelectedKey   = @"OEKeyboardBindingsIsSelectedKey";
 
 static NSString *const _OEKeyboardMenuItemRepresentedObject = @"org.openemu.Bindings.Keyboard";
@@ -287,20 +285,6 @@ static CFHashCode _OEHIDEventHashSetCallback(OEHIDEvent *value)
     // Hide player PopupButton if there is only one player
     //[[self playerPopupButton] setHidden:(numberOfPlayers == 1)];
     [[self playerPopupButton] selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:OELastControlsPlayerKey]];
-}
-
-- (NSMenu *)OE_playerMenuForPlayerCount:(NSUInteger)numberOfPlayers;
-{
-    NSMenu *playerMenu = [[NSMenu alloc] init];
-    for(NSUInteger player = 0; player < numberOfPlayers; player++)
-    {
-        NSString   *playerTitle = [NSString stringWithFormat:OELocalizedString(@"Player %ld", @""), player + 1];
-        NSMenuItem *playerItem  = [[NSMenuItem alloc] initWithTitle:playerTitle action:NULL keyEquivalent:@""];
-        [playerItem setTag:player + 1];
-        [playerMenu addItem:playerItem];
-    }
-
-    return playerMenu;
 }
 
 - (void)OE_devicesDidUpdateNotification:(NSNotification *)notification

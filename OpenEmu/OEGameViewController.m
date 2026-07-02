@@ -29,7 +29,6 @@
 #import "OERom.h"
 
 #import "OEGameView.h"
-#import "OECorePickerController.h"
 #import "OEDOGameCoreHelper.h"
 #import "OEDOGameCoreManager.h"
 #import "OEGameCoreManager.h"
@@ -44,7 +43,6 @@
 #import "OEGameDocument.h"
 #import "OEAudioDeviceManager.h"
 
-#import "OEHUDAlert+DefaultAlertsAdditions.h"
 #import "NSURL+OELibraryAdditions.h"
 #import "NSColor+OEAdditions.h"
 #import "NSViewController+OEAdditions.h"
@@ -64,15 +62,8 @@ BOOL extraMenuItemsSetupDone; //Warning! Global for app! (Sorry!)
 NSString *const OEGameVolumeKey = @"volume";
 NSString *const OEGameDefaultVideoFilterKey = @"videoFilter";
 NSString *const OEGameSystemVideoFilterKeyFormat = @"videoFilter.%@";
-NSString *const OEGameCoresInBackgroundKey = @"gameCoreInBackgroundThread";
-NSString *const OEDontShowGameTitleInWindowKey = @"dontShowGameTitleInWindow";
-NSString *const OEAutoSwitchCoreAlertSuppressionKey = @"changeCoreWhenLoadingStateWitoutConfirmation";
 NSString *const OEBackgroundPauseKey = @"backgroundPause";
-NSString *const OEForceCorePicker = @"forceCorePicker";
-NSString *const OEGameViewControllerEmulationWillFinishNotification = @"OEGameViewControllerEmulationWillFinishNotification";
-NSString *const OEGameViewControllerEmulationDidFinishNotification = @"OEGameViewControllerEmulationDidFinishNotification";
 NSString *const OETakeNativeScreenshots = @"takeNativeScreenshots";
-NSString *const OEGameViewControllerROMKey = @"OEROM";
 NSString *const OEGameViewBackgroundColorKey = @"gameViewBackgroundColor";
 
 NSString *const OEScreenshotFileFormatKey = @"screenshotFormat";
@@ -260,35 +251,6 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     NSMenu *emulationMenu = [emulationMenuItem submenu];
     
     NSMenuItem *item;
-    
-    // Setup Core selection menu
-    NSMenu *coresMenu = [[NSMenu alloc] init];
-    [coresMenu setTitle:OELocalizedString(@"Select Core", @"")];
-    
-    NSString *systemIdentifier = [self systemIdentifier];
-    NSArray *corePlugins = [OECorePlugin corePluginsForSystemIdentifier:systemIdentifier];
-    if([corePlugins count] > 1)
-    {
-        corePlugins = [corePlugins sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            return [[obj1 displayName] compare:[obj2 displayName]];
-        }];
-        
-        for(OECorePlugin *aPlugin in corePlugins)
-        {
-            NSMenuItem *coreItem = [[NSMenuItem alloc] initWithTitle:[aPlugin displayName] action:@selector(switchCore:) keyEquivalent:@""];
-            [coreItem setRepresentedObject:aPlugin];
-            
-            if([[aPlugin bundleIdentifier] isEqual:[self coreIdentifier]]) [coreItem setState:NSOnState];
-            
-            [coresMenu addItem:coreItem];
-        }
-        
-        item = [[NSMenuItem alloc] init];
-        item.title = OELocalizedString(@"Select Core", @"");
-        [item setSubmenu:coresMenu];
-        if([[coresMenu itemArray] count] > 1)
-            [emulationMenu addItem:item];
-    }
 
     // Setup Cheats menu
     // Its contents are built on demand by OECheatsMenuDelegate so that the
@@ -319,7 +281,8 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     //Setup Video Filter Menu
     NSMenu *filterMenu = [[NSMenu alloc] init];
     [filterMenu setTitle:OELocalizedString(@"Select Filter", @"")];
-    
+
+    NSString *systemIdentifier = [self systemIdentifier];
     NSString *selectedFilter = ([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:OEGameSystemVideoFilterKeyFormat, systemIdentifier]]
                                 ? : [[NSUserDefaults standardUserDefaults] objectForKey:OEGameDefaultVideoFilterKey]);
     
