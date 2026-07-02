@@ -191,15 +191,43 @@ static void OE_drawThumbnailWithScreenshot(NSImage *screenshot, NSImage *console
     if(screenshot) {
         // Draw screenshot cropped to fill
         NSSize imgSize = [screenshot size];
+
+        // Native pixel dimensions of the screenshot, used to decide how much
+        // vertical crop we can afford without scaling above native resolution.
+        NSBitmapImageRep *bitmapRep = nil;
+        for(NSImageRep *r in [screenshot representations]) {
+            if([r isKindOfClass:[NSBitmapImageRep class]]) { bitmapRep = (NSBitmapImageRep *)r; break; }
+        }
+        CGFloat pxW = bitmapRep ? [bitmapRep pixelsWide] : imgSize.width;
+        CGFloat pxH = bitmapRep ? [bitmapRep pixelsHigh] : imgSize.height;
+
+        // We'd like to drop the top and bottom 5% (10% total) of the screenshot
+        // before cropping, to trim HUD bars and letterboxing. Only crop as far
+        // as we can while the resulting square still has at least as many native
+        // pixels as the destination, so the icon is never scaled above the
+        // screenshot's native resolution.
+        CGFloat destPx = innerRect.size.width; // square screen area, in pixels
+        CGFloat cutFraction = 0.05;
+        if(pxH > 0.0) {
+            CGFloat maxCut = (1.0 - destPx / pxH) / 2.0;
+            if(maxCut < cutFraction) cutFraction = maxCut;
+        }
+        if(pxW < destPx) cutFraction = 0.0; // width already forces upscaling
+        if(cutFraction < 0.0) cutFraction = 0.0;
+
+        // Vertical band of the screenshot we crop from (in image points).
+        CGFloat bandY = cutFraction * imgSize.height;
+        CGFloat bandHeight = imgSize.height - 2.0 * bandY;
+
         CGFloat screenAspect = innerRect.size.width / innerRect.size.height;
-        CGFloat imgAspect = imgSize.width / imgSize.height;
+        CGFloat bandAspect = imgSize.width / bandHeight;
         NSRect srcRect;
-        if(imgAspect > screenAspect) {
-            CGFloat cropWidth = imgSize.height * screenAspect;
-            srcRect = NSMakeRect((imgSize.width - cropWidth) / 2.0, 0, cropWidth, imgSize.height);
+        if(bandAspect > screenAspect) {
+            CGFloat cropWidth = bandHeight * screenAspect;
+            srcRect = NSMakeRect((imgSize.width - cropWidth) / 2.0, bandY, cropWidth, bandHeight);
         } else {
             CGFloat cropHeight = imgSize.width / screenAspect;
-            srcRect = NSMakeRect(0, (imgSize.height - cropHeight) / 2.0, imgSize.width, cropHeight);
+            srcRect = NSMakeRect(0, bandY + (bandHeight - cropHeight) / 2.0, imgSize.width, cropHeight);
         }
 
         [NSGraphicsContext saveGraphicsState];

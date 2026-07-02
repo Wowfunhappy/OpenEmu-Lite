@@ -40,28 +40,28 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
 OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options)
 {
     @autoreleasepool {
-        
+
         NSURL *imageUrl = [(NSURL*)url URLByAppendingPathComponent:@"ScreenShot"];
         NSImage     *image = [[NSImage alloc] initWithContentsOfURL:imageUrl];
-        
+
+        // No screenshot saved for this game: do nothing and let the system
+        // fall back to the default icon.
+        if(image == nil) return noErr;
+
         NSSize  canvasSize = [image size];
-        
+
         CGContextRef cgContext = QLPreviewRequestCreateContext(preview, *(CGSize *)&canvasSize, true, NULL);
         if(cgContext)
         {
-            NSGraphicsContext *context = [NSGraphicsContext graphicsContextWithGraphicsPort:(void *)cgContext flipped:YES];
-            if(context)
-            {
-                NSGraphicsContext *gc = [NSGraphicsContext graphicsContextWithGraphicsPort:cgContext flipped:NO];
-                [NSGraphicsContext saveGraphicsState];
-                [NSGraphicsContext setCurrentContext:gc];
-                [image drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
-                [NSGraphicsContext restoreGraphicsState];
-            }
+            NSGraphicsContext *gc = [NSGraphicsContext graphicsContextWithGraphicsPort:cgContext flipped:NO];
+            [NSGraphicsContext saveGraphicsState];
+            [NSGraphicsContext setCurrentContext:gc];
+            [image drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
+            [NSGraphicsContext restoreGraphicsState];
             QLPreviewRequestFlushContext(preview, cgContext);
             CFRelease(cgContext);
         }
-        
+
         [image release];
     }
     return noErr;
