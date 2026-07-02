@@ -1,60 +1,35 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
 
-// Fixed-address arena allocator for Lua.
-// All Lua allocations go into a single contiguous memory region mapped
-// at a fixed virtual address. This allows save states by simply dumping
-// the entire region to disk and restoring it at the same address.
-
-// Arena size: 32MB. PICO-8's own Lua limit is 2MB, but eris save-state restore
-// transiently needs the freshly-loaded cart state, the serialized blob, and the
-// unpersisted duplicate live at once, so we give it generous headroom. The arena
-// is MAP_ANON, so unused pages cost no physical memory.
-#define LUA_ARENA_SIZE (32 * 1024 * 1024)
-
-// Fixed virtual address for the arena. Chosen to be in an unused region
-// of the 64-bit address space, far from typical heap/stack/library regions.
-#define LUA_ARENA_ADDR ((void *)0x400000000ULL)
+// Lua allocator backed by a private macOS malloc zone.
+//
+// Historically this was a fixed-address mmap arena so save states could dump
+// the raw Lua heap. Save states are now eris object-graph serializations and
+// don't care where Lua memory lives, but the zone keeps the arena's one
+// remaining useful property: Vm::HardReset can abandon a (possibly corrupt)
+// Lua state and reclaim ALL of its memory in one shot by destroying the zone,
+// without lua_close() walking GC lists that may contain garbage pointers.
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Initialize the arena: mmap a fixed-address region and set up the free list.
-// Returns the arena base pointer, or NULL on failure.
+// Create the zone, destroying the previous one (and everything in it) if
+// this is a re-init for a fresh Lua state. Returns the opaque allocator
+// userdata to pass to lua_newstate, or NULL on failure.
 void *lua_arena_init(void);
 
-// Destroy the arena: munmap the region.
+// Destroy the zone and all memory allocated from it.
 void lua_arena_destroy(void);
 
 // Lua-compatible allocator function (matches lua_Alloc signature).
-// ud is the arena base pointer returned by lua_arena_init.
+// ud is the pointer returned by lua_arena_init.
 void *lua_arena_alloc(void *ud, void *ptr, size_t osize, size_t nsize);
 
-// Get the arena base address (for save/load).
+// The current zone (opaque), or NULL if not initialized. Used as a
+// "Lua memory exists" sanity check by the save-state code.
 void *lua_arena_base(void);
-
-// Get the arena size.
-size_t lua_arena_size(void);
-
-// Check if a pointer is within the arena.
-int lua_arena_contains(void *ptr);
-
-// Fixup: after restoring an arena from a different process, all C function
-// pointers inside it are wrong (ASLR). Call this to adjust them.
-void lua_arena_fixup_pointers(void *old_ref, void *new_ref);
-
-// Build a list of offsets within the arena that contain code pointers.
-// Returns the count. Writes offsets to the provided buffer.
-size_t lua_arena_find_code_pointers(uint32_t *offsets, size_t max_offsets);
-
-// Apply fixup only to the specified offsets.
-void lua_arena_fixup_at_offsets(const uint32_t *offsets, size_t count, ptrdiff_t delta);
-
-// Check if an offset falls within a free block (should not be scanned/fixed)
-int lua_arena_offset_is_free(uint32_t offset);
 
 #ifdef __cplusplus
 }

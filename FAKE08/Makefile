@@ -107,8 +107,7 @@ Z8LUA_SRCS := $(LIBS_DIR)/z8lua/eris.c \
 # Other C sources
 OTHER_C_SRCS := $(LIBS_DIR)/simpleini/ConvertUTF.c \
                 $(LIBS_DIR)/miniz/miniz.c \
-                LuaArena.c \
-                LuaFixup.c
+                LuaArena.c
 
 # C++ sources
 CXX_SRCS := $(LIBS_DIR)/lodepng/lodepng.cpp \
