@@ -155,6 +155,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     // so opening two documents simultaneously would re-enter dispatch_once
     // from the same thread and deadlock. Run the init on a background thread
     // and block here with a semaphore (which does NOT pump the run loop).
+    // Only do this where XPC is actually usable (10.8+); on Lion
+    // -[OEXPCCAgentConfiguration init] builds an array with a nil object and
+    // crashes, and documents fall back to OEDOGameCoreManager anyway.
+    if([OEXPCGameCoreManager canUseXPCGameCoreManager])
     {
         dispatch_semaphore_t sem = dispatch_semaphore_create(0);
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
