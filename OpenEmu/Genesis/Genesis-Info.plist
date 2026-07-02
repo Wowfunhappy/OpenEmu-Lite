@@ -38,7 +38,6 @@
 	<array>
 		<string>smd</string>
 		<string>bin</string>
-		<string>md</string>
 		<string>gen</string>
 	</array>
 	<key>OEControlListKey</key>

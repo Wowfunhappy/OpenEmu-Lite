@@ -52,7 +52,6 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>smd</string>
-				<string>md</string>
 				<string>gen</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
