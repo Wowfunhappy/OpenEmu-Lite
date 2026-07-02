@@ -69,6 +69,14 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     NSMutableArray *_gameDocuments;
 
+    // Documents that state restoration asked us to reopen. The decision to
+    // restore them can't be made until we know whether the app was launched
+    // by opening a file, so they're buffered here until
+    // -applicationDidFinishLaunching:.
+    NSMutableArray *_pendingRestorationBlocks;
+    BOOL _openedFileAtLaunch;
+    BOOL _didFinishLaunching;
+
     id _HIDEventsMonitor;
     id _keyboardEventsMonitor;
     id _unhandledEventsMonitor;
@@ -217,6 +225,28 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
         block();
     }];
     [self setStartupQueue:nil];
+
+    _didFinishLaunching = YES;
+
+    // Decide now whether last session's documents should reopen. We can't
+    // wait for application:openFiles: to find out — AppKit holds the odoc
+    // Apple Event for a double-clicked file until restoration completes, so
+    // waiting for it would deadlock (the restoration completion handlers
+    // below are what unblock its delivery). Instead check how the app was
+    // launched: only a plain launch handles its oapp event inline right here;
+    // a launched-to-open-documents app posts this notification with no
+    // current event (its odoc is suspended awaiting restoration).
+    NSAppleEventDescriptor *launchEvent = [[NSAppleEventManager sharedAppleEventManager] currentAppleEvent];
+    BOOL plainLaunch = ([launchEvent eventClass] == kCoreEventClass && [launchEvent eventID] == kAEOpenApplication);
+    if(!plainLaunch)
+        _openedFileAtLaunch = YES;
+
+    NSArray *restorationBlocks = _pendingRestorationBlocks;
+    _pendingRestorationBlocks = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for(void (^restoreBlock)(void) in restorationBlocks)
+            restoreBlock();
+    });
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -247,6 +277,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
 {
+    // The user asked for specific files, so don't also restore the documents
+    // that were open last session.
+    _openedFileAtLaunch = YES;
+
     [self OE_ensureInitialized];
 
     for (NSString *fileString in filenames) {
@@ -383,16 +417,33 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
      }];
 }
 
+// Called by state restoration to reopen documents from the last session.
+// Whether they should reopen depends on why the app was launched, which isn't
+// known until -applicationDidFinishLaunching:, so buffer the requests until
+// then. Either way every completionHandler must eventually be called: AppKit
+// holds further launch events (like the odoc for a double-clicked file) until
+// restoration reports completion.
 - (void)reopenDocumentForURL:(NSURL *)urlOrNil withContentsOfURL:(NSURL *)contentsURL display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
-	// Only restore previously-open documents if none are already open.
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue(), ^{
-	    [self OE_ensureInitialized];
-		
-		if ([_gameDocuments count] < 1) {
-			[self openDocumentWithContentsOfURL:contentsURL display:displayDocument completionHandler:completionHandler];
+	void (^restoreBlock)(void) = ^{
+		if(_openedFileAtLaunch)
+		{
+			if(completionHandler != nil)
+				completionHandler(nil, NO, [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]);
+			return;
 		}
-	});
+
+		[self OE_ensureInitialized];
+		[self openDocumentWithContentsOfURL:contentsURL display:displayDocument completionHandler:completionHandler];
+	};
+
+	if(_didFinishLaunching)
+		dispatch_async(dispatch_get_main_queue(), restoreBlock);
+	else
+	{
+		if(_pendingRestorationBlocks == nil) _pendingRestorationBlocks = [NSMutableArray array];
+		[_pendingRestorationBlocks addObject:[restoreBlock copy]];
+	}
 }
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
