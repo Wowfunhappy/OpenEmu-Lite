@@ -69,10 +69,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 {
     NSMutableArray *_gameDocuments;
 
-    // Set when macOS asks us to restore a previously-open document at launch,
-    // so we don't also pop the open panel from applicationOpenUntitledFile:.
-    BOOL _documentRestorationRequested;
-
     id _HIDEventsMonitor;
     id _keyboardEventsMonitor;
     id _unhandledEventsMonitor;
@@ -223,20 +219,7 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-    return YES;
-}
-
-- (BOOL)applicationOpenUntitledFile:(NSApplication *)sender
-{
-    // If macOS is restoring a previously-open document (Resume / "reopen windows
-    // when logging back in"), let that happen instead of prompting.
-    if(_documentRestorationRequested)
-        return NO;
-
-    // Launched without any documents to open: prompt the user to pick a game.
-    [self OE_ensureInitialized];
-    [self openDocument:sender];
-    return YES;
+    return NO;
 }
 
 - (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
@@ -335,11 +318,6 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
 
 - (void)reopenDocumentForURL:(NSURL *)urlOrNil withContentsOfURL:(NSURL *)contentsURL display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))completionHandler
 {
-	// Note that a restore was requested so applicationOpenUntitledFile: doesn't
-	// also pop the open panel. This runs synchronously during launch's state
-	// restoration, before applicationOpenUntitledFile: is called.
-	_documentRestorationRequested = YES;
-
 	// Only restore previously-open documents if none are already open.
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue(), ^{
 	    [self OE_ensureInitialized];
