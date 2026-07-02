@@ -120,6 +120,11 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
     // Save State Notifications
     NSTimeInterval _lastQuickSave;
     GLuint _saveStateTexture;
+
+    // Paused / fast-forward monochrome tone effect
+    GLhandleARB _toneProgram;
+    GLuint      _toneTexture;
+    BOOL        _toneSetupDone;
 }
 
 - (NSDictionary *)OE_shadersForContext:(CGLContextObj)context
@@ -559,34 +564,15 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
             }
         }
 
-        if(_fastForwarding || _showsPausedTint)
+        if(_fastForwarding)
         {
-            glDisable(GL_TEXTURE_RECTANGLE_EXT);
-            glDisable(GL_TEXTURE_2D);
-
-            glEnable(GL_BLEND);
-
-            if(_fastForwarding)
-            {
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glColor4f(0.35f, 0.90f, 0.85f, 0.30f);
-            }
-            else
-            {
-                glBlendFunc(GL_DST_COLOR, GL_ZERO);
-                glColor4f(0.85f, 0.75f, 0.30f, 1.0f);
-            }
-
-            glBegin(GL_QUADS);
-            glVertex2f(-1.0f, -1.0f);
-            glVertex2f(-1.0f,  1.0f);
-            glVertex2f( 1.0f,  1.0f);
-            glVertex2f( 1.0f, -1.0f);
-            glEnd();
-
-            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-            glDisable(GL_BLEND);
-            glEnable(GL_TEXTURE_RECTANGLE_EXT);
+            // Remap the fast-forwarding frame to a blue (cyanotype) tone.
+            [self OE_drawTonedFrameInCGLContext:cgl_ctx blueTone:YES];
+        }
+        else if(_showsPausedTint)
+        {
+            // Remap the paused frame to a sepia tone.
+            [self OE_drawTonedFrameInCGLContext:cgl_ctx blueTone:NO];
         }
 
         if([_gameServer hasClients])
@@ -912,6 +898,97 @@ static NSString *const _OEDefaultVideoFilterKey = @"videoFilter";
     glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
     glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+// Redraws the already-rendered frame with a monochrome tone: sepia (warm) while
+// paused, or its cyanotype (cool/blue) counterpart while fast-forwarding.
+// A plain blended overlay can only tint (it multiplies per channel), so a small
+// fragment shader is used to remap each pixel through the tone matrix instead.
+- (void)OE_drawTonedFrameInCGLContext:(CGLContextObj)context blueTone:(BOOL)blueTone
+{
+    CGLContextObj cgl_ctx = context;
+
+    // Lazily build the tone shader and the capture texture on first use.
+    if(!_toneSetupDone)
+    {
+        _toneSetupDone = YES;
+
+        const GLcharARB *fragmentSource =
+            "uniform sampler2D OETexture;\n"
+            "uniform float OEBlueTone;\n"
+            "void main()\n"
+            "{\n"
+            "    vec3 color = texture2D(OETexture, gl_TexCoord[0].xy).rgb;\n"
+            "    vec3 sepia = vec3(dot(color, vec3(0.393, 0.769, 0.189)),\n"
+            "                      dot(color, vec3(0.349, 0.686, 0.168)),\n"
+            "                      dot(color, vec3(0.272, 0.534, 0.131)));\n"
+            "    // Swap the warm/cool axis (R<->B) for the blue variant.\n"
+            "    vec3 toned = mix(sepia, sepia.bgr, OEBlueTone);\n"
+            "    gl_FragColor = vec4(clamp(toned, 0.0, 1.0), 1.0);\n"
+            "}\n";
+
+        GLint compiled = 0;
+        GLhandleARB fragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+        glShaderSourceARB(fragmentShader, 1, &fragmentSource, NULL);
+        glCompileShaderARB(fragmentShader);
+        glGetObjectParameterivARB(fragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
+
+        if(compiled)
+        {
+            _toneProgram = glCreateProgramObjectARB();
+            glAttachObjectARB(_toneProgram, fragmentShader);
+            glLinkProgramARB(_toneProgram);
+
+            GLint linked = 0;
+            glGetObjectParameterivARB(_toneProgram, GL_OBJECT_LINK_STATUS_ARB, &linked);
+            if(!linked)
+            {
+                glDeleteObjectARB(_toneProgram);
+                _toneProgram = NULL;
+            }
+        }
+        else NSLog(@">> Failed to compile paused tone shader");
+
+        glDeleteObjectARB(fragmentShader);
+
+        glGenTextures(1, &_toneTexture);
+    }
+
+    // If the shader is unavailable, just leave the frame untinted.
+    if(_toneProgram == NULL) return;
+
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    GLsizei width  = viewport[2];
+    GLsizei height = viewport[3];
+    if(width <= 0 || height <= 0) return;
+
+    // Capture the frame that was just drawn, then redraw it toned.
+    glDisable(GL_TEXTURE_RECTANGLE_EXT);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _toneTexture);
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewport[0], viewport[1], width, height, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glUseProgramObjectARB(_toneProgram);
+    glUniform1iARB(glGetUniformLocationARB(_toneProgram, "OETexture"), 0);
+    glUniform1fARB(glGetUniformLocationARB(_toneProgram, "OEBlueTone"), blueTone ? 1.0f : 0.0f);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f,  1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex2f( 1.0f,  1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex2f( 1.0f, -1.0f);
+    glEnd();
+
+    glUseProgramObjectARB(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_RECTANGLE_EXT);
 }
 
 // GL render method
