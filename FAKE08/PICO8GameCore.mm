@@ -150,6 +150,37 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     }
     s_instrCount += 10000; // hook fires every 10k instructions
     if (s_instrCount > kMaxInstrsPerFrame) {
+        // Before killing the cart, log where it was spinning and the locals of
+        // the innermost frames — this is the only record of what went wrong.
+        luaL_traceback(L, L, NULL, 0);
+        NSLog(@"PICO-8: frame budget exceeded (%d instrs), traceback:\n%s",
+              s_instrCount, lua_tostring(L, -1));
+        lua_pop(L, 1);
+        // Dump locals of the innermost few frames to see the runaway values
+        for (int level = 0; level < 4; level++) {
+            lua_Debug dbg;
+            if (!lua_getstack(L, level, &dbg)) break;
+            lua_getinfo(L, "nSl", &dbg);
+            NSMutableString *locals = [NSMutableString string];
+            for (int i = 1; i <= 40; i++) {
+                const char *name = lua_getlocal(L, &dbg, i);
+                if (!name) break;
+                int t = lua_type(L, -1);
+                if (t == LUA_TNUMBER) {
+                    [locals appendFormat:@" %s=%.5f", name, (double)lua_tonumber(L, -1)];
+                } else if (t == LUA_TBOOLEAN) {
+                    [locals appendFormat:@" %s=%s", name, lua_toboolean(L, -1) ? "true" : "false"];
+                } else if (t == LUA_TSTRING) {
+                    [locals appendFormat:@" %s=\"%s\"", name, lua_tostring(L, -1)];
+                } else {
+                    [locals appendFormat:@" %s=<%s>", name, lua_typename(L, t)];
+                }
+                lua_pop(L, 1);
+            }
+            NSLog(@"PICO-8: level %d [%s:%d in %s]:%@",
+                  level, dbg.short_src, dbg.currentline,
+                  dbg.name ? dbg.name : "?", locals);
+        }
         luaL_error(L, "frame budget exceeded (infinite loop?)");
     }
 }
@@ -296,7 +327,7 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     free(_videoBuffer);
     free(_audioBuffer);
     free(_monoBuffer);
-    // Don't destroy the arena — it's a fixed mmap that gets reinitialized on next use
+    // Don't destroy the Lua malloc zone — lua_arena_init reinitializes it on next use
 }
 
 - (NSTimeInterval)frameInterval
