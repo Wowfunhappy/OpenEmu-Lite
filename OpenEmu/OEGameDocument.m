@@ -868,6 +868,11 @@ typedef enum : NSUInteger
     [self enableOSSleep];
     [self setEmulationPaused:YES];
 
+    // We pause here only to freeze the core while we autosave and tear down —
+    // the user didn't pause, and the window is about to close. Suppress the
+    // yellow "paused" tint so it doesn't briefly flash on quit.
+    [[[self gameViewController] gameView] setShowsPausedTint:NO];
+
     //[[self controlsWindow] setCanShow:NO];
 
     /*if(![[OEHUDAlert stopEmulationAlert] runModal] == NSAlertDefaultReturn)
