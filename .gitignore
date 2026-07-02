@@ -24,3 +24,7 @@ icon?
 # FAKE08 build output
 FAKE08/build/
 FAKE08/FAKE08.oecoreplugin/
+
+# Xcode-generated framework module maps
+**/*.framework/Modules
+**/*.framework/Versions/*/Modules/
