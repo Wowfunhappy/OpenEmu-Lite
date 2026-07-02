@@ -9852,7 +9852,8 @@ zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W
 									<reference key="NSMenu" ref="1039504524"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<string key="NSTitle">Doppelte Geschwindigkeit</string>
-									<string key="NSKeyEquiv"/>
+									<string key="NSKeyEquiv">d</string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="364983442"/>
 									<reference key="NSMixedImage" ref="771956725"/>
