@@ -219,6 +219,21 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
     [self setStartupQueue:nil];
 }
 
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+    // Nothing left to close: let termination proceed.
+    if([_gameDocuments count] == 0)
+        return NSTerminateNow;
+
+    // Depending on the OS release, AppKit consults the delegate and/or runs the
+    // document review (reviewUnsavedDocumentsWithAlertTitle:...) on quit — on
+    // Lion the review runs first and this method may never see open documents.
+    // Whichever entry point AppKit picks, the answer is the same: close every
+    // game document synchronously (see OE_closeAllGameDocumentsByPumpingRunLoop
+    // for why it must be synchronous), then report the verdict.
+    return [self OE_closeAllGameDocumentsByPumpingRunLoop] ? NSTerminateNow : NSTerminateCancel;
+}
+
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
     if([OEXPCGameCoreManager canUseXPCGameCoreManager])
@@ -273,7 +288,55 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
         return;
     }
 
-    [self closeAllDocumentsWithDelegate:delegate didCloseAllSelector:didReviewAllSelector contextInfo:contextInfo];
+    // On quit, AppKit calls this from inside -[NSApplication _shouldTerminate]
+    // and then spins a nested event loop in a private run-loop mode until we
+    // deliver the didReviewAllSelector callback. Delivering it asynchronously
+    // deadlocks (see OE_closeAllGameDocumentsByPumpingRunLoop), so close all
+    // game documents synchronously and deliver the verdict before returning.
+    // AppKit fully supports the review completing synchronously — that is the
+    // normal path for apps with no unsaved documents.
+    if([self OE_closeAllGameDocumentsByPumpingRunLoop])
+    {
+        // All games closed; let super review any remaining regular documents
+        // and deliver the callback.
+        [super reviewUnsavedDocumentsWithAlertTitle:title cancellable:cancellable delegate:delegate didReviewAllSelector:didReviewAllSelector contextInfo:contextInfo];
+    }
+    else
+        SEND_CALLBACK(delegate, didReviewAllSelector, self, NO, contextInfo);
+}
+
+// Closes every open game document and does not return until they are all torn
+// down (or a 30 second safety deadline passes). Returns YES if none remain.
+//
+// This must run synchronously, pumping the default run-loop mode: closing a
+// game document is asynchronous — it autosaves and stops emulation via DO
+// round-trips to the helper process, whose replies (and our main-queue
+// completion blocks) are only serviced when the default mode is pumped. The
+// nested event loop AppKit spins during app termination runs in a private mode
+// that never services them, so any quit path that waits asynchronously
+// deadlocks: the helper blocks mid-save waiting for us, and we block waiting
+// for a completion that can never arrive.
+- (BOOL)OE_closeAllGameDocumentsByPumpingRunLoop
+{
+    NSArray *gameDocuments = [_gameDocuments copy];
+    __block NSInteger remainingDocuments = [gameDocuments count];
+    for(OEGameDocument *document in gameDocuments)
+    {
+        [document canCloseDocumentWithCompletionHandler:
+         ^(NSDocument *document, BOOL shouldClose)
+         {
+             remainingDocuments--;
+             if(shouldClose) [document close];
+         }];
+    }
+
+    // Pump until every document finished closing. The deadline only exists so
+    // a wedged helper process cannot make quit hang forever.
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:30.0];
+    while(remainingDocuments > 0 && [deadline timeIntervalSinceNow] > 0.0)
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+
+    return [_gameDocuments count] == 0;
 }
 
 - (void)closeAllDocumentsWithDelegate:(id)delegate didCloseAllSelector:(SEL)didCloseAllSelector contextInfo:(void *)contextInfo

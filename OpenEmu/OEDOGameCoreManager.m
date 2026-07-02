@@ -49,6 +49,25 @@
 
 @end
 
+// Sending over DO throws (NSInvalidSendPortException & friends) if the helper
+// process has already died — which can happen at any time, and routinely
+// happens during teardown when documents close concurrently. An uncaught
+// exception here aborts the whole app, so every _rootProxy send is guarded.
+// Returns NO if the helper was unreachable.
+static BOOL OESendToHelper(void(^send)(void))
+{
+    @try
+    {
+        send();
+        return YES;
+    }
+    @catch(NSException *exception)
+    {
+        NSLog(@"Helper communication failed: %@: %@", [exception name], [exception reason]);
+        return NO;
+    }
+}
+
 @implementation OEDOGameCoreManager
 
 - (id)initWithROMPath:(NSString *)romPath corePlugin:(OECorePlugin *)plugin systemController:(OESystemController *)systemController displayHelper:(id<OEGameCoreDisplayHelper>)displayHelper
@@ -72,25 +91,35 @@
 
     [self setGameCoreHelper:(id<OEGameCoreHelper>)[NSNull null]];
 
-    [_rootProxy loadROMAtPath:[self ROMPath]
-        usingCorePluginAtPath:[[self plugin] path]
-           systemPluginAtPath:[[[self systemController] bundle] bundlePath]
-                 withDelegate:_delegateHelper
-                displayHelper:(id<OEDOGameCoreDisplayHelper>)[self displayHelper]
-            messageIdentifier:
-     [self messageIdentifierForResponderClientHandler:
-      ^(id responderClient, NSError *error)
-      {
-          if(responderClient == nil)
+    BOOL sent = OESendToHelper(^{
+        [_rootProxy loadROMAtPath:[self ROMPath]
+            usingCorePluginAtPath:[[self plugin] path]
+               systemPluginAtPath:[[[self systemController] bundle] bundlePath]
+                     withDelegate:_delegateHelper
+                    displayHelper:(id<OEDOGameCoreDisplayHelper>)[self displayHelper]
+                messageIdentifier:
+         [self messageIdentifierForResponderClientHandler:
+          ^(id responderClient, NSError *error)
           {
-              errorHandler(error);
-              return;
-          }
+              if(responderClient == nil)
+              {
+                  errorHandler(error);
+                  return;
+              }
 
-          [(NSDistantObject *)responderClient setProtocolForProxy:[[[self systemController] responderClass] gameSystemResponderClientProtocol]];
-          
-          completionHandler(responderClient);
-      }]];
+              [(NSDistantObject *)responderClient setProtocolForProxy:[[[self systemController] responderClass] gameSystemResponderClientProtocol]];
+
+              completionHandler(responderClient);
+          }]];
+    });
+
+    if(!sent)
+    {
+        [self stop];
+        errorHandler([NSError errorWithDomain:OEGameDocumentErrorDomain
+                                         code:OEInvalidHelperConnectionError
+                                     userInfo:[NSDictionary dictionaryWithObject:OELocalizedString(@"The background process connection couldn't be established", @"Invalid helper connection error reason.") forKey:NSLocalizedFailureReasonErrorKey]]);
+    }
 }
 
 - (BOOL)_startHelperProcessWithError:(NSError **)outError
@@ -187,104 +216,153 @@
 
 - (void)setVolume:(CGFloat)value;
 {
-    [_rootProxy setVolume:value];
+    OESendToHelper(^{ [_rootProxy setVolume:value]; });
 }
 
 - (void)setPauseEmulation:(BOOL)pauseEmulation;
 {
-    [_rootProxy setPauseEmulation:pauseEmulation];
+    OESendToHelper(^{ [_rootProxy setPauseEmulation:pauseEmulation]; });
 }
 
 - (void)fastForward:(BOOL)flag;
 {
-    [_rootProxy fastForward:flag];
+    OESendToHelper(^{ [_rootProxy fastForward:flag]; });
 }
 
 - (void)setAudioOutputDeviceID:(AudioDeviceID)deviceID;
 {
-    [_rootProxy setAudioOutputDeviceID:deviceID];
+    OESendToHelper(^{ [_rootProxy setAudioOutputDeviceID:deviceID]; });
 }
 
 - (void)setDrawSquarePixels:(BOOL)drawSquarePixels;
 {
-    [_rootProxy setDrawSquarePixels:drawSquarePixels];
+    OESendToHelper(^{ [_rootProxy setDrawSquarePixels:drawSquarePixels]; });
 }
 
 - (void)setupEmulationWithCompletionHandler:(void(^)(IOSurfaceID surfaceID, OEIntSize screenSize, OEIntSize aspectSize))handler;
 {
     void *blk = _Block_copy((__bridge void *)handler);
 
-    [_rootProxy setupEmulationWithDelegate:_delegateHelper messageIdentifier:
-     [self messageIdentifierForSetupCompletionHandler:
-      ^(IOSurfaceID surfaceID, OEIntSize screenSize, OEIntSize aspectSize) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-              void(^block)(IOSurfaceID surfaceID, OEIntSize screenSize, OEIntSize aspectSize) = (__bridge id)blk;
-              block(surfaceID, screenSize, aspectSize);
-              _Block_release(blk);
-          });
-      }]];
+    OESendToHelper(^{
+        [_rootProxy setupEmulationWithDelegate:_delegateHelper messageIdentifier:
+         [self messageIdentifierForSetupCompletionHandler:
+          ^(IOSurfaceID surfaceID, OEIntSize screenSize, OEIntSize aspectSize) {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  void(^block)(IOSurfaceID surfaceID, OEIntSize screenSize, OEIntSize aspectSize) = (__bridge id)blk;
+                  block(surfaceID, screenSize, aspectSize);
+                  _Block_release(blk);
+              });
+          }]];
+    });
 }
 
 - (void)startEmulationWithCompletionHandler:(void (^)(void))handler
 {
-    [_rootProxy startEmulationWithDelegate:_delegateHelper messageIdentifier:
-     [self messageIdentifierForCompletionHandler:
-      ^{
-          dispatch_async(dispatch_get_main_queue(), ^{
-              handler();
-          });
-      }]];
+    OESendToHelper(^{
+        [_rootProxy startEmulationWithDelegate:_delegateHelper messageIdentifier:
+         [self messageIdentifierForCompletionHandler:
+          ^{
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  handler();
+              });
+          }]];
+    });
 }
 
 - (void)resetEmulationWithCompletionHandler:(void(^)(void))handler;
 {
-    [_rootProxy resetEmulationWithDelegate:_delegateHelper messageIdentifier:
-     [self messageIdentifierForCompletionHandler:
-      ^{
-          dispatch_async(dispatch_get_main_queue(), ^{
-              handler();
-          });
-      }]];
+    OESendToHelper(^{
+        [_rootProxy resetEmulationWithDelegate:_delegateHelper messageIdentifier:
+         [self messageIdentifierForCompletionHandler:
+          ^{
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  handler();
+              });
+          }]];
+    });
 }
 
 - (void)stopEmulationWithCompletionHandler:(void(^)(void))handler;
 {
-    [_rootProxy stopEmulationWithDelegate:_delegateHelper messageIdentifier:
-     [self messageIdentifierForCompletionHandler:
-      ^{
-          dispatch_async(dispatch_get_main_queue(), ^{
-              handler();
-          });
-      }]];
+    BOOL sent = OESendToHelper(^{
+        [_rootProxy stopEmulationWithDelegate:_delegateHelper messageIdentifier:
+         [self messageIdentifierForCompletionHandler:
+          ^{
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  handler();
+                  // Tear down the DO connection explicitly. Without this the
+                  // NSConnection is only ever -released (never -invalidated), so it
+                  // stays registered in the main run loop; once the helper process
+                  // is killed and its distant-object proxies are freed, the run loop
+                  // later services the dead connection and sends -release to already
+                  // freed proxies — an intermittent zombie crash on game close.
+                  // Capturing self here keeps the manager alive until stop runs, even
+                  // though `handler` drops the document's reference to it.
+                  [self stop];
+              });
+          }]];
+    });
+
+    // A dead helper is a stopped helper: complete the close as if the helper
+    // had acknowledged the stop, so quitting can proceed.
+    if(!sent)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            handler();
+            [self stop];
+        });
+    }
 }
 
 - (void)saveStateToFileAtPath:(NSString *)fileName completionHandler:(void (^)(BOOL success, NSError *error))handler;
 {
-    [_rootProxy saveStateToFileAtPath:fileName withDelegate:_delegateHelper messageIdentifier:
-     [self messageIdentifierForSuccessHandler:
-      ^(BOOL success, NSError *error)
-      {
-          dispatch_async(dispatch_get_main_queue(), ^{
-              handler(success, error);
-          });
-      }]];
+    BOOL sent = OESendToHelper(^{
+        [_rootProxy saveStateToFileAtPath:fileName withDelegate:_delegateHelper messageIdentifier:
+         [self messageIdentifierForSuccessHandler:
+          ^(BOOL success, NSError *error)
+          {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  handler(success, error);
+              });
+          }]];
+    });
+
+    if(!sent)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            handler(NO, [NSError errorWithDomain:OEGameDocumentErrorDomain
+                                            code:OEInvalidHelperConnectionError
+                                        userInfo:nil]);
+        });
+    }
 }
 
 - (void)loadStateFromFileAtPath:(NSString *)fileName completionHandler:(void (^)(BOOL success, NSError *error))handler;
 {
-    [_rootProxy loadStateFromFileAtPath:fileName withDelegate:_delegateHelper messageIdentifier:
-     [self messageIdentifierForSuccessHandler:
-      ^(BOOL success, NSError *error)
-      {
-          dispatch_async(dispatch_get_main_queue(), ^{
-              handler(success, error);
-          });
-      }]];
+    BOOL sent = OESendToHelper(^{
+        [_rootProxy loadStateFromFileAtPath:fileName withDelegate:_delegateHelper messageIdentifier:
+         [self messageIdentifierForSuccessHandler:
+          ^(BOOL success, NSError *error)
+          {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  handler(success, error);
+              });
+          }]];
+    });
+
+    if(!sent)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            handler(NO, [NSError errorWithDomain:OEGameDocumentErrorDomain
+                                            code:OEInvalidHelperConnectionError
+                                        userInfo:nil]);
+        });
+    }
 }
 
 - (void)setCheat:(NSString *)cheatCode withType:(NSString *)type enabled:(BOOL)enabled;
 {
-    [_rootProxy setCheat:cheatCode withType:type enabled:enabled];
+    OESendToHelper(^{ [_rootProxy setCheat:cheatCode withType:type enabled:enabled]; });
 }
 
 #pragma mark - Message set up
