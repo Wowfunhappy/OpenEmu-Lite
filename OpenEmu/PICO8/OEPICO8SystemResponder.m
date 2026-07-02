@@ -52,4 +52,47 @@
     [[self client] didReleasePICO8Button:(OEPICO8Button)[aKey key]];
 }
 
+// The base class only routes left-button events; PICO-8's devkit mouse
+// (stat 34) also reports the right button, so handle the full set here.
+- (void)handleMouseEvent:(OEEvent *)event
+{
+    OEIntPoint point = [event locationInGameView];
+    switch([event type])
+    {
+        case NSLeftMouseDown :
+        case NSLeftMouseDragged :
+            [[self client] leftMouseDownAtPoint:point];
+            break;
+        case NSLeftMouseUp :
+            [[self client] leftMouseUp];
+            break;
+        case NSRightMouseDown :
+        case NSRightMouseDragged :
+            [[self client] rightMouseDownAtPoint:point];
+            break;
+        case NSRightMouseUp :
+            [[self client] rightMouseUp];
+            break;
+        case NSMouseMoved :
+            [[self client] mouseMovedAtPoint:point];
+            break;
+        default :
+            break;
+    }
+}
+
+// Forward raw key events for the devkit keyboard (stat 30/31) in addition
+// to the normal bindings (super), which keep btn()/btnp() working.
+- (void)HIDKeyDown:(OEHIDEvent *)anEvent
+{
+    [[self client] didPressKey:[anEvent keycode]];
+    [super HIDKeyDown:anEvent];
+}
+
+- (void)HIDKeyUp:(OEHIDEvent *)anEvent
+{
+    [[self client] didReleaseKey:[anEvent keycode]];
+    [super HIDKeyUp:anEvent];
+}
+
 @end

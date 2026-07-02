@@ -46,6 +46,9 @@
 static const int PicoScreenWidth = 128;
 static const int PicoScreenHeight = 128;
 
+static const int kKeyRepeatDelay = 18;   // frames before auto-repeat starts (~300ms)
+static const int kKeyRepeatInterval = 4; // frames between repeats (~15 cps)
+
 @interface PICO8GameCore () <OEPICO8SystemResponderClient>
 {
     Vm *_vm;
@@ -61,6 +64,15 @@ static const int PicoScreenHeight = 128;
 
     uint8_t _kHeld;
     uint8_t _kDown;
+
+    int16_t _mouseX;
+    int16_t _mouseY;
+    uint8_t _mouseBtns;
+
+    BOOL _shiftHeld;
+    unsigned short _repeatKeyCode; // HID code of key being held for auto-repeat, 0 = none
+    std::string _repeatKeyChar;
+    int _repeatKeyFrames;
 
     size_t _frameCount;
     NSString *_pendingSaveStatePath;
@@ -203,7 +215,16 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     if (L) lua_sethook(L, luaResetHook, LUA_MASKCOUNT, 10000);
 
     // Feed input state to the host before stepping.
-    oeSetInputState(_kDown, _kHeld, 0, 0, 0);
+    oeSetInputState(_kDown, _kHeld, _mouseX, _mouseY, _mouseBtns);
+
+    // Devkit keyboard auto-repeat, matching PICO-8's typed-character repeat.
+    if (_repeatKeyCode != 0) {
+        _repeatKeyFrames++;
+        if (_repeatKeyFrames >= kKeyRepeatDelay &&
+            (_repeatKeyFrames - kKeyRepeatDelay) % kKeyRepeatInterval == 0) {
+            oePushKeyboardKey(_repeatKeyChar.c_str());
+        }
+    }
 
     bool stepOK = _vm->Step();
 
@@ -647,6 +668,114 @@ static void luaResetHook(lua_State *L, lua_Debug *ar) {
     }
 
     _kHeld &= ~mask;
+}
+
+#pragma mark - Devkit mouse
+
+// The game view maps window coordinates to the 128x128 screen (clamped to
+// 0..128 inclusive); PICO-8's stat(32)/stat(33) range is 0..127.
+- (void)OE_setMousePosition:(OEIntPoint)aPoint
+{
+    _mouseX = MAX(0, MIN(aPoint.x, 127));
+    _mouseY = MAX(0, MIN(aPoint.y, 127));
+}
+
+- (oneway void)mouseMovedAtPoint:(OEIntPoint)aPoint
+{
+    [self OE_setMousePosition:aPoint];
+}
+
+- (oneway void)leftMouseDownAtPoint:(OEIntPoint)aPoint
+{
+    [self OE_setMousePosition:aPoint];
+    _mouseBtns |= 0x1;
+}
+
+- (oneway void)leftMouseUp
+{
+    _mouseBtns &= ~0x1;
+}
+
+- (oneway void)rightMouseDownAtPoint:(OEIntPoint)aPoint
+{
+    [self OE_setMousePosition:aPoint];
+    _mouseBtns |= 0x2;
+}
+
+- (oneway void)rightMouseUp
+{
+    _mouseBtns &= ~0x2;
+}
+
+#pragma mark - Devkit keyboard
+
+// HID keyboard usage codes (usage page 0x07)
+enum {
+    kHIDKeyA = 0x04, kHIDKeyZ = 0x1D,
+    kHIDKey1 = 0x1E, kHIDKey0 = 0x27,
+    kHIDKeyReturn = 0x28, kHIDKeyBackspace = 0x2A,
+    kHIDKeyTab = 0x2B, kHIDKeySpace = 0x2C,
+    kHIDKeyPunctFirst = 0x2D, kHIDKeyPunctLast = 0x38,
+    kHIDKeypadEnter = 0x58,
+    kHIDKeyLeftShift = 0xE1, kHIDKeyRightShift = 0xE5,
+};
+
+// Returns the PICO-8 key string for a HID keycode, or NULL if the key
+// doesn't produce a character.
+static const char *charForHIDKey(unsigned short keyCode, BOOL shift)
+{
+    static char letter[2] = {0, 0};
+
+    if (keyCode >= kHIDKeyA && keyCode <= kHIDKeyZ) {
+        letter[0] = (shift ? 'A' : 'a') + (keyCode - kHIDKeyA);
+        return letter;
+    }
+    if (keyCode >= kHIDKey1 && keyCode <= kHIDKey0) {
+        static const char *digits[]  = {"1","2","3","4","5","6","7","8","9","0"};
+        static const char *shifted[] = {"!","@","#","$","%","^","&","*","(",")"};
+        return (shift ? shifted : digits)[keyCode - kHIDKey1];
+    }
+    if (keyCode >= kHIDKeyPunctFirst && keyCode <= kHIDKeyPunctLast) {
+        // -, =, [, ], \, (0x32 non-US #), ;, ', `, comma, ., /
+        static const char *punct[]   = {"-","=","[","]","\\","#",";","'","`",",",".","/"};
+        static const char *shifted[] = {"_","+","{","}","|","~",":","\"","~","<",">","?"};
+        return (shift ? shifted : punct)[keyCode - kHIDKeyPunctFirst];
+    }
+    switch (keyCode) {
+        case kHIDKeyReturn:
+        case kHIDKeypadEnter:  return "\r";
+        case kHIDKeyBackspace: return "\b";
+        case kHIDKeyTab:       return "\t";
+        case kHIDKeySpace:     return " ";
+    }
+    return NULL;
+}
+
+- (oneway void)didPressKey:(unsigned short)keyCode
+{
+    if (keyCode == kHIDKeyLeftShift || keyCode == kHIDKeyRightShift) {
+        _shiftHeld = YES;
+        return;
+    }
+
+    const char *key = charForHIDKey(keyCode, _shiftHeld);
+    if (key == NULL)
+        return;
+
+    oePushKeyboardKey(key);
+    _repeatKeyCode = keyCode;
+    _repeatKeyChar = key;
+    _repeatKeyFrames = 0;
+}
+
+- (oneway void)didReleaseKey:(unsigned short)keyCode
+{
+    if (keyCode == kHIDKeyLeftShift || keyCode == kHIDKeyRightShift) {
+        _shiftHeld = NO;
+        return;
+    }
+    if (keyCode == _repeatKeyCode)
+        _repeatKeyCode = 0;
 }
 
 @end

@@ -45,4 +45,14 @@ typedef enum _OEPICO8Button
 - (oneway void)didPushPICO8Button:(OEPICO8Button)button;
 - (oneway void)didReleasePICO8Button:(OEPICO8Button)button;
 
+// Devkit mouse (stat 32-34) and keyboard (stat 30/31).
+// Key codes are HID usage codes from OEHIDEvent.
+- (oneway void)mouseMovedAtPoint:(OEIntPoint)aPoint;
+- (oneway void)leftMouseDownAtPoint:(OEIntPoint)aPoint;
+- (oneway void)leftMouseUp;
+- (oneway void)rightMouseDownAtPoint:(OEIntPoint)aPoint;
+- (oneway void)rightMouseUp;
+- (oneway void)didPressKey:(unsigned short)keyCode;
+- (oneway void)didReleaseKey:(unsigned short)keyCode;
+
 @end
