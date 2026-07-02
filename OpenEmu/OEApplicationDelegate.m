@@ -46,6 +46,7 @@
 
 #import "OEPreferencesController.h"
 #import "OEGameViewController.h"
+#import "OECheatsWindowController.h"
 
 #import <OpenEmuSystem/OpenEmuSystem.h>
 #import "OEToolTipManager.h"
@@ -194,6 +195,10 @@ static void *const _OEApplicationDelegateAllPluginsContext = (void *)&_OEApplica
      ^(OEDeviceHandler *handler, OEHIDEvent *event)
      {
          if(![NSApp isActive] && [event type] == OEHIDEventTypeKeyboard) return;
+
+         // Don't route input to the game while the Manage Cheats window is focused,
+         // so cheat editing (typing codes, deleting rows) isn't fed to the emulator.
+         if([[[NSApp keyWindow] windowController] isKindOfClass:[OECheatsWindowController class]]) return;
 
          [[[self currentGameDocument] gameSystemResponder] handleHIDEvent:event];
      }];
