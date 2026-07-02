@@ -152,6 +152,11 @@ typedef enum
         [window setFrame:windowRect display:NO animate:NO];
         [window center];
         [window setContentAspectRatio:[gameViewController defaultScreenSize]];
+
+        // Prevent the window from being resized below 1x resolution. The generic
+        // 100x100 minimum set in -initWithWindow: applies before the game view (and
+        // hence its native size) is known; now that it is, clamp to the 1x window size.
+        [window setMinSize:[self OE_windowSizeForGameViewIntegralScale:1]];
         [[window contentView] addSubview:[gameViewController view]];
         const NSRect contentRect = [[window contentView]frame];
         [[gameViewController view] setFrame:contentRect];
