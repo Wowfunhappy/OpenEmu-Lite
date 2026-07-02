@@ -767,6 +767,7 @@
 		94EBBD31183F4DB000743756 /* Arcade.oesystemplugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 945E42FB1517F2B500057D08 /* Arcade.oesystemplugin */; };
 		94EBBD3A183F50A400743756 /* N64.oesystemplugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1415540F1442B3B300A01683 /* N64.oesystemplugin */; };
 		94F6CB7C16DD727600CD48A4 /* OECheats.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F6CB7B16DD727600CD48A4 /* OECheats.m */; };
+		AB10C0DE000000000000C101 /* OECheatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = AB10C0DE000000000000C102 /* OECheatsWindowController.m */; };
 		94FC53881688FF60003C6AFE /* controller_gamegear_mask.png in Resources */ = {isa = PBXBuildFile; fileRef = 94FC53861688FF60003C6AFE /* controller_gamegear_mask.png */; };
 		94FC53891688FF60003C6AFE /* controller_gamegear.png in Resources */ = {isa = PBXBuildFile; fileRef = 94FC53871688FF60003C6AFE /* controller_gamegear.png */; };
 		A6F3061218AF3BB7007CF986 /* INWindowButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F3061118AF3BB7007CF986 /* INWindowButton.m */; };
@@ -784,7 +785,6 @@
 		AB095F292676E5FC00EC2CE8 /* _ntsc-stock.cg in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94380782184E6AE100E2274B /* _ntsc-stock.cg */; };
 		AB095F2A2676E5FC00EC2CE8 /* NTSC.cgp in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94380783184E6AE100E2274B /* NTSC.cgp */; };
 		AB095F2B2676E5FC00EC2CE8 /* Pixellate.cg in Copy Filters Folder To App Resources */ = {isa = PBXBuildFile; fileRef = 94539AFD187D096C00CD1BA9 /* Pixellate.cg */; };
-		ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7EC826780E90006EB243 /* cheats-database.xml */; };
 		ABAB7ED626783A26006EB243 /* _gtu-pass1.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECB26783A26006EB243 /* _gtu-pass1.cg */; };
 		ABAB7ED726783A26006EB243 /* _gtu-pass2.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECC26783A26006EB243 /* _gtu-pass2.cg */; };
 		ABAB7ED826783A26006EB243 /* _gtu-pass3.cg in Resources */ = {isa = PBXBuildFile; fileRef = ABAB7ECD26783A26006EB243 /* _gtu-pass3.cg */; };
@@ -2594,6 +2594,8 @@
 		94E6C303166DB15900082F27 /* Controller-Mappings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Mappings.plist"; sourceTree = "<group>"; };
 		94F6CB7A16DD727600CD48A4 /* OECheats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OECheats.h; sourceTree = "<group>"; };
 		94F6CB7B16DD727600CD48A4 /* OECheats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OECheats.m; sourceTree = "<group>"; };
+		AB10C0DE000000000000C103 /* OECheatsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OECheatsWindowController.h; sourceTree = "<group>"; };
+		AB10C0DE000000000000C102 /* OECheatsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OECheatsWindowController.m; sourceTree = "<group>"; };
 		94FC53861688FF60003C6AFE /* controller_gamegear_mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controller_gamegear_mask.png; sourceTree = "<group>"; };
 		94FC53871688FF60003C6AFE /* controller_gamegear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controller_gamegear.png; sourceTree = "<group>"; };
 		94FEFA4B18A80ECC0033A762 /* _ntsc-pass1-composite-3phase.cg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "_ntsc-pass1-composite-3phase.cg"; sourceTree = "<group>"; };
@@ -2609,7 +2611,6 @@
 		FADE000000000000000000A3 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = pt.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		FADE000000000000000000A4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		FADE000000000000000000A5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		ABAB7EC826780E90006EB243 /* cheats-database.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "cheats-database.xml"; sourceTree = "<group>"; };
 		ABAB7ECB26783A26006EB243 /* _gtu-pass1.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass1.cg; sourceTree = "<group>"; };
 		ABAB7ECC26783A26006EB243 /* _gtu-pass2.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass2.cg; sourceTree = "<group>"; };
 		ABAB7ECD26783A26006EB243 /* _gtu-pass3.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = _gtu-pass3.cg; sourceTree = "<group>"; };
@@ -3704,7 +3705,6 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				ABAB7EC826780E90006EB243 /* cheats-database.xml */,
 				83B04E3A196860B800CB985E /* Credits.rtf */,
 				83FA054F13B9DFC20055A520 /* Frameworks */,
 				1BEF34741168F8640090F72B /* PLists */,
@@ -4569,6 +4569,8 @@
 			children = (
 				94F6CB7A16DD727600CD48A4 /* OECheats.h */,
 				94F6CB7B16DD727600CD48A4 /* OECheats.m */,
+				AB10C0DE000000000000C103 /* OECheatsWindowController.h */,
+				AB10C0DE000000000000C102 /* OECheatsWindowController.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -6738,7 +6740,6 @@
 				53439BFE13B93920005C0CC8 /* hud_button.png in Resources */,
 				53439C0613B93920005C0CC8 /* hud_window.png in Resources */,
 				83B04E421968610F00CB985E /* Localizable.strings in Resources */,
-				ABAB7EC926780E90006EB243 /* cheats-database.xml in Resources */,
 				53439C1A13B93920005C0CC8 /* controls_background.jpg in Resources */,
 				53439C2013B93920005C0CC8 /* dark_checkbox.png in Resources */,
 				53439C2113B93920005C0CC8 /* dark_inset_box.png in Resources */,
@@ -7544,6 +7545,7 @@
 				8C415ECD16B0682B00980DB9 /* OEMultipassShader.m in Sources */,
 				C6C3734216BE7065003E57AE /* OEBuiltInShader.m in Sources */,
 				94F6CB7C16DD727600CD48A4 /* OECheats.m in Sources */,
+				AB10C0DE000000000000C101 /* OECheatsWindowController.m in Sources */,
 				838DB01916DBE14E00B8DDC8 /* OETextField.m in Sources */,
 				838DB01C16DBE15900B8DDC8 /* OETextFieldCell.m in Sources */,
 				14CB5DAA16FE1F8300342817 /* OEAudioDeviceManager.m in Sources */,

@@ -89,11 +89,21 @@ enum _OEGameDocumentErrorCodes
 - (IBAction)stopEmulation:(id)sender;
 
 #pragma mark - Cheats
-- (IBAction)addCheat:(id)sender;
+// User-created cheats for this game, loaded from / saved to the OECheats store
+// keyed by the ROM md5. Each element is a mutable dictionary with the keys
+// "description" (title), "code", "type", and "enabled" (NSNumber BOOL).
+@property(nonatomic, readonly) NSMutableArray *cheats;
+
+- (IBAction)manageCheats:(id)sender;
 - (IBAction)setCheat:(id)sender;
 - (IBAction)toggleCheat:(id)sender;
 - (BOOL)supportsCheats;
 - (void)setCheat:(NSString *)cheatCode withType:(NSString *)type enabled:(BOOL)enabled;
+
+// Editor-facing mutations. Each persists the cheat list immediately.
+- (void)addNewCheat;
+- (void)removeCheatAtIndex:(NSUInteger)index;
+- (void)saveCheats;
 
 #pragma mark - Saving States
 - (BOOL)supportsSaveStates;

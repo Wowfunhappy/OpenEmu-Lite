@@ -632,3 +632,22 @@
 
 /*s|OEPrefLibraryController.m|401|*/ "Your library was moved sucessfully. OpenEmu must relaunch now!" = "Your library was moved sucessfully. OpenEmu must relaunch now!";
 
+/* Cheats */
+/*s|OEGameViewController.m|Cheats submenu title*/ "Cheats" = "Cheats";
+/*s|OECheatsWindowController.m|Cheats menu item*/ "Manage Cheats…" = "Manage Cheats…";
+/*s|OECheatsWindowController.m|Cheats window title*/ "Manage Cheats" = "Manage Cheats";
+/*s|OECheatsWindowController.m|Cheats window title with ROM name*/ "Manage Cheats — %@" = "Manage Cheats — %@";
+/*s|OECheatsWindowController.m|Cheats table 'title' column header*/ "Title" = "Title";
+/*s|OECheatsWindowController.m|Cheats table 'code' column header*/ "Code" = "Code";
+/*s|OECheatsWindowController.m|Cheats table empty-area tooltip*/ "Double-click to add a cheat" = "Double-click to add a cheat";
+/*s|OEGameDocument.m|Default title for a newly added cheat / menu title for a cheat with no title*/ "Untitled Cheat" = "Untitled Cheat";
+
+/* Edit menu (present only while the Manage Cheats panel is key) */
+/*s|OECheatsWindowController.m|Edit menu title*/ "Edit" = "Edit";
+/*s|OECheatsWindowController.m|Edit menu item*/ "Undo" = "Undo";
+/*s|OECheatsWindowController.m|Edit menu item*/ "Redo" = "Redo";
+/*s|OECheatsWindowController.m|Edit menu item*/ "Cut" = "Cut";
+/*s|OECheatsWindowController.m|Edit menu item*/ "Copy" = "Copy";
+/*s|OECheatsWindowController.m|Edit menu item*/ "Paste" = "Paste";
+/*s|OECheatsWindowController.m|Edit menu item*/ "Delete" = "Delete";
+

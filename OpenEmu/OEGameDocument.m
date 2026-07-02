@@ -29,6 +29,8 @@
 #import "OEApplicationDelegate.h"
 #import "OEAudioDeviceManager.h"
 #import "OEBackgroundColorView.h"
+#import "OECheats.h"
+#import "OECheatsWindowController.h"
 #import "OECorePickerController.h"
 #import "OECorePlugin.h"
 #import "OERom.h"
@@ -84,6 +86,8 @@ typedef enum : NSUInteger
     BOOL                _isFastForwarding;
     //BOOL                _pausedByGoingToBackground;
     BOOL                _isTerminatingEmulation;
+
+    NSMutableArray     *_cheats;
 }
 
 @property OEGameViewController *gameViewController;
@@ -540,7 +544,15 @@ typedef enum : NSUInteger
             [menuItem setState:NSOffState];
         }
     }
-    
+
+    else if(action == @selector(manageCheats:)) {
+        return [self supportsCheats];
+    }
+
+    else if(action == @selector(OE_selectCheatsParentMenuItem:)) {
+        return [self supportsCheats];
+    }
+
     return YES;
 }
 
@@ -607,8 +619,24 @@ typedef enum : NSUInteger
     [_gameCoreManager startEmulationWithCompletionHandler:
      ^{
          _emulationStatus = OEEmulationStatusPlaying;
+         [self OE_applyEnabledCheats];
      }];
-    
+
+}
+
+// Apply any cheat the user left enabled once the freshly-loaded game is running,
+// so persisted "on" cheats take effect automatically. Applying after the core has
+// started (rather than into a cold boot) means a game that verifies its ROM
+// checksum at power-on (e.g. Sonic 2) still boots, then gets patched.
+- (void)OE_applyEnabledCheats
+{
+    if(![self supportsCheats]) return;
+
+    for(NSDictionary *cheat in [self cheats])
+    {
+        if([[cheat objectForKey:@"enabled"] boolValue])
+            [self setCheat:[cheat objectForKey:@"code"] withType:[cheat objectForKey:@"type"] enabled:YES];
+    }
 }
 
 - (BOOL)isEmulationPaused
@@ -818,6 +846,11 @@ typedef enum : NSUInteger
 {
     if([[OEHUDAlert resetSystemAlert] runModal] == NSAlertDefaultReturn)
     {
+        // Enabled cheats stay applied across a reset: a Game Genie ROM patch
+        // persists in the loaded ROM through system_reset, mirroring how a real
+        // Game Genie stays plugged in. (A game that verifies its ROM checksum at
+        // boot, e.g. Sonic 2, will therefore need a companion checksum-disable
+        // code to survive a reset with a code active — same as on hardware.)
         [_gameCoreManager resetEmulationWithCompletionHandler:
          ^{
              // Force status to playing without going through setPauseEmulation:,
@@ -989,47 +1022,55 @@ typedef enum : NSUInteger
     return [[[_gameCoreManager plugin] controller] supportsCheatCodeForSystemIdentifier:[_gameSystemController systemIdentifier]];
 }
 
-- (IBAction)addCheat:(id)sender;
+- (NSMutableArray *)cheats
 {
-    OEHUDAlert *alert = [[OEHUDAlert alloc] init];
+    // Loaded lazily from the persistent store keyed by the ROM md5.
+    if(_cheats == nil)
+        _cheats = [OECheats cheatsForMD5:[[self rom] md5Hash]];
+    return _cheats;
+}
 
-    [alert setOtherInputLabelText:OELocalizedString(@"Title:", @"")];
-    [alert setShowsOtherInputField:YES];
-    [alert setOtherStringValue:OELocalizedString(@"Cheat Description", @"")];
+- (void)saveCheats
+{
+    [OECheats setCheats:[self cheats] forMD5:[[self rom] md5Hash]];
+}
 
-    [alert setInputLabelText:OELocalizedString(@"Code:", @"")];
-    [alert setShowsInputField:YES];
-    [alert setStringValue:@"Join multi-line cheats with '+' e.g. 000-000+111-111"];
+- (void)addNewCheat
+{
+    // Newly added cheats start disabled; enabling is an explicit user action.
+    [[self cheats] addObject:[@{
+        @"description" : OELocalizedString(@"Untitled Cheat", @""),
+        @"code"        : @"",
+        @"type"        : @"Unknown",
+        @"enabled"     : @NO,
+    } mutableCopy]];
+    [self saveCheats];
+}
 
-    [alert setDefaultButtonTitle:OELocalizedString(@"Add Cheat", @"")];
-    [alert setAlternateButtonTitle:OELocalizedString(@"Cancel", @"")];
-    
-    [alert setShowsSuppressionButton:YES];
-    [alert setSuppressionLabelText:OELocalizedString(@"Enable now", @"Cheats button label")];
+- (void)removeCheatAtIndex:(NSUInteger)index
+{
+    if(index >= [[self cheats] count]) return;
 
-    [alert setInputLimit:1000];
+    NSMutableDictionary *cheat = [[self cheats] objectAtIndex:index];
 
-    if([alert runModal])
-    {
-        NSNumber *enabled;
-        if ([[alert suppressionButton] state] == NSOnState)
-        {
-            enabled = @YES;
-            [self setCheat:[alert stringValue] withType:@"Unknown" enabled:[enabled boolValue]];
-        }
-        else
-        {
-            enabled = @NO;
-        }
-        
-        TODO("decide how to handle setting a cheat type from the modal and save added cheats to file");
-        [[sender representedObject] addObject:[@{
-             @"code" : [alert stringValue],
-             @"type" : @"Unknown",
-             @"description" : [alert otherStringValue],
-             @"enabled" : enabled,
-         } mutableCopy]];
-    }
+    // Turn the cheat off in the running core before forgetting about it.
+    if([[cheat objectForKey:@"enabled"] boolValue])
+        [self setCheat:[cheat objectForKey:@"code"] withType:[cheat objectForKey:@"type"] enabled:NO];
+
+    [[self cheats] removeObjectAtIndex:index];
+    [self saveCheats];
+}
+
+- (IBAction)manageCheats:(id)sender;
+{
+    [[OECheatsWindowController sharedController] showCheatsForDocument:self];
+}
+
+// No-op: exists only so the front document can enable/disable the
+// Emulation ▸ Cheats parent menu item through validateMenuItem:. Clicking the
+// item just opens its submenu.
+- (IBAction)OE_selectCheatsParentMenuItem:(id)sender;
+{
 }
 
 - (IBAction)setCheat:(id)sender;
@@ -1050,6 +1091,7 @@ typedef enum : NSUInteger
     }
 
     [self setCheat:code withType:type enabled:enabled];
+    [self saveCheats];
 }
 
 - (IBAction)toggleCheat:(id)sender;
@@ -1059,6 +1101,7 @@ typedef enum : NSUInteger
     BOOL enabled = ![[[sender representedObject] objectForKey:@"enabled"] boolValue];
     [[sender representedObject] setObject:@(enabled) forKey:@"enabled"];
     [self setCheat:code withType:type enabled:enabled];
+    [self saveCheats];
 }
 
 - (void)setCheat:(NSString *)cheatCode withType:(NSString *)type enabled:(BOOL)enabled;

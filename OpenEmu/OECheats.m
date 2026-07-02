@@ -1,6 +1,6 @@
 /*
  Copyright (c) 2013, OpenEmu Team
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
      * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
      * Neither the name of the OpenEmu Team nor the
        names of its contributors may be used to endorse or promote products
        derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY OpenEmu Team ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,92 +26,48 @@
 
 #import "OECheats.h"
 
-@interface OECheats ()
-@property BOOL didFindMd5Hash;
-@property NSMutableArray *cheatsFromMd5Hash;
-@property NSString *searchHash;
-@end
+// NSUserDefaults key mapping md5 hash -> array of cheat dictionaries.
+static NSString *const OECheatsDefaultsKey = @"OECheats";
 
 @implementation OECheats
-@synthesize didFindMd5Hash, cheatsFromMd5Hash;
 
-- (id)initWithMd5Hash:(NSString*)md5
++ (NSMutableArray *)cheatsForMD5:(NSString *)md5
 {
-    self = [super init];
-    if(self != nil)
+    NSMutableArray *cheats = [NSMutableArray array];
+    if(md5 == nil) return cheats;
+
+    NSDictionary *store = [[NSUserDefaults standardUserDefaults] dictionaryForKey:OECheatsDefaultsKey];
+    NSArray *stored = [store objectForKey:md5];
+
+    // Rehydrate as mutable dictionaries so callers can flip "enabled" in place.
+    for(NSDictionary *cheat in stored)
+        [cheats addObject:[cheat mutableCopy]];
+
+    return cheats;
+}
+
++ (void)setCheats:(NSArray *)cheats forMD5:(NSString *)md5
+{
+    if(md5 == nil) return;
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *store = [[defaults dictionaryForKey:OECheatsDefaultsKey] mutableCopy] ?: [NSMutableDictionary dictionary];
+
+    if([cheats count] == 0)
     {
-        [self setSearchHash:md5];
-        [self findCheats];
+        [store removeObjectForKey:md5];
     }
-    return self;
-}
-
-- (NSArray *)allCheats;
-{
-    return [cheatsFromMd5Hash copy];
-}
-
--(void)findCheats
-{
-    /* XML cheats database format:
-     
-     <?xml version="1.0" encoding="UTF-8"?>
-     <systems>
-        <system id="openemu.system.nes">
-            <game title="Some Game">
-                <hashes>
-                    <hash md5="9e107d9d372bb6826bd81d3542a419d6" />
-                </hashes>
-                <cheats>
-                    <cheat code="048E:88" type="Action Replay" description="Invincibility" />
-                    <cheat code="010F4ED8+01424FD8" type="GameShark" description="Infinite Money" />
-                    <cheat code="69C4-AF6C+62C4-A7DC" type="Game Genie" description="Infinite time" />
-                </cheats>
-            </game>
-        </system>
-     ...
-     </systems>
-    
-    */
-    
-    // TODO: read cheats-database from server instead of bundling with the app for e-z updating
-    NSString *cheatsDatabaseFilename = @"cheats-database.xml";
-    NSString *cheatsDatabasePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:cheatsDatabaseFilename];
-    
-    NSData *xml = [NSData dataWithContentsOfFile:cheatsDatabasePath];
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:xml];
-    
-    cheatsFromMd5Hash = [[NSMutableArray alloc] init];
-    
-    [parser setDelegate:(id)self];
-    [parser parse];
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict
-{
-    // Parse until we find our md5 hash
-    if ([elementName isEqualToString:@"hash"] && [[attributeDict valueForKey:@"md5"] isEqualToString:[self searchHash]]) {
-        
-        [self setDidFindMd5Hash:YES];
-        
-    // Parse cheats where md5 hash was found
-    } else if(didFindMd5Hash && [elementName isEqualToString:@"cheat"]) {
-        NSMutableDictionary *cheatsDictionary = [[NSMutableDictionary alloc] init];
-        [cheatsDictionary setObject:[attributeDict valueForKey:@"code"] forKey:@"code"];
-        [cheatsDictionary setObject:[attributeDict valueForKey:@"type"] forKey:@"type"];
-        [cheatsDictionary setObject:[attributeDict valueForKey:@"description"] forKey:@"description"];
-        [cheatsDictionary setObject:[NSNumber numberWithBool:NO] forKey:@"enabled"];
-        
-        [cheatsFromMd5Hash addObject:cheatsDictionary];
+    else
+    {
+        // Store immutable, property-list-safe copies.
+        NSMutableArray *plistCheats = [NSMutableArray arrayWithCapacity:[cheats count]];
+        for(NSDictionary *cheat in cheats)
+            [plistCheats addObject:[cheat copy]];
+        [store setObject:plistCheats forKey:md5];
     }
-}
 
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName
-{
-    // Stop parsing after all cheats have been found for md5
-    if(didFindMd5Hash && [elementName isEqualToString:@"cheats"]) {
-        [parser abortParsing];
-    }
+    [defaults setObject:store forKey:OECheatsDefaultsKey];
+    [defaults synchronize];
 }
 
 @end

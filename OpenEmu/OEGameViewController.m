@@ -56,7 +56,7 @@
 #import "OEShaderPlugin.h"
 #import "OEGameIntegralScalingDelegate.h"
 #import "OEPopoutGameWindowController.h"
-#import "OECheats.h"
+#import "OECheatsWindowController.h"
 BOOL extraMenuItemsSetupDone; //Warning! Global for app! (Sorry!)
 
 #import <OpenEmuSystem/OpenEmuSystem.h>
@@ -91,8 +91,6 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     
     
     NSArray        *_filterPlugins;
-    NSMutableArray *_cheats;
-    BOOL            _cheatsLoaded;
 }
 
 @end
@@ -176,33 +174,9 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
     [filterSet filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF beginswith '_'"]];
     _filterPlugins = [[filterSet allObjects] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     
-    if(!_cheatsLoaded)
-        [self OE_loadCheats];
-    
     if(!extraMenuItemsSetupDone)
         [self extraMenuItemSetup];
-    
-    [self cheatsMenuItemSetup];
-    
-    
 }
-
-#pragma mark - Cheats
-- (void)OE_loadCheats
-{
-    // In order to load cheats, we need the game core to be running and, consequently, the ROM to be set.
-    if(self.supportsCheats)
-    {
-        NSString *md5Hash = self.document.rom.md5Hash;
-        if(md5Hash)
-        {
-            OECheats *cheatsXML = [[OECheats alloc] initWithMd5Hash:md5Hash];
-            _cheats             = [cheatsXML.allCheats mutableCopy];
-            _cheatsLoaded       = YES;
-        }
-    }
-}
-
 
 //- (void)viewWillDisappear
 //{
@@ -315,9 +289,27 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
         if([[coresMenu itemArray] count] > 1)
             [emulationMenu addItem:item];
     }
-    
-    
-    
+
+    // Setup Cheats menu
+    // Its contents are built on demand by OECheatsMenuDelegate so that the
+    // submenu always reflects the frontmost game document's cheats and their
+    // on/off state, rather than the document that happened to be frontmost when
+    // this menu was first created.
+    // Placed directly under "Controls…" (index 0), before the first separator.
+    NSMenu *cheatsMenu = [[NSMenu alloc] init];
+    [cheatsMenu setTitle:OELocalizedString(@"Cheats", @"")];
+    [cheatsMenu setDelegate:[OECheatsMenuDelegate sharedDelegate]];
+    item = [[NSMenuItem alloc] init];
+    [item setTitle:[cheatsMenu title]];
+    // The action lets the front game document enable/disable this parent item
+    // through responder-chain validation: it is disabled when no document is
+    // loaded or the current core does not support cheats.
+    [item setAction:@selector(OE_selectCheatsParentMenuItem:)];
+    [emulationMenu insertItem:item atIndex:1];
+    [item setSubmenu:cheatsMenu];
+
+
+
     //View Menu
     
     NSMenuItem *viewMenuItem = [mainMenu itemAtIndex:3];
@@ -366,50 +358,6 @@ NSString *const OEScreenshotPropertiesKey = @"screenshotProperties";
 
     extraMenuItemsSetupDone = true;
 }
-
-
-
-- (void)cheatsMenuItemSetup {
-    //Wowfunhappy. Unlike "extra" menu items, runs for each document.
-    
-    if([self supportsCheats] && [_cheats count] != 0)
-    {
-        NSMenu *mainMenu = [NSApp mainMenu];
-        
-        //Emulation Menu
-        NSMenuItem *emulationMenuItem = [mainMenu itemAtIndex:2];
-        NSMenu *emulationMenu = [emulationMenuItem submenu];
-        
-        NSMenu *cheatsMenu = [[NSMenu alloc] init];
-        [cheatsMenu setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[self document]rom]name]]];
-        NSMenuItem *item = [[NSMenuItem alloc] init];
-        [item setTitle:[NSString stringWithFormat:@"Select %@ Cheat", [[[self document]rom]name]]];
-        [emulationMenu addItem:item];
-        [item setSubmenu:cheatsMenu];
-        
-        /*NSMenuItem *addCheatMenuItem = [[NSMenuItem alloc] initWithTitle:OELocalizedString(@"Add Cheat…", @"")
-         action:@selector(addCheat:)
-         keyEquivalent:@""];
-         [addCheatMenuItem setRepresentedObject:_cheats];
-         [cheatsMenu addItem:addCheatMenuItem];*/
-        
-        /*if([_cheats count] != 0)
-         [cheatsMenu addItem:[NSMenuItem separatorItem]];*/
-        
-        for(NSDictionary *cheatObject in _cheats)
-        {
-            NSString *description = [cheatObject objectForKey:@"description"];
-            BOOL enabled          = [[cheatObject objectForKey:@"enabled"] boolValue];
-            
-            NSMenuItem *cheatsMenuItem = [[NSMenuItem alloc] initWithTitle:description action:@selector(setCheat:) keyEquivalent:@""];
-            [cheatsMenuItem setRepresentedObject:cheatObject];
-            [cheatsMenuItem setState:enabled ? NSOnState : NSOffState];
-            
-            [cheatsMenu addItem:cheatsMenuItem];
-        }
-    }
-}
-
 
 
 

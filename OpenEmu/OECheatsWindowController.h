@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2013, OpenEmu Team
+ Copyright (c) 2026, OpenEmu Team
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -24,19 +24,25 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
-// Persistent per-game store for user-created cheats, keyed by the ROM's md5 hash.
-// Each cheat is a mutable dictionary with the keys: "description" (title),
-// "code", "type" (defaults to "Unknown"), and "enabled" (NSNumber BOOL).
-// Backed by NSUserDefaults so cheats and their on/off state persist across runs.
-@interface OECheats : NSObject
+@class OEGameDocument;
 
-// Returns a mutable array of mutable cheat dictionaries for the given md5.
-// Never returns nil (an empty array is returned when no cheats are stored).
-+ (NSMutableArray *)cheatsForMD5:(NSString *)md5;
+// A shared, editable table window for managing a game's user cheats
+// (Enabled / Title / Code, with add and remove buttons). It is retargeted to
+// whichever document invokes it.
+@interface OECheatsWindowController : NSWindowController
 
-// Persists the given cheats for the md5. Passing an empty array clears them.
-+ (void)setCheats:(NSArray *)cheats forMD5:(NSString *)md5;
++ (instancetype)sharedController;
+- (void)showCheatsForDocument:(OEGameDocument *)document;
+
+@end
+
+// Shared NSMenuDelegate that rebuilds the Emulation ▸ Cheats submenu every time
+// it opens, so it always reflects the frontmost game document. It offers a
+// "Manage Cheats…" item plus (below a separator) one toggle item per cheat.
+@interface OECheatsMenuDelegate : NSObject <NSMenuDelegate>
+
++ (instancetype)sharedDelegate;
 
 @end
